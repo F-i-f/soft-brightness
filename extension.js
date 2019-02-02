@@ -6,7 +6,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const Convenience = Me.imports.convenience;
-const BrightnessSlider = imports.ui.main.panel.statusArea.aggregateMenu._brightness._slider;
+const Brightness = imports.ui.main.panel.statusArea.aggregateMenu._brightness;
+const BrightnessSlider = Brightness._slider;
 
 let debug = null;
 let enabled = null;
@@ -18,10 +19,10 @@ let currentBrightnessSettingChangedConnection = null;
 let useBacklightSettingChangedConnection = null;
 let monitorsSettingChangedConnection = null;
 let monitorsChangedConnection = null;
+let brightnessIndicatorOriginalSync = null;
 let sliderChangedBacklightConnection = null;
 let sliderChangedBacklightCode = null;
 let sliderChangedConnection = null;
-let initTimeoutId = null;
 
 function log(what) {
     global.log('Soft-Brightness: '+what);
@@ -95,19 +96,11 @@ function on_debug_change() {
     log('debug = '+debug);
 }
 
-function clearInitTimeout() {
-    if (initTimeoutId != null) {
-	Mainloop.source_remove(initTimeoutId);
-	initTimeoutId = null;
-    }
-}
-
 function on_brightness_change() {
     let curBrightness = settings.get_double('current-brightness');
     let minBrightness = settings.get_double('min-brightness');
 
     log_debug("on_brightness_change: current-brightness="+curBrightness+", min-brightness="+minBrightness);
-    clearInitTimeout();
     if (curBrightness < minBrightness) {
 	curBrightness = minBrightness;
 	if (! settings.get_boolean('use-backlight')) {
@@ -130,11 +123,19 @@ function on_monitors_change() {
     on_brightness_change();
 }
 
+function replacement_sync() {
+    log_debug('Brightness Indicator _sync()');
+}
+
 function disableBacklightControl() {
     log_debug('disableBacklightControl()');
     if (sliderChangedBacklightConnection != null) {
 	BrightnessSlider.disconnect(sliderChangedBacklightConnection);
 	sliderChangedBacklightConnection = null;
+    }
+    if (brightnessIndicatorOriginalSync == null) {
+	brightnessIndicatorOriginalSync = imports.ui.status.brightness.Indicator.prototype._sync;
+	imports.ui.status.brightness.Indicator.prototype._sync = replacement_sync;
     }
 }
 
@@ -142,6 +143,10 @@ function enableBacklightControl() {
     log_debug('enableBacklightControl()');
     if (sliderChangedBacklightConnection == null) {
 	sliderChangedBacklightConnection = BrightnessSlider.connect('value-changed', sliderChangedBacklightCode);
+    }
+    if (brightnessIndicatorOriginalSync != null) {
+	imports.ui.status.brightness.Indicator.prototype._sync = brightnessIndicatorOriginalSync;
+	brightnessIndicatorOriginalSync = null;
     }
 }
 
@@ -193,13 +198,11 @@ function enable() {
 
 	let curBrightness = settings.get_double('current-brightness');
 	sliderChanged(BrightnessSlider, curBrightness);
-	// This is fugly.
 	BrightnessSlider.setValue(curBrightness);
-	initTimeoutId = Mainloop.timeout_add_seconds(3, function() {
-	    log_debug('Initialing brightness set = '+curBrightness);
-	    BrightnessSlider.setValue(curBrightness);
-	    initTimeoutId = null;
-	});
+
+	// Show the slider, it can be hidden on some systems - this is
+	// not undone at disable() time
+	Brightness._item.actor.visible = true;
 
 	enabled = true;
     }
@@ -210,7 +213,6 @@ function disable() {
 	log_debug('disable() skipped as session-mode = unlock-dialog');
     } else if (enabled) {
 	log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
-	clearInitTimeout();
 	settings.disconnect(debugSettingChangedConnection);
 	Main.layoutManager.disconnect(monitorsChangedConnection);
 	settings.disconnect(minBrightnessSettingChangedConnection);
