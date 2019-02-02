@@ -1,0 +1,12 @@
+{
+  "description": "Use the brightness slider to change the brightness via an alpha layer (and stop using the backlight, if you have one).",
+  "name": "Soft brightness",
+  "shell-version": [
+    "3.30"
+  ], 
+  "gettext-domain": "gnome-shell-extensions",
+  "settings-schema": "org.gnome.shell.extensions.soft-brightness",
+  "url": "", 
+  "uuid": "soft-brightness@fifi.org", 
+  "version": 1
+}
