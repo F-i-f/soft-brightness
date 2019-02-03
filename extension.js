@@ -102,9 +102,33 @@ function showOverlays(opacity) {
     }
 }
 
+function storeBrightnessLevel(value) {
+    if (settings.get_boolean('use-backlight') && Brightness._proxy.Brightness >= 0) {
+	let convertedBrightness = Math.min(100, Math.round(value * 100.0)+1);
+	log_debug('storeBrightnessLevel('+value+') by proxy -> '+convertedBrightness);
+	Brightness._proxy.Brightness = convertedBrightness;
+    } else {
+	log_debug('storeBrightnessLevel('+value+') by setting');
+	settings.set_double('current-brightness', value);
+    }
+}
+
+function getBrightnessLevel() {
+    let brightness = Brightness._proxy.Brightness;
+    if (settings.get_boolean('use-backlight') && brightness != brightness >= 0) {
+	let convertedBrightness = brightness / 100.0;
+	log_debug('getBrightnessLevel() by proxy = '+convertedBrightness+' <- '+brightness);
+	return convertedBrightness;
+    } else {
+	brightness = settings.get_double('current-brightness');
+	log_debug('getBrightnessLevel() by setting = '+brightness);
+	return brightness;
+    }
+}
+
 function sliderChanged(slider, value) {
     log_debug("sliderChanged, value="+value);
-    settings.set_double('current-brightness', value);
+    storeBrightnessLevel(value);
 }
 
 function on_debug_change() {
@@ -113,7 +137,7 @@ function on_debug_change() {
 }
 
 function on_brightness_change() {
-    let curBrightness = settings.get_double('current-brightness');
+    let curBrightness = getBrightnessLevel();
     let minBrightness = settings.get_double('min-brightness');
 
     log_debug("on_brightness_change: current-brightness="+curBrightness+", min-brightness="+minBrightness);
@@ -122,7 +146,7 @@ function on_brightness_change() {
 	if (! settings.get_boolean('use-backlight')) {
 	    BrightnessSlider.setValue(curBrightness);
 	}
-	settings.set_double('current-brightness', minBrightness);
+	storeBrightnessLevel(minBrightness);
 	return;
     }
     if (curBrightness >= 1) {
@@ -135,42 +159,23 @@ function on_brightness_change() {
 }
 
 function on_monitors_change() {
+    log_debug('on_monitors_change()');
     hideOverlays();
     on_brightness_change();
 }
 
 function replacement_sync() {
     log_debug('Brightness Indicator _sync()');
-}
-
-function disableBacklightControl() {
-    log_debug('disableBacklightControl()');
-    if (sliderChangedBacklightConnection != null) {
-	BrightnessSlider.disconnect(sliderChangedBacklightConnection);
-	sliderChangedBacklightConnection = null;
-    }
-    if (brightnessIndicatorOriginalSync == null) {
-	brightnessIndicatorOriginalSync = imports.ui.status.brightness.Indicator.prototype._sync;
-	imports.ui.status.brightness.Indicator.prototype._sync = replacement_sync;
-    }
-}
-
-function enableBacklightControl() {
-    log_debug('enableBacklightControl()');
-    if (sliderChangedBacklightConnection == null) {
-	sliderChangedBacklightConnection = BrightnessSlider.connect('value-changed', sliderChangedBacklightCode);
-    }
-    if (brightnessIndicatorOriginalSync != null) {
-	imports.ui.status.brightness.Indicator.prototype._sync = brightnessIndicatorOriginalSync;
-	brightnessIndicatorOriginalSync = null;
-    }
+    on_brightness_change();
+    BrightnessSlider.setValue(getBrightnessLevel());
 }
 
 function on_use_backlight_change() {
+    log_debug('on_use_backlight_change()');
     if (settings.get_boolean('use-backlight')) {
-	enableBacklightControl();
-    } else {
-	disableBacklightControl();
+	storeBrightnessLevel(settings.get_double('current-brightness'));
+    } else if (Brightness._proxy.Brightness != null && Brightness._proxy.Brightness >= 0) {
+	storeBrightnessLevel(Brightness._proxy.Brightness / 100.0);
     }
 }
 
@@ -202,8 +207,13 @@ function enable() {
 	debugSettingChangedConnection = settings.connect('changed::debug', on_debug_change);
 	debug = settings.get_boolean('debug');
 	log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
-	if (! settings.get_boolean('use-backlight')) {
-	    disableBacklightControl();
+	if (sliderChangedBacklightConnection != null) {
+	    BrightnessSlider.disconnect(sliderChangedBacklightConnection);
+	    sliderChangedBacklightConnection = null;
+	}
+	if (brightnessIndicatorOriginalSync == null) {
+	    brightnessIndicatorOriginalSync = imports.ui.status.brightness.Indicator.prototype._sync;
+	    imports.ui.status.brightness.Indicator.prototype._sync = imports.ui.status.brightness.Indicator.wrapFunction('_sync', replacement_sync);
 	}
 	sliderChangedConnection = BrightnessSlider.connect('value-changed', sliderChanged);
 	monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', on_monitors_change);
@@ -212,9 +222,12 @@ function enable() {
 	monitorsSettingChangedConnection = settings.connect('changed::monitors', on_monitors_change);
 	useBacklightSettingChangedConnection = settings.connect('changed::use-backlight', on_use_backlight_change);
 
-	let curBrightness = settings.get_double('current-brightness');
-	sliderChanged(BrightnessSlider, curBrightness);
-	BrightnessSlider.setValue(curBrightness);
+	// If we use the backlight and the Brightness proxy is null, it's still connecting and we'll get a _sync later.
+	if (! settings.get_boolean('use-backlight') || Brightness._proxy.Brightness != null) {
+	    let curBrightness = getBrightnessLevel();
+	    sliderChanged(BrightnessSlider, curBrightness);
+	    BrightnessSlider.setValue(curBrightness);
+	}
 
 	// Show the slider, it can be hidden on some systems - this is
 	// not undone at disable() time
@@ -235,7 +248,13 @@ function disable() {
 	settings.disconnect(currentBrightnessSettingChangedConnection);
 	settings.disconnect(monitorsSettingChangedConnection);
 	BrightnessSlider.disconnect(sliderChangedConnection);
-	enableBacklightControl();
+	if (sliderChangedBacklightConnection == null) {
+	    sliderChangedBacklightConnection = BrightnessSlider.connect('value-changed', sliderChangedBacklightCode);
+	}
+	if (brightnessIndicatorOriginalSync != null) {
+	    imports.ui.status.brightness.Indicator.prototype._sync = brightnessIndicatorOriginalSync;
+	    brightnessIndicatorOriginalSync = null;
+	}
 	hideOverlays();
 	settings.run_dispose();
 	enabled = false;
