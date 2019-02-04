@@ -104,8 +104,8 @@ let ModifiedIndicator = new Lang.Class({
 	}));
 
 	this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
-	this._minBrightnessSettingChangedConnection = settings.connect('changed::min-brightness', this._on_brightness_change.bind(this));
-	this._currentBrightnessSettingChangedConnection = settings.connect('changed::current-brightness', this._on_brightness_change.bind(this));
+	this._minBrightnessSettingChangedConnection = settings.connect('changed::min-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
+	this._currentBrightnessSettingChangedConnection = settings.connect('changed::current-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
 	this._monitorsSettingChangedConnection = settings.connect('changed::monitors', this._on_monitors_change.bind(this));
 	this._builtinMonitorSettingChangedConnection = settings.connect('changed::builtin-monitor', this._on_monitors_change.bind(this));
 	this._useBacklightSettingChangedConnection = settings.connect('changed::use-backlight', this._on_use_backlight_change.bind(this));
@@ -140,7 +140,7 @@ let ModifiedIndicator = new Lang.Class({
 
     _sync() {
 	log_debug("_sync()");
-	this._on_brightness_change();
+	this._on_brightness_change(false);
 	this._slider.setValue(this._getBrightnessLevel());
     },
 
@@ -154,9 +154,9 @@ let ModifiedIndicator = new Lang.Class({
 	}
     },
 
-    _showOverlays(opacity) {
-	log_debug('_showOverlays('+opacity+')');
-	if (this._overlays == null) {
+    _showOverlays(opacity, force) {
+	log_debug('_showOverlays('+opacity+', '+force+')');
+	if (this._overlays == null || force) {
 	    let enabledMonitors = settings.get_string('monitors');
 	    let monitors;
 	    log_debug('_showOverlays(): enabledMonitors='+enabledMonitors);
@@ -187,6 +187,9 @@ let ModifiedIndicator = new Lang.Class({
 		    log("_showOverlays(): Unhandled \"monitors\" setting = "+enabledMonitors);
 		    return;
 		}
+	    }
+	    if (force) {
+		this._hideOverlays();
 	    }
 	    this._overlays = [];
 	    for (let i=0; i < monitors.length; ++i) {
@@ -235,7 +238,7 @@ let ModifiedIndicator = new Lang.Class({
 	}
     },
 
-    _on_brightness_change() {
+    _on_brightness_change(force) {
 	let curBrightness = this._getBrightnessLevel();
 	let minBrightness = settings.get_double('min-brightness');
 
@@ -253,7 +256,7 @@ let ModifiedIndicator = new Lang.Class({
 	} else {
 	    let opacity = (1-curBrightness)*255;
 	    log_debug("_on_brightness_change: opacity="+opacity);
-	    this._showOverlays(opacity);
+	    this._showOverlays(opacity, force);
 	}
     },
 
@@ -278,8 +281,7 @@ let ModifiedIndicator = new Lang.Class({
 		}
 	    }
 	    this._monitorNames = monitorNames;
-	    this._hideOverlays();
-	    this._on_brightness_change();
+	    this._on_brightness_change(true);
 	}));
     },
 
