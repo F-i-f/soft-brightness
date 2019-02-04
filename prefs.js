@@ -56,13 +56,10 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 
 	this.monitors_label = new Gtk.Label({label: _("Monitor(s):"), halign: Gtk.Align.START});
 	this.monitors_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
-	this.monitors_control.append_text(_("All"));
-	this.monitors_control.append_text(_("Built-in"));
-	this.monitors_control.append_text(_("External"));
-	this.monitors_control.set_active(this._settings.get_enum('monitors'));
-	this.monitors_control.connect('changed', Lang.bind(this, function() {
-	    this._settings.set_enum('monitors', this.monitors_control.get_active());
-	}));
+	this.monitors_control.append("All", _("All"));
+	this.monitors_control.append("Built-in", _("Built-in"));
+	this.monitors_control.append("External", _("External"));
+	this._settings.bind('monitors', this.monitors_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
 	this.attach(this.monitors_label, 1, ypos, 1, 1);
 	this.attach(this.monitors_control, 2, ypos, 1, 1);
 
@@ -72,8 +69,7 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 	this.builtin_monitor_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
 	let builtin_monitor_name = this._settings.get_string('builtin-monitor');
 	if (builtin_monitor_name != "") {
-	    this.builtin_monitor_control.append_text(builtin_monitor_name);
-	    this.builtin_monitor_control.set_active(builtin_monitor_name);
+	    this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
 	}
 	let displayConfig = Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
 	    if (error) {
@@ -88,14 +84,12 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 		for (let i=0; i < result.length; ++i) {
 		    let display_name = result[i][0];
 		    if (display_name != builtin_monitor_name) {
-			this.builtin_monitor_control.append_text(display_name);
+			this.builtin_monitor_control.append(display_name, display_name);
 		    }
 		}
 	    }));
 	}));
-	this.builtin_monitor_control.connect('changed', Lang.bind(this, function() {
-	    this._settings.set_enum('builtin-monitor', this.builtin_monitor_control.get_active());
-	}));
+	this._settings.bind('builtin-monitor', this.builtin_monitor_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
 	this.attach(this.builtin_monitor_label, 1, ypos, 1, 1);
 	this.attach(this.builtin_monitor_control, 2, ypos, 1, 1);
 
