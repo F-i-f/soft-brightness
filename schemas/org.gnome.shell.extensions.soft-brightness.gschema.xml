@@ -15,6 +15,11 @@
       <summary>Monitors</summary>
       <description>The monitors whose brigthness should be adjusted.</description>
     </key>
+    <key name="builtin-monitor" type="s">
+      <default>""</default>
+      <summary>Builtin monitor</summary>
+      <description>The name of the built-in monitor.</description>
+    </key>
     <key name="min-brightness" type="d">
       <range min="0" max="1"/>
       <default>0.1</default>

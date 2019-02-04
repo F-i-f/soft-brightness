@@ -16,12 +16,14 @@
 
 const Lang = imports.lang;
 const St = imports.gi.St;
+const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const Convenience = Me.imports.convenience;
+const Utils = Me.imports.utils;
 const Indicator = imports.ui.status.brightness.Indicator;
 const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 
@@ -48,12 +50,16 @@ let ModifiedIndicator = new Lang.Class({
     _init() {
 	this.parent();
 
+	this._monitorManager = null;
+	this._displayConfigProxy = null;
+	this._monitorNames = null;
 	this._overlays = null;
 
 	this._monitorsChangedConnection = null;
 	this._minBrightnessSettingChangedConnection = null;
 	this._currentBrightnessSettingChangedConnection = null;
 	this._monitorsSettingChangedConnection = null;
+	this._builtinMonitorSettingChangedConnection = null;
 	this._useBacklightSettingChangedConnection = null;
     },
 
@@ -86,10 +92,22 @@ let ModifiedIndicator = new Lang.Class({
 	    return;
 	}
 
+	this._monitorManager = Meta.MonitorManager.get();
+	Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
+	    if (error) {
+		log("newDisplayConfig() callback: Cannot get Display Config: " + error);
+		return;
+	    }
+	    log_debug('newDisplayConfig() callback');
+	    this._displayConfigProxy = proxy;
+	    this._on_monitors_change();
+	}));
+
 	this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
 	this._minBrightnessSettingChangedConnection = settings.connect('changed::min-brightness', this._on_brightness_change.bind(this));
 	this._currentBrightnessSettingChangedConnection = settings.connect('changed::current-brightness', this._on_brightness_change.bind(this));
 	this._monitorsSettingChangedConnection = settings.connect('changed::monitors', this._on_monitors_change.bind(this));
+	this._builtinMonitorSettingChangedConnection = settings.connect('changed::builtin-monitor', this._on_monitors_change.bind(this));
 	this._useBacklightSettingChangedConnection = settings.connect('changed::use-backlight', this._on_use_backlight_change.bind(this));
 
 	// If we use the backlight and the Brightness proxy is null, it's still connecting and we'll get a _sync later.
@@ -110,6 +128,7 @@ let ModifiedIndicator = new Lang.Class({
 	settings.disconnect(this._minBrightnessSettingChangedConnection);
 	settings.disconnect(this._currentBrightnessSettingChangedConnection);
 	settings.disconnect(this._monitorsSettingChangedConnection);
+	settings.disconnect(this._builtinMonitorSettingChangedConnection);
 	settings.disconnect(this._useBacklightSettingChangedConnection);
 	this._hideOverlays();
     },
@@ -136,24 +155,38 @@ let ModifiedIndicator = new Lang.Class({
     },
 
     _showOverlays(opacity) {
+	log_debug('_showOverlays('+opacity+')');
 	if (this._overlays == null) {
-	    let monitorConfig = settings.get_string('monitors');
+	    let enabledMonitors = settings.get_string('monitors');
 	    let monitors;
-	    log_debug('_showOverlays(): monitorConfig='+monitorConfig);
-	    if (monitorConfig == "All") {
+	    log_debug('_showOverlays(): enabledMonitors='+enabledMonitors);
+	    if (enabledMonitors == "All") {
 		monitors = Main.layoutManager.monitors;
-	    } else if (monitorConfig == "Built-in") {
-		monitors = [Main.layoutManager.primaryMonitor];
-	    } else if (monitorConfig == "External") {
-		monitors = [];
-		for (let i=0; i < Main.layoutManager.monitors.length; ++i) {
-		    if (Main.layoutManager.monitors[i] != Main.layoutManager.primaryMonitor) {
-			monitors.push(Main.layoutManager.monitors[i]);
-		    }
-		}
 	    } else {
-		log("_showOverlays(): Unhandled \"monitors\" setting = "+monitorConfig);
-		return;
+		if (this._monitorNames == null) {
+		    log_debug("_showOverlays(): skipping run as _monitorNames hasn't been set yet.");
+		    return;
+		}
+		let builtinMonitorName = settings.get_string('builtin-monitor');
+		if (builtinMonitorName == "" || builtinMonitorName == null) {
+		    builtinMonitorName = this._monitorNames[Main.layoutManager.primaryIndex];
+		    log_debug('_showOverlays(): no builtin monitor, setting to "'+builtinMonitorName+'" and skipping run');
+		    settings.set_string('builtin-monitor', builtinMonitorName);
+		    return;
+		}
+		if (enabledMonitors == "Built-in") {
+		    monitors = [Main.layoutManager.primaryMonitor];
+		} else if (enabledMonitors == "External") {
+		    monitors = [];
+		    for (let i=0; i < Main.layoutManager.monitors.length; ++i) {
+			if (Main.layoutManager.monitors[i] != Main.layoutManager.primaryMonitor) {
+			    monitors.push(Main.layoutManager.monitors[i]);
+			}
+		    }
+		} else {
+		    log("_showOverlays(): Unhandled \"monitors\" setting = "+enabledMonitors);
+		    return;
+		}
 	    }
 	    this._overlays = [];
 	    for (let i=0; i < monitors.length; ++i) {
@@ -225,9 +258,29 @@ let ModifiedIndicator = new Lang.Class({
     },
 
     _on_monitors_change() {
-	log_debug('_on_monitors_change()');
-	this._hideOverlays();
-	this._on_brightness_change();
+	if (this._displayConfigProxy == null) {
+	    log_debug("_on_monitors_change(): skipping run as the proxy hasn't been set up yet.");
+	    return;
+	}
+	log_debug("_on_monitors_change()");
+	Utils.getMonitorConfig(this._displayConfigProxy, Lang.bind(this, function(result, error) {
+	    if (error) {
+		log("_on_monitors_change(): cannot get Monitor Config: "+error);
+		return;
+	    }
+	    let monitorNames = [];
+	    for (let i=0; i < result.length; ++i) {
+		let [monitorName, connectorName] = result[i];
+		let monitorIndex = this._monitorManager.get_monitor_for_connector(connectorName);
+		log_debug('_on_monitors_change(): monitor="'+monitorName+'", connector="'+connectorName+'", index='+monitorIndex);
+		if (monitorIndex >= 0) {
+		    monitorNames[monitorIndex] = monitorName;
+		}
+	    }
+	    this._monitorNames = monitorNames;
+	    this._hideOverlays();
+	    this._on_brightness_change();
+	}));
     },
 
     _on_use_backlight_change() {
