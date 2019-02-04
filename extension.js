@@ -159,34 +159,32 @@ let ModifiedIndicator = new Lang.Class({
 	if (this._overlays == null || force) {
 	    let enabledMonitors = settings.get_string('monitors');
 	    let monitors;
-	    log_debug('_showOverlays(): enabledMonitors='+enabledMonitors);
+	    log_debug('_showOverlays(): enabledMonitors="'+enabledMonitors+'"');
 	    if (enabledMonitors == "All") {
 		monitors = Main.layoutManager.monitors;
-	    } else {
+	    } else if (enabledMonitors == "Built-in" || enabledMonitors == "External") {
 		if (this._monitorNames == null) {
 		    log_debug("_showOverlays(): skipping run as _monitorNames hasn't been set yet.");
 		    return;
 		}
 		let builtinMonitorName = settings.get_string('builtin-monitor');
+		log_debug('_showOverlays(): builtinMonitorName="'+builtinMonitorName+'"');
 		if (builtinMonitorName == "" || builtinMonitorName == null) {
 		    builtinMonitorName = this._monitorNames[Main.layoutManager.primaryIndex];
 		    log_debug('_showOverlays(): no builtin monitor, setting to "'+builtinMonitorName+'" and skipping run');
 		    settings.set_string('builtin-monitor', builtinMonitorName);
 		    return;
 		}
-		if (enabledMonitors == "Built-in") {
-		    monitors = [Main.layoutManager.primaryMonitor];
-		} else if (enabledMonitors == "External") {
-		    monitors = [];
-		    for (let i=0; i < Main.layoutManager.monitors.length; ++i) {
-			if (Main.layoutManager.monitors[i] != Main.layoutManager.primaryMonitor) {
-			    monitors.push(Main.layoutManager.monitors[i]);
-			}
+		monitors = [];
+		for (let i=0; i < Main.layoutManager.monitors.length; ++i) {
+		    if (    (enabledMonitors == "Built-in" && this._monitorNames[i] == builtinMonitorName )
+			 || (enabledMonitors == "External" && this._monitorNames[i] != builtinMonitorName ) ) {
+			monitors.push(Main.layoutManager.monitors[i]);
 		    }
-		} else {
-		    log("_showOverlays(): Unhandled \"monitors\" setting = "+enabledMonitors);
-		    return;
 		}
+	    } else {
+		log("_showOverlays(): Unhandled \"monitors\" setting = "+enabledMonitors);
+		return;
 	    }
 	    if (force) {
 		this._hideOverlays();
