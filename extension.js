@@ -160,9 +160,9 @@ let ModifiedIndicator = new Lang.Class({
 	    let enabledMonitors = settings.get_string('monitors');
 	    let monitors;
 	    log_debug('_showOverlays(): enabledMonitors="'+enabledMonitors+'"');
-	    if (enabledMonitors == "All") {
+	    if (enabledMonitors == "all") {
 		monitors = Main.layoutManager.monitors;
-	    } else if (enabledMonitors == "Built-in" || enabledMonitors == "External") {
+	    } else if (enabledMonitors == "built-in" || enabledMonitors == "external") {
 		if (this._monitorNames == null) {
 		    log_debug("_showOverlays(): skipping run as _monitorNames hasn't been set yet.");
 		    return;
@@ -177,8 +177,8 @@ let ModifiedIndicator = new Lang.Class({
 		}
 		monitors = [];
 		for (let i=0; i < Main.layoutManager.monitors.length; ++i) {
-		    if (    (enabledMonitors == "Built-in" && this._monitorNames[i] == builtinMonitorName )
-			 || (enabledMonitors == "External" && this._monitorNames[i] != builtinMonitorName ) ) {
+		    if (    (enabledMonitors == "built-in" && this._monitorNames[i] == builtinMonitorName )
+			 || (enabledMonitors == "external" && this._monitorNames[i] != builtinMonitorName ) ) {
 			monitors.push(Main.layoutManager.monitors[i]);
 		    }
 		}

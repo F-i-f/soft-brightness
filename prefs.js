@@ -56,9 +56,9 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 
 	this.monitors_label = new Gtk.Label({label: _("Monitor(s):"), halign: Gtk.Align.START});
 	this.monitors_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
-	this.monitors_control.append("All", _("All"));
-	this.monitors_control.append("Built-in", _("Built-in"));
-	this.monitors_control.append("External", _("External"));
+	this.monitors_control.append("all", _("All"));
+	this.monitors_control.append("built-in", _("Built-in"));
+	this.monitors_control.append("external", _("External"));
 	this._settings.bind('monitors', this.monitors_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
 	this.attach(this.monitors_label,   1, ypos, 1, 1);
 	this.attach(this.monitors_control, 2, ypos, 1, 1);

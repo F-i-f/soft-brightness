@@ -1,8 +1,8 @@
 <schemalist gettext-domain="gnome-shell-extensions">
   <enum id="org.gnome.shell.extensions.soft-brightness.monitors">
-    <value value="0" nick="All"/>
-    <value value="1" nick="Built-in"/>
-    <value value="2" nick="External"/>
+    <value value="0" nick="all"/>
+    <value value="1" nick="built-in"/>
+    <value value="2" nick="external"/>
   </enum>
   <schema id="org.gnome.shell.extensions.soft-brightness" path="/org/gnome/shell/extensions/soft-brightness/">
     <key name="use-backlight" type="b">
@@ -11,7 +11,7 @@
       <description>Use the regular backlight control.</description>
     </key>
     <key name="monitors" enum="org.gnome.shell.extensions.soft-brightness.monitors">
-      <default>"All"</default>
+      <default>"all"</default>
       <summary>Monitors</summary>
       <description>The monitors whose brigthness should be adjusted.</description>
     </key>
