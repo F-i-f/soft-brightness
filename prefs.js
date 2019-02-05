@@ -144,7 +144,7 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 		}
 		this.builtin_monitor_control.append(display_name, display_name);
 	    }
-	    if (! builtin_found) {
+	    if (! builtin_found && builtin_monitor_name != "") {
 		this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
 	    }
 	    this._bindBuiltinMonitorControl();
