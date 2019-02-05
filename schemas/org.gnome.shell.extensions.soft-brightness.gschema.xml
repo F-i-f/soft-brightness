@@ -26,7 +26,7 @@
       <description>The name of the built-in monitor.</description>
     </key>
     <key name="prevent-unredirect" enum="org.gnome.shell.extensions.soft-brightness.prevent-unredirect">
-      <default>"never"</default>
+      <default>"when-correcting"</default>
       <summary>Prevent window unredirecting behavior</summary>
       <description>If set to never, unredirection is never prevent. If
       set to when-correcting, unredirection will be prevent when the
