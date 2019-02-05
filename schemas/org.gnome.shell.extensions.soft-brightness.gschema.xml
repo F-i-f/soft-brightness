@@ -4,6 +4,11 @@
     <value value="1" nick="built-in"/>
     <value value="2" nick="external"/>
   </enum>
+  <enum id="org.gnome.shell.extensions.soft-brightness.prevent-unredirect">
+    <value value="0" nick="never"/>
+    <value value="1" nick="when-correcting"/>
+    <value value="2" nick="always"/>
+  </enum>
   <schema id="org.gnome.shell.extensions.soft-brightness" path="/org/gnome/shell/extensions/soft-brightness/">
     <key name="use-backlight" type="b">
       <default>false</default>
@@ -19,6 +24,16 @@
       <default>""</default>
       <summary>Builtin monitor</summary>
       <description>The name of the built-in monitor.</description>
+    </key>
+    <key name="prevent-unredirect" enum="org.gnome.shell.extensions.soft-brightness.prevent-unredirect">
+      <default>"never"</default>
+      <summary>Prevent window unredirecting behavior</summary>
+      <description>If set to never, unredirection is never prevent. If
+      set to when-correcting, unredirection will be prevent when the
+      brightness is not at the maximum setting (and an alpha layer is
+      lowering the brightness).  If set to always, window
+      unredirection will always be prevented when this extension is
+      active, allowing tear-free display.</description>
     </key>
     <key name="min-brightness" type="d">
       <range min="0" max="1"/>

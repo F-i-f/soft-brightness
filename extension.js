@@ -50,6 +50,7 @@ let ModifiedIndicator = new Lang.Class({
     _init() {
 	this.parent();
 
+	this._unredirectPrevented = false;
 	this._monitorManager = null;
 	this._displayConfigProxy = null;
 	this._monitorNames = null;
@@ -61,6 +62,7 @@ let ModifiedIndicator = new Lang.Class({
 	this._monitorsSettingChangedConnection = null;
 	this._builtinMonitorSettingChangedConnection = null;
 	this._useBacklightSettingChangedConnection = null;
+	this._preventUnredirectChangedConnection = null;
     },
 
     _swapMenu(oldIndicator, newIndicator) {
@@ -109,6 +111,7 @@ let ModifiedIndicator = new Lang.Class({
 	this._monitorsSettingChangedConnection = settings.connect('changed::monitors', this._on_monitors_change.bind(this));
 	this._builtinMonitorSettingChangedConnection = settings.connect('changed::builtin-monitor', this._on_monitors_change.bind(this));
 	this._useBacklightSettingChangedConnection = settings.connect('changed::use-backlight', this._on_use_backlight_change.bind(this));
+	this._preventUnredirectChangedConnection = settings.connect('changed::prevent-unredirect', Lang.bind(this, function() { this._on_brightness_change(true); }));
 
 	// If we use the backlight and the Brightness proxy is null, it's still connecting and we'll get a _sync later.
 	if (! settings.get_boolean('use-backlight') || this._proxy.Brightness != null) {
@@ -130,7 +133,8 @@ let ModifiedIndicator = new Lang.Class({
 	settings.disconnect(this._monitorsSettingChangedConnection);
 	settings.disconnect(this._builtinMonitorSettingChangedConnection);
 	settings.disconnect(this._useBacklightSettingChangedConnection);
-	this._hideOverlays();
+	settings.disconnect(this._preventUnredirectChangedConnection);
+	this._hideOverlays(true);
     },
 
     _sliderChanged(slider, value) {
@@ -144,13 +148,45 @@ let ModifiedIndicator = new Lang.Class({
 	this._slider.setValue(this._getBrightnessLevel());
     },
 
-    _hideOverlays() {
+    _preventUnredirect() {
+	if (! this._unredirectPrevented) {
+	    log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect='+settings.get_string('prevent-unredirect'));
+	    Meta.disable_unredirect_for_display(global.display);
+	    this._unredirectPrevented = true;
+	}
+    },
+
+    _allowUnredirect() {
+	if (this._unredirectPrevented) {
+	    log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect='+settings.get_string('prevent-unredirect'));
+	    Meta.enable_unredirect_for_display(global.display);
+	    this._unredirectPrevented = false;
+	}
+    },
+
+    _hideOverlays(forceUnpreventUnredirect) {
 	if (this._overlays != null) {
-	    log_debug("drop overlays, count="+this._overlays.length);
+	    log_debug("_hideOverlays(): drop overlays, count="+this._overlays.length);
 	    for (let i=0; i < this._overlays.length; ++i) {
 		Main.uiGroup.remove_actor(this._overlays[i]);
 	    }
 	    this._overlays = null;
+	}
+	let preventUnredirect = settings.get_string('prevent-unredirect');
+	if (forceUnpreventUnredirect) {
+	    preventUnredirect = 'never';
+	}
+	switch(preventUnredirect) {
+	case "always":
+	    this._preventUnredirect();
+	    break;
+	case "when-correcting":
+	case "never":
+	    this._allowUnredirect();
+	    break;
+	default:
+	    log('_hideOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
+	    break;
 	}
     },
 
@@ -187,8 +223,22 @@ let ModifiedIndicator = new Lang.Class({
 		return;
 	    }
 	    if (force) {
-		this._hideOverlays();
+		this._hideOverlays(false);
 	    }
+	    let preventUnredirect = settings.get_string('prevent-unredirect');
+	    switch(preventUnredirect) {
+	    case "always":
+	    case "when-correcting":
+		this._preventUnredirect();
+		break;
+	    case "never":
+		this._allowUnredirect();
+		break;
+	    default:
+		log('_showOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
+		break;
+	    }
+
 	    this._overlays = [];
 	    for (let i=0; i < monitors.length; ++i) {
 		let monitor = monitors[i];
@@ -250,7 +300,7 @@ let ModifiedIndicator = new Lang.Class({
 	    return;
 	}
 	if (curBrightness >= 1) {
-	    this._hideOverlays();
+	    this._hideOverlays(false);
 	} else {
 	    let opacity = (1-curBrightness)*255;
 	    log_debug("_on_brightness_change: opacity="+opacity);
