@@ -8,5 +8,5 @@
   "settings-schema": "org.gnome.shell.extensions.soft-brightness",
   "url": "", 
   "uuid": "soft-brightness@fifi.org", 
-  "version": 2
+  "version": 3
 }
