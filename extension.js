@@ -27,6 +27,7 @@ const Utils = Me.imports.utils;
 const Indicator = imports.ui.status.brightness.Indicator;
 const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 
+let first_log = true;
 let debug = null;
 let enabled = null;
 let settings = null;
@@ -34,6 +35,10 @@ let debugSettingChangedConnection = null;
 let modifiedIndicator = null;
 
 function log(what) {
+    if (first_log) {
+	first_log = false;
+	log('version '+Me.metadata['version']);
+    }
     global.log('Soft-Brightness: '+what);
 }
 
