@@ -48,7 +48,7 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 
 	this.enabled_label = new Gtk.Label({label: _("Use backlight control:"), halign: Gtk.Align.START});
 	this.enabled_control = new Gtk.Switch();
-	this.attach(this.enabled_label, 1, ypos, 1, 1);
+	this.attach(this.enabled_label,   1, ypos, 1, 1);
 	this.attach(this.enabled_control, 2, ypos, 1, 1);
 	this._settings.bind('use-backlight', this.enabled_control, 'active', Gio.SettingsBindFlags.DEFAULT);
 
@@ -60,7 +60,7 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 	this.monitors_control.append("Built-in", _("Built-in"));
 	this.monitors_control.append("External", _("External"));
 	this._settings.bind('monitors', this.monitors_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
-	this.attach(this.monitors_label, 1, ypos, 1, 1);
+	this.attach(this.monitors_label,   1, ypos, 1, 1);
 	this.attach(this.monitors_control, 2, ypos, 1, 1);
 
 	ypos += 1;
@@ -71,26 +71,16 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 	if (builtin_monitor_name != "") {
 	    this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
 	}
-	let displayConfig = Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
+	this.displayConfigProxy = Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
 	    if (error) {
 		log("Cannot get DisplayConfig: "+error);
 		return;
 	    }
-	    Utils.getMonitorConfig(proxy, Lang.bind(this, function(result, error) {
-		if (error) {
-		    log("Cannot get DisplayConfig: "+error);
-		    return;
-		}
-		for (let i=0; i < result.length; ++i) {
-		    let display_name = result[i][0];
-		    if (display_name != builtin_monitor_name) {
-			this.builtin_monitor_control.append(display_name, display_name);
-		    }
-		}
-	    }));
+	    this.displayConfigProxy.connectSignal('MonitorsChanged', this._refreshMonitors.bind(this));
+	    this._refreshMonitors();
 	}));
-	this._settings.bind('builtin-monitor', this.builtin_monitor_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
-	this.attach(this.builtin_monitor_label, 1, ypos, 1, 1);
+	this._bindBuiltinMonitorControl();
+	this.attach(this.builtin_monitor_label,   1, ypos, 1, 1);
 	this.attach(this.builtin_monitor_control, 2, ypos, 1, 1);
 
 	ypos += 1;
@@ -104,7 +94,7 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 		step_increment: 0.01
 	    })
 	});
-	this.attach(this.min_brightness_label, 1, ypos, 1, 1);
+	this.attach(this.min_brightness_label,   1, ypos, 1, 1);
 	this.attach(this.min_brightness_control, 2, ypos, 1, 1);
 	this._settings.bind('min-brightness', this.min_brightness_control, 'value', Gio.SettingsBindFlags.DEFAULT);
 
@@ -112,10 +102,42 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 
 	this.debug_label = new Gtk.Label({label: _("Debug:"), halign: Gtk.Align.START});
 	this.debug_control = new Gtk.Switch();
-	this.attach(this.debug_label, 1, ypos, 1, 1);
+	this.attach(this.debug_label,   1, ypos, 1, 1);
 	this.attach(this.debug_control, 2, ypos, 1, 1);
 	this._settings.bind('debug', this.debug_control, 'active', Gio.SettingsBindFlags.DEFAULT);
-}
+    }
+
+    _bindBuiltinMonitorControl() {
+	this._settings.bind('builtin-monitor', this.builtin_monitor_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
+    }
+
+    _unbindBuiltinMonitorControl() {
+	Gio.Settings.unbind(this.builtin_monitor_control, 'active-id');
+    }
+
+    _refreshMonitors() {
+	Utils.getMonitorConfig(this.displayConfigProxy, Lang.bind(this, function(result, error) {
+	    if (error) {
+		log("Cannot get DisplayConfig: "+error);
+		return;
+	    }
+	    let builtin_monitor_name = this._settings.get_string('builtin-monitor');
+	    this._unbindBuiltinMonitorControl();
+	    this.builtin_monitor_control.remove_all();
+	    let builtin_found = false;
+	    for (let i=0; i < result.length; ++i) {
+		let display_name = result[i][0];
+		if (display_name == builtin_monitor_name) {
+		    builtin_found = true;
+		}
+		this.builtin_monitor_control.append(display_name, display_name);
+	    }
+	    if (! builtin_found) {
+		this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
+	    }
+	    this._bindBuiltinMonitorControl();
+	}));
+    }
 });
 
 function buildPrefsWidget() {
