@@ -108,8 +108,8 @@ let ModifiedIndicator = new Lang.Class({
 	this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
 	this._minBrightnessSettingChangedConnection = settings.connect('changed::min-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
 	this._currentBrightnessSettingChangedConnection = settings.connect('changed::current-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
-	this._monitorsSettingChangedConnection = settings.connect('changed::monitors', this._on_monitors_change.bind(this));
-	this._builtinMonitorSettingChangedConnection = settings.connect('changed::builtin-monitor', this._on_monitors_change.bind(this));
+	this._monitorsSettingChangedConnection = settings.connect('changed::monitors', Lang.bind(this, function() { this._on_brightness_change(true); }));
+	this._builtinMonitorSettingChangedConnection = settings.connect('changed::builtin-monitor', Lang.bind(this, function() { this._on_brightness_change(true); }));
 	this._useBacklightSettingChangedConnection = settings.connect('changed::use-backlight', this._on_use_backlight_change.bind(this));
 	this._preventUnredirectChangedConnection = settings.connect('changed::prevent-unredirect', Lang.bind(this, function() { this._on_brightness_change(true); }));
 
