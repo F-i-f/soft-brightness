@@ -6,7 +6,7 @@
     ],
     "gettext-domain": "soft-brightness",
     "settings-schema": "org.gnome.shell.extensions.soft-brightness",
-    "url": "",
+    "url": "https://github.com/F-i-f/soft-brightness",
     "uuid": "soft-brightness@fifi.org",
     "version": 3,
     "vcs_revision": "@VCS_TAG@"
