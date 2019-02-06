@@ -29,7 +29,7 @@ extension_uuid		       = meson.project_name() + extension_uuid_suffix
 extension_target_dir	       = home + '/.local/share/gnome-shell/extensions/' + extension_uuid
 extension_target_dir_schemas   = join_paths(extension_target_dir, 'schemas')
 extension_target_locale_dir    = join_paths(extension_target_dir, 'locale')
-extension_target_dir_dbus_intf = extension_target_dir
+extension_target_dir_dbus_intf = join_paths(extension_target_dir, 'dbus-interfaces')
 
 meson_extra_scripts            = 'meson-scripts'
 

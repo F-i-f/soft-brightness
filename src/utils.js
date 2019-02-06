@@ -25,7 +25,7 @@ let cachedDisplayConfigProxy = null;
 function getDisplayConfigProxy() {
     if (cachedDisplayConfigProxy == null) {
 	let xml = null;
-	let file = Gio.File.new_for_path(Me.path + '/org.gnome.Mutter.DisplayConfig.xml');
+	let file = Gio.File.new_for_path(Me.path + '/dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml');
 	try {
 	    let [ok, bytes] = file.load_contents(null);
 	    if (ok) {
