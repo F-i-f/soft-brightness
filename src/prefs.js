@@ -87,9 +87,9 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 
 	this.prevent_unredirect_label = new Gtk.Label({label: _("Full-screen behavior:"), halign: Gtk.Align.START});
 	this.prevent_unredirect_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
-	this.prevent_unredirect_control.append("never",           _("Do not enfore brightness in full-screen"));
+	this.prevent_unredirect_control.append("never",           _("Do not enforce brightness in full-screen"));
 	this.prevent_unredirect_control.append("when-correcting", _("Brightness enforced in full-screen"));
-	this.prevent_unredirect_control.append("always",          _("Brightness enforecd in full-screen, always tear-free"));
+	this.prevent_unredirect_control.append("always",          _("Brightness enforced in full-screen, always tear-free"));
 	this._settings.bind('prevent-unredirect', this.prevent_unredirect_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
 	this.attach(this.prevent_unredirect_label,   1, ypos, 1, 1);
 	this.attach(this.prevent_unredirect_control, 2, ypos, 1, 1);
