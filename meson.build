@@ -33,10 +33,7 @@ extension_target_dir_dbus_intf = extension_target_dir
 
 meson_extra_scripts            = 'meson-scripts'
 
-extension_metadata = vcs_tag(command:  ['git', 'rev-parse', 'HEAD'],
-			     input:    files('src/metadata.json.in'),
-			     output:   'metadata.json',
-			     fallback: 'unknown')
+subdir('src')
 
 custom_target('gschemas.compiled',
 	      build_by_default: true,
@@ -48,7 +45,7 @@ custom_target('gschemas.compiled',
 install_data(extension_schemas,
 	     install_dir: extension_target_dir_schemas)
 
-install_data(extension_sources + [extension_metadata.full_path()] + extension_data + extension_libs,
+install_data(extension_sources + extension_data + extension_libs,
 	     install_dir: extension_target_dir)
 
 install_data(extension_dbus_interfaces,
