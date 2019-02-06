@@ -18,7 +18,7 @@ extension_data		  = files('src/metadata.json', 'src/stylesheet.css')
 extension_schemas	  = files('schemas/org.gnome.shell.extensions.'+ meson.project_name() + '.gschema.xml')
 extension_dbus_interfaces = files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml')
 
-# Boiler plates
+# Boilerplate
 run_home = run_command('sh', '-c', 'echo $HOME')
 if run_home.returncode() != 0
   error('HOME not found, exit=@0@'.format(run_home.returncode()))
@@ -32,11 +32,11 @@ extension_target_dir_dbus_intf = extension_target_dir
 
 custom_target('gschemas.compiled',
 	      build_by_default: true,
-	      command: ['sh', '-c', 'glib-compile-schemas --targetdir . $(dirname @INPUT0@)'],
-	      input: extension_schemas,
-	      output: 'gschemas.compiled',
-	      install: true,
-	      install_dir: extension_target_dir_schemas)
+	      command:          ['sh', '-c', 'glib-compile-schemas --targetdir . $(dirname @INPUT0@)'],
+	      input:            extension_schemas,
+	      output:           'gschemas.compiled',
+	      install:          true,
+	      install_dir:      extension_target_dir_schemas)
 install_data(extension_schemas,
 	     install_dir: extension_target_dir_schemas)
 
@@ -45,3 +45,9 @@ install_data(extension_sources + extension_data + extension_libs,
 
 install_data(extension_dbus_interfaces,
 	     install_dir: extension_target_dir_dbus_intf)
+
+custom_target('extension',
+	      build_by_default: false,
+	      install: false,
+	      command: [files('meson-scripts/make-extension'), extension_target_dir, '@OUTDIR@', '@OUTPUT@'],
+	      output:  'extension.zip')

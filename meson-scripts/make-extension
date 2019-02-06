@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -eu
+
+progname="${0##*/}"
+
+if [ $# != 3 ]
+then
+  echo 1>&2 "usage: $progname <install_dir> <output_dir> <output_file>"
+  exit 1
+fi
+
+install_dir="$1"
+output_dir="$(cd "$2" && pwd)"
+output_file="$3"
+
+tmpdir=""
+clean() {
+  local xit=$? xit2=0
+  rm -fr "$tmpdir" || xit2=$?
+  if [ "$xit" -eq 0 ]
+  then
+    xit=$xit2
+  fi
+  trap - EXIT
+  exit $xit
+}
+
+trap clean INT TERM HUP QUIT EXIT
+
+tmpdir="$(mktemp -d "$(pwd)/make-extension-XXXXXXX.tmp")"
+DESTDIR="$tmpdir" ninja install
+cd "$tmpdir$install_dir" && zip -r "$output_dir/$output_file" *
