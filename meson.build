@@ -33,7 +33,22 @@ extension_target_dir_dbus_intf = extension_target_dir
 
 meson_extra_scripts            = 'meson-scripts'
 
-subdir('src')
+extension_metadata_conf = configuration_data()
+git_rev_cmd = run_command('git', 'rev-parse', 'HEAD')
+if git_rev_cmd.returncode() != 0
+  error('git rev-parse exit=@0@'.format(git_rev_cmd.returncode()))
+endif
+extension_metadata_conf.set('VCS_TAG', git_rev_cmd.stdout().strip())
+
+extension_data += configure_file(input:         'src/metadata.json.in',
+				 output:        'metadata.json',
+				 configuration: extension_metadata_conf)
+
+#extension_metadata = vcs_tag(command:  ['git', 'rev-parse', 'HEAD'],
+#			     input:    files('metadata.json.in'),
+#			     output:   'metadata.json',
+#			     fallback: 'unknown')
+#extension_data += extension_metadata.full_path()
 
 custom_target('gschemas.compiled',
 	      build_by_default: true,
