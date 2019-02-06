@@ -1,0 +1,47 @@
+# Boilerplate
+project('soft-brightness',
+	 version: '3',
+	 meson_version: '>= 0.44.0',
+	 license: 'GPL3' )
+
+gettext_domain = meson.project_name()
+
+gnome = import('gnome')
+i18n  = import('i18n')
+
+extension_uuid_suffix = '@fifi.org'
+
+# Extension settings
+extension_sources	  = files('src/extension.js', 'src/prefs.js', 'src/utils.js')
+extension_libs		  = files('lib/convenience.js')
+extension_data		  = files('src/metadata.json', 'src/stylesheet.css')
+extension_schemas	  = files('schemas/org.gnome.shell.extensions.'+ meson.project_name() + '.gschema.xml')
+extension_dbus_interfaces = files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml')
+
+# Boiler plates
+run_home = run_command('sh', '-c', 'echo $HOME')
+if run_home.returncode() != 0
+  error('HOME not found, exit=@0@'.format(run_home.returncode()))
+endif
+home     = run_home.stdout().strip()
+
+extension_uuid		       = meson.project_name() + extension_uuid_suffix
+extension_target_dir	       = home + '/.local/share/gnome-shell/extensions/' + extension_uuid
+extension_target_dir_schemas   = join_paths(extension_target_dir, 'schemas')
+extension_target_dir_dbus_intf = extension_target_dir
+
+custom_target('gschemas.compiled',
+	      build_by_default: true,
+	      command: ['sh', '-c', 'glib-compile-schemas --targetdir . $(dirname @INPUT0@)'],
+	      input: extension_schemas,
+	      output: 'gschemas.compiled',
+	      install: true,
+	      install_dir: extension_target_dir_schemas)
+install_data(extension_schemas,
+	     install_dir: extension_target_dir_schemas)
+
+install_data(extension_sources + extension_data + extension_libs,
+	     install_dir: extension_target_dir)
+
+install_data(extension_dbus_interfaces,
+	     install_dir: extension_target_dir_dbus_intf)
