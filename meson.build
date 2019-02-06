@@ -36,9 +36,11 @@ meson_extra_scripts            = 'meson-scripts'
 extension_metadata_conf = configuration_data()
 git_rev_cmd = run_command('git', 'rev-parse', 'HEAD')
 if git_rev_cmd.returncode() != 0
-  error('git rev-parse exit=@0@'.format(git_rev_cmd.returncode()))
+  warning('git rev-parse exit=@0@'.format(git_rev_cmd.returncode()))
+  extension_metadata_conf.set('VCS_TAG', 'unknown')
+else
+  extension_metadata_conf.set('VCS_TAG', git_rev_cmd.stdout().strip())
 endif
-extension_metadata_conf.set('VCS_TAG', git_rev_cmd.stdout().strip())
 
 extension_data += configure_file(input:         'src/metadata.json.in',
 				 output:        'metadata.json',
@@ -48,7 +50,7 @@ extension_data += configure_file(input:         'src/metadata.json.in',
 #			     input:    files('metadata.json.in'),
 #			     output:   'metadata.json',
 #			     fallback: 'unknown')
-#extension_data += extension_metadata.full_path()
+#extension_data += extension_metadata
 
 custom_target('gschemas.compiled',
 	      build_by_default: true,
