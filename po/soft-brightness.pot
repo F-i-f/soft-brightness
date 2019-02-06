@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-05 22:42-0800\n"
+"POT-Creation-Date: 2019-02-06 10:43-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,4 +63,65 @@ msgstr ""
 
 #: src/prefs.js:115
 msgid "Debug:"
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
+msgid "Use backlight control."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:16
+msgid "Use the regular backlight control."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:20
+msgid "Monitors"
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
+msgid "The monitors whose brigthness should be adjusted."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:25
+msgid "Builtin monitor"
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:26
+msgid "The name of the built-in monitor."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:30
+msgid "Prevent window unredirecting behavior"
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
+msgid ""
+"If set to never, unredirection is never prevent. If set to when-correcting, "
+"unredirection will be prevent when the brightness is not at the maximum "
+"setting (and an alpha layer is lowering the brightness). If set to always, "
+"window unredirection will always be prevented when this extension is active, "
+"allowing tear-free display."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:41
+msgid "Minimum brightness"
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:42
+msgid "Minimum brightness level."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:47
+msgid "Current brightness level"
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:48
+msgid "The current brightness level."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
+msgid "Debugging"
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
+msgid "Enable debugging for the extension."
 msgstr ""
