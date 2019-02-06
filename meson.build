@@ -28,7 +28,10 @@ home     = run_home.stdout().strip()
 extension_uuid		       = meson.project_name() + extension_uuid_suffix
 extension_target_dir	       = home + '/.local/share/gnome-shell/extensions/' + extension_uuid
 extension_target_dir_schemas   = join_paths(extension_target_dir, 'schemas')
+extension_target_locale_dir    = join_paths(extension_target_dir, 'locale')
 extension_target_dir_dbus_intf = extension_target_dir
+
+meson_extra_scripts            = 'meson-scripts'
 
 extension_metadata = vcs_tag(command:  ['git', 'rev-parse', 'HEAD'],
 			     input:    files('src/metadata.json.in'),
@@ -54,5 +57,7 @@ install_data(extension_dbus_interfaces,
 custom_target('extension',
 	      build_by_default: false,
 	      install: false,
-	      command: [files('meson-scripts/make-extension'), extension_target_dir, '@OUTDIR@', '@OUTPUT@'],
+	      command: [files(join_paths(meson_extra_scripts, 'make-extension')), extension_target_dir, '@OUTDIR@', '@OUTPUT@'],
 	      output:  'extension.zip')
+
+subdir('po')

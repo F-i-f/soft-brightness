@@ -4,7 +4,7 @@
     "shell-version": [
 	"3.30"
     ],
-    "gettext-domain": "gnome-shell-extensions",
+    "gettext-domain": "soft-brightness",
     "settings-schema": "org.gnome.shell.extensions.soft-brightness",
     "url": "",
     "uuid": "soft-brightness@fifi.org",

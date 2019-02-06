@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the soft-brightness package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: soft-brightness\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-02-05 22:42-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/prefs.js:49
+msgid "Use backlight control:"
+msgstr ""
+
+#: src/prefs.js:57
+msgid "Monitor(s):"
+msgstr ""
+
+#: src/prefs.js:59
+msgid "All"
+msgstr ""
+
+#: src/prefs.js:60
+msgid "Built-in"
+msgstr ""
+
+#: src/prefs.js:61
+msgid "External"
+msgstr ""
+
+#: src/prefs.js:68
+msgid "Built-in monitor:"
+msgstr ""
+
+#: src/prefs.js:88
+msgid "Full-screen behavior:"
+msgstr ""
+
+#: src/prefs.js:90
+msgid "Do not enforce brightness in full-screen"
+msgstr ""
+
+#: src/prefs.js:91
+msgid "Brightness enforced in full-screen"
+msgstr ""
+
+#: src/prefs.js:92
+msgid "Brightness enforced in full-screen, always tear-free"
+msgstr ""
+
+#: src/prefs.js:99
+msgid "Minimum brightness (0..1):"
+msgstr ""
+
+#: src/prefs.js:115
+msgid "Debug:"
+msgstr ""
