@@ -57,6 +57,9 @@ if git_rev_cmd.returncode() != 0
 else
   extension_metadata_conf.set('VCS_TAG', git_rev_cmd.stdout().strip())
 endif
+extension_metadata_conf.set('uuid', extension_uuid)
+extension_metadata_conf.set('version', meson.project_version())
+extension_metadata_conf.set('gettext_domain', gettext_domain)
 
 extension_data += configure_file(input:         'src/metadata.json.in',
 				 output:        'metadata.json',

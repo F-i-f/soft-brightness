@@ -4,10 +4,10 @@
     "shell-version": [
 	"3.30"
     ],
-    "gettext-domain": "soft-brightness",
+    "gettext-domain": "@gettext_domain@",
     "settings-schema": "org.gnome.shell.extensions.soft-brightness",
     "url": "https://github.com/F-i-f/soft-brightness",
-    "uuid": "soft-brightness@fifi.org",
-    "version": 3,
+    "uuid": "@uuid@",
+    "version": @version@,
     "vcs_revision": "@VCS_TAG@"
 }
