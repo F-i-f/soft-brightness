@@ -37,7 +37,7 @@ let modifiedIndicator = null;
 function log(what) {
     if (first_log) {
 	first_log = false;
-	log('version '+Me.metadata['version']);
+	log('version '+Me.metadata['version']+' / git '+Me.metadata['vcs_revision']);
     }
     global.log('Soft-Brightness: '+what);
 }

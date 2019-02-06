@@ -12,11 +12,11 @@ i18n  = import('i18n')
 extension_uuid_suffix = '@fifi.org'
 
 # Extension settings
-extension_sources	  = files('src/extension.js', 'src/prefs.js', 'src/utils.js')
-extension_libs		  = files('lib/convenience.js')
-extension_data		  = files('src/metadata.json', 'src/stylesheet.css')
-extension_schemas	  = files('schemas/org.gnome.shell.extensions.'+ meson.project_name() + '.gschema.xml')
-extension_dbus_interfaces = files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml')
+extension_sources	  = [files('src/extension.js', 'src/prefs.js', 'src/utils.js')]
+extension_libs		  = [files('lib/convenience.js')]
+extension_data		  = [files('src/stylesheet.css')]
+extension_schemas	  = [files('schemas/org.gnome.shell.extensions.'+ meson.project_name() + '.gschema.xml')]
+extension_dbus_interfaces = [files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml')]
 
 # Boilerplate
 run_home = run_command('sh', '-c', 'echo $HOME')
@@ -30,6 +30,11 @@ extension_target_dir	       = home + '/.local/share/gnome-shell/extensions/' + e
 extension_target_dir_schemas   = join_paths(extension_target_dir, 'schemas')
 extension_target_dir_dbus_intf = extension_target_dir
 
+extension_metadata = vcs_tag(command:  ['git', 'rev-parse', 'HEAD'],
+			     input:    files('src/metadata.json.in'),
+			     output:   'metadata.json',
+			     fallback: 'unknown')
+
 custom_target('gschemas.compiled',
 	      build_by_default: true,
 	      command:          ['sh', '-c', 'glib-compile-schemas --targetdir . $(dirname @INPUT0@)'],
@@ -40,7 +45,7 @@ custom_target('gschemas.compiled',
 install_data(extension_schemas,
 	     install_dir: extension_target_dir_schemas)
 
-install_data(extension_sources + extension_data + extension_libs,
+install_data(extension_sources + [extension_metadata.full_path()] + extension_data + extension_libs,
 	     install_dir: extension_target_dir)
 
 install_data(extension_dbus_interfaces,
