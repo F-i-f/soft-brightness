@@ -45,17 +45,25 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 	this._settings = Convenience.getSettings();
 
 	let ypos = 1;
+	let descr;
 
+	descr = _(this._settings.settings_schema.get_key('use-backlight').get_description());
 	this.enabled_label = new Gtk.Label({label: _("Use backlight control:"), halign: Gtk.Align.START});
+	this.enabled_label.set_tooltip_text(descr);
 	this.enabled_control = new Gtk.Switch({halign: Gtk.Align.END});
+	this.enabled_control.set_tooltip_text(descr);
+	this.enabled_label.set_tooltip_text(this._settings.settings_schema.get_key('use-backlight').get_description());
 	this.attach(this.enabled_label,   1, ypos, 1, 1);
 	this.attach(this.enabled_control, 2, ypos, 1, 1);
 	this._settings.bind('use-backlight', this.enabled_control, 'active', Gio.SettingsBindFlags.DEFAULT);
 
 	ypos += 1;
 
+	descr = _(this._settings.settings_schema.get_key('monitors').get_description());
 	this.monitors_label = new Gtk.Label({label: _("Monitor(s):"), halign: Gtk.Align.START});
+	this.monitors_label.set_tooltip_text(descr);
 	this.monitors_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
+	this.monitors_control.set_tooltip_text(descr);
 	this.monitors_control.append("all", _("All"));
 	this.monitors_control.append("built-in", _("Built-in"));
 	this.monitors_control.append("external", _("External"));
@@ -65,8 +73,11 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 
 	ypos += 1;
 
+	descr = _(this._settings.settings_schema.get_key('builtin-monitor').get_description());
 	this.builtin_monitor_label = new Gtk.Label({label: _("Built-in monitor:"), halign: Gtk.Align.START});
+	this.builtin_monitor_label.set_tooltip_text(descr);
 	this.builtin_monitor_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
+	this.builtin_monitor_control.set_tooltip_text(descr);
 	let builtin_monitor_name = this._settings.get_string('builtin-monitor');
 	if (builtin_monitor_name != "") {
 	    this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
@@ -85,8 +96,11 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 
 	ypos += 1;
 
+	descr = _(this._settings.settings_schema.get_key('prevent-unredirect').get_description());
 	this.prevent_unredirect_label = new Gtk.Label({label: _("Full-screen behavior:"), halign: Gtk.Align.START});
+	this.prevent_unredirect_label.set_tooltip_text(descr);
 	this.prevent_unredirect_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
+	this.prevent_unredirect_control.set_tooltip_text(descr);
 	this.prevent_unredirect_control.append("never",           _("Do not enforce brightness in full-screen"));
 	this.prevent_unredirect_control.append("when-correcting", _("Brightness enforced in full-screen"));
 	this.prevent_unredirect_control.append("always",          _("Brightness enforced in full-screen, always tear-free"));
@@ -96,7 +110,9 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 
 	ypos += 1;
 
+	descr = _(this._settings.settings_schema.get_key('min-brightness').get_description());
 	this.min_brightness_label = new Gtk.Label({label: _("Minimum brightness (0..1):"), halign: Gtk.Align.START});
+	this.min_brightness_label.set_tooltip_text(descr);
 	this.min_brightness_control = new Gtk.SpinButton({
 	    halign: Gtk.Align.END,
 	    digits: 2,
@@ -106,14 +122,18 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 		step_increment: 0.01
 	    })
 	});
+	this.min_brightness_control.set_tooltip_text(descr);
 	this.attach(this.min_brightness_label,   1, ypos, 1, 1);
 	this.attach(this.min_brightness_control, 2, ypos, 1, 1);
 	this._settings.bind('min-brightness', this.min_brightness_control, 'value', Gio.SettingsBindFlags.DEFAULT);
 
 	ypos += 1;
 
+	descr = _(this._settings.settings_schema.get_key('debug').get_description());
 	this.debug_label = new Gtk.Label({label: _("Debug:"), halign: Gtk.Align.START});
+	this.debug_label.set_tooltip_text(descr);
 	this.debug_control = new Gtk.Switch({halign: Gtk.Align.END});
+	this.debug_control.set_tooltip_text(descr);
 	this.attach(this.debug_label,   1, ypos, 1, 1);
 	this.attach(this.debug_control, 2, ypos, 1, 1);
 	this._settings.bind('debug', this.debug_control, 'active', Gio.SettingsBindFlags.DEFAULT);
