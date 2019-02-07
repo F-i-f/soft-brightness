@@ -30,7 +30,7 @@ extension_uuid_suffix = '@fifi.org'
 extension_lib_convenience = files('gse-lib/lib/convenience.js')
 
 # Extension settings
-m4_include([../meson.build.gselib])m4_dnl
+m4_include([../meson.build.gse-lib])m4_dnl
 
 # Boilerplate
 run_home = run_command('sh', '-c', 'echo $HOME')
