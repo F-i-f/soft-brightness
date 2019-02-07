@@ -20,7 +20,7 @@
 # Boilerplate
 project('soft-brightness',
 	 version: '3',
-	 meson_version: '>= 0.40.0',
+	 meson_version: '>= 0.44.0',
 	 license: 'GPL3' )
 
 gettext_domain = meson.project_name()

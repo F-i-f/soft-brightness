@@ -31,7 +31,7 @@ Check-out the GitHub [releases page](https://github.com/F-i-f/soft-brightness/re
 
 ### Requirements
 
-- [meson](http://mesonbuild.com/) v0.40.0 or later.
+- [meson](http://mesonbuild.com/) v0.44.0 or later.
 
 ### Running the build
 
