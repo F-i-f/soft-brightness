@@ -1,0 +1,3 @@
+#!/bin/sh
+set -eu
+git subtree pull -P gse-lib -m "Pull from gse-lib." git@github.com:F-i-f/gse-lib.git master

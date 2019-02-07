@@ -1,0 +1,3 @@
+#!/bin/sh
+set -eu
+git subtree push -P gse-lib -m "Push to gse-lib." git@github.com:F-i-f/gse-lib.git master
