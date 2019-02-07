@@ -8,7 +8,7 @@ gse_lib_base="$project_base"/gse-lib
 
 if [ -d "$project_base/po" ]
 then
-  install "$gse_lib_base"/po/meson.build "$project_base/po/"
+  cp -a "$gse_lib_base"/po/meson.build "$project_base/po/"
 fi
 
 m4 -P -I "$project_base" "$gse_lib_base/meson.build.m4" > "$project_base/meson.build"
