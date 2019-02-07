@@ -1,4 +1,4 @@
-# Soft-brightness - Control the display's brightness via an alpha channel.
+# gse-lib - Library for gnome-shell extensions
 # Copyright (C) 2019 Philippe Troin <phil@fifi.org>
 #
 # This program is free software: you can redistribute it and/or modify
