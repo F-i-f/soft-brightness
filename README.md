@@ -77,3 +77,8 @@ Let's call it release v2 then.
 #### February 2, 2019
 
 First public release.
+
+## Credits
+
+- The [`gse-lib` credits](https://github.com/F-i-f/gse-lib/) are
+  included here by reference.
