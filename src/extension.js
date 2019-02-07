@@ -18,6 +18,7 @@ const Lang = imports.lang;
 const St = imports.gi.St;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
+const Shell = imports.gi.Shell;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -173,7 +174,7 @@ let ModifiedIndicator = new Lang.Class({
 	if (this._overlays != null) {
 	    log_debug("_hideOverlays(): drop overlays, count="+this._overlays.length);
 	    for (let i=0; i < this._overlays.length; ++i) {
-		Main.uiGroup.remove_actor(this._overlays[i]);
+		global.stage.remove_actor(this._overlays[i]);
 	    }
 	    this._overlays = null;
 	}
@@ -255,8 +256,10 @@ let ModifiedIndicator = new Lang.Class({
 		overlay.set_position(monitor.x, monitor.y);
 		overlay.set_width(monitor.width);
 		overlay.set_height(monitor.height);
-		overlay.set_z_position(0.00001);
-		Main.uiGroup.add_actor(overlay);
+
+		global.stage.add_actor(overlay);
+		Shell.util_set_hidden_from_pick(overlay, true);
+
 		this._overlays.push(overlay);
 	    }
 	}
