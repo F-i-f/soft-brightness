@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-06 10:43-0800\n"
-"PO-Revision-Date: 2019-02-06 12:07-0800\n"
+"POT-Creation-Date: 2019-02-07 09:16-0800\n"
+"PO-Revision-Date: 2019-02-07 09:21-0800\n"
 "Last-Translator: Philippe Troin <phil@fifi.org>\n"
 "Language-Team: none\n"
 "Language: fr\n"
@@ -17,51 +17,51 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/prefs.js:49
+#: src/prefs.js:51
 msgid "Use backlight control:"
 msgstr "Utiliser le rétroéclairage :"
 
-#: src/prefs.js:57
+#: src/prefs.js:65
 msgid "Monitor(s):"
 msgstr "Moniteur(s) :"
 
-#: src/prefs.js:59
+#: src/prefs.js:69
 msgid "All"
 msgstr "Tous"
 
-#: src/prefs.js:60
+#: src/prefs.js:70
 msgid "Built-in"
 msgstr "Interne"
 
-#: src/prefs.js:61
+#: src/prefs.js:71
 msgid "External"
 msgstr "Externes"
 
-#: src/prefs.js:68
+#: src/prefs.js:79
 msgid "Built-in monitor:"
 msgstr "Écran intégré"
 
-#: src/prefs.js:88
+#: src/prefs.js:102
 msgid "Full-screen behavior:"
 msgstr "Comportement en plein-écran :"
 
-#: src/prefs.js:90
+#: src/prefs.js:106
 msgid "Do not enforce brightness in full-screen"
 msgstr "Ne pas changer la luminosité en plein-écran"
 
-#: src/prefs.js:91
+#: src/prefs.js:107
 msgid "Brightness enforced in full-screen"
 msgstr "Réglage de luminosité actif en plein-écran"
 
-#: src/prefs.js:92
+#: src/prefs.js:108
 msgid "Brightness enforced in full-screen, always tear-free"
 msgstr "Réglage de luminosité actif en plein-écran, mode sans-déchirures"
 
-#: src/prefs.js:99
+#: src/prefs.js:116
 msgid "Minimum brightness (0..1):"
 msgstr "Luminosité minimale (0..1) :"
 
-#: src/prefs.js:115
+#: src/prefs.js:135
 msgid "Debug:"
 msgstr "Débogage :"
 
@@ -87,7 +87,7 @@ msgstr "Les moniteurs sur lesquels la luminosité sera changée."
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:25
 #, fuzzy
 msgid "Builtin monitor"
-msgstr "Écran intégré"
+msgstr "WTF"
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:26
 #, fuzzy
@@ -106,11 +106,10 @@ msgid ""
 "window unredirection will always be prevented when this extension is active, "
 "allowing tear-free display."
 msgstr ""
-"\"never\": la non-redirection n'est jamais évitée.  "
-"\"when-correcting\": la non-redirection est évitée quand la luminosité "
-"n'est pas maximale.  "
-"\"always\": la non-redirection est toujours évité, et l'affichage est "
-"toujours sans déchirure (synchronisation verticale)."
+"\"never\": la non-redirection n'est jamais évitée.  \"when-correcting\": la "
+"non-redirection est évitée quand la luminosité n'est pas maximale.  \"always"
+"\": la non-redirection est toujours évité, et l'affichage est toujours sans "
+"déchirure (synchronisation verticale)."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:41
 #, fuzzy
@@ -120,7 +119,7 @@ msgstr "Luminosité minimale (0..1) :"
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:42
 #, fuzzy
 msgid "Minimum brightness level."
-msgstr "Luminosité minimale (0..1) :"
+msgstr "Luminosité minimale."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:47
 msgid "Current brightness level"
