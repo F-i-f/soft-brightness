@@ -89,9 +89,9 @@ Meson will fill in some variables automagically.  All variables expansions are s
 - `@version@` by your extension's version as declared in the `gse_lib_project()` statement.
 - `@VCS_TAG@` will be the current git revision number.
 
-### Run the `meson-gse-autogen` tool, `meson` and `ninja`
+### Run the `meson-gse/meson-gse` tool, `meson` and `ninja`
 ```
-meson-gse/meson-autogen
+meson-gse/meson-gse
 meson build
 ninja -C build install # Install to $HOME/.local/share/gnome-shell/extensions
 ninja -C build extension.zip # Builds the extension in build/extension.zip
