@@ -1,4 +1,4 @@
-# gse-lib - Library for gnome-shell extensions
+# meson-gse - Library for gnome-shell extensions
 # Copyright (C) 2019 Philippe Troin <phil@fifi.org>
 #
 # This program is free software: you can redistribute it and/or modify

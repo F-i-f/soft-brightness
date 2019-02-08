@@ -80,5 +80,5 @@ First public release.
 
 ## Credits
 
-- The [`gse-lib` credits](https://github.com/F-i-f/gse-lib/) are
+- The [`meson-gse` credits](https://github.com/F-i-f/meson-gse/) are
   included here by reference.

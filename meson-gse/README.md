@@ -1,17 +1,17 @@
-# gse-lib
+# meson-gse
 # A Gnome Shell Extension library
 
 ## Overview
 
-gse-lib contains various files needed when using meson for building
+meson-gse contains various files needed when using meson for building
 Gnome Shell extensions.
 
-This repository is supposed to be included in the `gse-lib` top-level
+This repository is supposed to be included in the `meson-gse` top-level
 directory of your extension (with git-subtree and/or git-submodule).
 
 ## Usage
 ### Expected layout
-gse-lib expects your project to have a certain layout:
+meson-gse expects your project to have a certain layout:
 - `_<root directory>_/`
 - `po/`
 -- Internationalization files go here:
@@ -25,23 +25,23 @@ gse-lib expects your project to have a certain layout:
 - `src/stylesheet.css` Optional **[auto-included]**
 - `src/pref.js`  Optional. **[auto-included]**
 
-### Import gse-lib in your git tree
+### Import meson-gse in your git tree
 In your extension's top-level directory, run:
 ``` shell
-git subtree pull -P gse-lib -m "Pull from gse-lib." git@github.com:F-i-f/gse-lib.git master
+git subtree pull -P meson-gse -m "Pull from meson-gse." git@github.com:F-i-f/meson-gse.git master
 ```
 As a convenience, when pulling update from the project, two
 convenience commands automate pushing and pulling:
 
 ``` shell
-gse-lib/git-subtree-pull
-gse-lib/git-subtree-push
+meson-gse/git-subtree-pull
+meson-gse/git-subtree-push
 ```
 
 ### Create required files
-You need to create two files: `meson.build.gse-lib` and `src/metadata.json.in`
+You need to create two files: `meson.build.meson-gse` and `src/metadata.json.in`
 
-#### The `meson.build.gse-lib` file
+#### The `meson.build.meson-gse` file
 ##### Syntax
 `# You can put a header here`
 `# But no meson directives can be used`
@@ -50,8 +50,8 @@ You need to create two files: `meson.build.gse-lib` and `src/metadata.json.in`
 
 - _extension name_ will be used as the _project name_ in the `meson_project()` definition and must conform to its requirements.
 - _extension_version_ must be a single integer as it will be used in the Gnome Shell extension's `metadata.json` file.
-- _gse_assigments, meson code block_ can be any meson code, but you're expected to fill in some gse-lib meson variables as described below.
-##### Available gse-lib meson variables
+- _gse_assigments, meson code block_ can be any meson code, but you're expected to fill in some meson-gse variables as described below.
+##### Available meson-gse variables
 - __extension_sources__
 You can add any javascript files to this meson variable.  Note that the `src/extension.js` and `src/prefs.js` (if it exists) files are automatically included.
 Example:
@@ -59,7 +59,7 @@ Example:
 The `extension_sources` files are installed in the extension's root directory by the `install` or `extension.zip` `ninja` targets.
 - __extension_libs__
 This meson variable is intended for external javascript libraries.  The difference between `extension_sources` and `extension_libs` is that the `extension_sources` javascript files will be checked for syntax when running `ninja check` while the `extension_libs` javascript files won't.
-The very commonly used `convenience.js` file is included in the gse-lib distribution and its path is available in the meson variable `extension_lib_convenience`.
+The very commonly used `convenience.js` file is included in the meson-gse distribution and its path is available in the meson variable `extension_lib_convenience`.
 Example:
 `extension_libs += extension_lib_convenience`
 `extension_libs += files('lib/other-library.js')`
@@ -89,9 +89,9 @@ Meson will fill in some variables automagically.  All variables expansions are s
 - `@version@` by your extension's version as declared in the `gse_lib_project()` statement.
 - `@VCS_TAG@` will be the current git revision number.
 
-### Run the `gse-lib-autogen` tool, `meson` and `ninja`
+### Run the `meson-gse-autogen` tool, `meson` and `ninja`
 ```
-gse-lib/meson-autogen
+meson-gse/meson-autogen
 meson build
 ninja -C build install # Install to $HOME/.local/share/gnome-shell/extensions
 ninja -C build extension.zip # Builds the extension in build/extension.zip
@@ -115,5 +115,5 @@ If your file layout is:
 - I've been inspired by the
   [gnome-shell-extensions](https://gitlab.gnome.org/GNOME/gnome-shell-extensions/)
   for writing the meson build files.  Thanks to [Florian Müllner](https://gitlab.gnome.org/fmuellner).
-- gse-lib includes the `convenience.js` file from Giovanni Campagna
+- meson-gse includes the `convenience.js` file from Giovanni Campagna
   <scampa.giovanni@gmail.com>.

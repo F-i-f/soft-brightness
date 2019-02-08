@@ -1,4 +1,6 @@
-# gse-lib - Library for gnome-shell extensions
+#!/bin/sh
+
+# meson-gse - Library for gnome-shell extensions
 # Copyright (C) 2019 Philippe Troin <phil@fifi.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,6 +16,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-i18n.gettext(gettext_domain, preset: 'glib', install: false)
-meson.add_install_script(join_paths(meson.source_root(), meson_extra_scripts, 'install-po'),
-			 gettext_domain, extension_target_locale_dir)
+set -eu
+
+progname="${0##*/}"
+project_base="$(cd "$(dirname "$0")"/.. && pwd)"
+gse_lib_base="$project_base"/meson-gse
+
+if [ -d "$project_base/po" ]
+then
+  cp -a "$gse_lib_base"/po/meson.build "$project_base/po/"
+fi
+
+exitcode=0
+target="$project_base/meson.build"
+m4 -P "$gse_lib_base/meson.build.m4" "$project_base/meson-gse.build" > "$target"  || exitcode=$?
+if [ $exitcode -ne 0 ]
+then
+  rm -f "$target"
+  exit $exitcode
+fi

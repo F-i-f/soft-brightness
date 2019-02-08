@@ -1,6 +1,4 @@
-#!/bin/sh
-
-# gse-lib - Library for gnome-shell extensions
+# meson-gse - Library for gnome-shell extensions
 # Copyright (C) 2019 Philippe Troin <phil@fifi.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,34 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-set -eu
-
-progname="${0##*/}"
-
-if [ $# != 3 ]
-then
-  echo 1>&2 "usage: $progname <install_dir> <output_dir> <output_file>"
-  exit 1
-fi
-
-install_dir="$1"
-output_dir="$(cd "$2" && pwd)"
-output_file="$3"
-
-tmpdir=""
-clean() {
-  local xit=$? xit2=0
-  rm -fr "$tmpdir" || xit2=$?
-  if [ "$xit" -eq 0 ]
-  then
-    xit=$xit2
-  fi
-  trap - EXIT
-  exit $xit
-}
-
-trap clean INT TERM HUP QUIT EXIT
-
-tmpdir="$(mktemp -d "$(pwd)/make-extension-XXXXXXX.tmp")"
-DESTDIR="$tmpdir" ninja install
-cd "$tmpdir$install_dir" && zip -r "$output_dir/$output_file" *
+i18n.gettext(gettext_domain, preset: 'glib', install: false)
+meson.add_install_script(join_paths(meson.source_root(), meson_extra_scripts, 'install-po'),
+			 gettext_domain, extension_target_locale_dir)
