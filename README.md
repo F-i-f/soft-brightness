@@ -45,40 +45,41 @@ You need to create two files: `meson-gse.build` and `src/metadata.json.in`
 ##### Syntax
 `# You can put a header here`
 `# But no meson directives can be used`
-`gse_lib_project({`_extension name_`}, {`_extension version_`}, {`_gse assigments, meson code block_`})`
-`# You can put other comments or meson directives after the gse_lib_project statement`
+`gse_project({`_extension name_`}, {`_extension uuid domain_`{`_extension version_`}, {`_gse assigments, meson code block_`})`
+`# You can put other comments or meson directives after the gse_project statement`
 
 - _extension name_ will be used as the _project name_ in the `meson_project()` definition and must conform to its requirements.
+- _extension uuid domain_ will be appended to _extension name_ when generating the extension's UUID.
 - _extension_version_ must be a single integer as it will be used in the Gnome Shell extension's `metadata.json` file.
 - _gse_assigments, meson code block_ can be any meson code, but you're expected to fill in some meson-gse variables as described below.
 ##### Available meson-gse variables
-- __extension_sources__
+- __gse_sources__
 You can add any javascript files to this meson variable.  Note that the `src/extension.js` and `src/prefs.js` (if it exists) files are automatically included.
 Example:
-`extension_sources += files('src/other.js', 'src/foo.js')`
-The `extension_sources` files are installed in the extension's root directory by the `install` or `extension.zip` `ninja` targets.
-- __extension_libs__
-This meson variable is intended for external javascript libraries.  The difference between `extension_sources` and `extension_libs` is that the `extension_sources` javascript files will be checked for syntax when running `ninja check` while the `extension_libs` javascript files won't.
-The very commonly used `convenience.js` file is included in the meson-gse distribution and its path is available in the meson variable `extension_lib_convenience`.
+`gse_sources += files('src/other.js', 'src/foo.js')`
+The `gse_sources` files are installed in the extension's root directory by the `install` or `extension.zip` `ninja` targets.
+- __gse_libs__
+This meson variable is intended for external javascript libraries.  The difference between `gse_sources` and `gse_libs` is that the `gse_sources` javascript files will be checked for syntax when running `ninja check` while the `gse_libs` javascript files won't.
+The very commonly used `convenience.js` file is included in the meson-gse distribution and its path is available in the meson variable `gse_lib_convenience`.
 Example:
-`extension_libs += extension_lib_convenience`
-`extension_libs += files('lib/other-library.js')`
-The `extension_libs` files are installed in the extension's root directory by the `install` or `extension.zip` `ninja` targets.
-- __extension_data__
+`gse_libs += gse_lib_convenience`
+`gse_libs += files('lib/other-library.js')`
+The `gse_libs` files are installed in the extension's root directory by the `install` or `extension.zip` `ninja` targets.
+- __gse_data__
 This meson variable can be used for other non-javascript data files.  The `src/stylesheet.css` file is automatically included if it exists.
 Example:
-`extension_data += files('icons/blah.png', 'src/datafile.xml')`
-The `extension_data` files are installed in the extension's root directory by the `install` or `extension.zip` `ninja` targets.
-- __extension_schemas__
+`gse_data += files('icons/blah.png', 'src/datafile.xml')`
+The `gse_data` files are installed in the extension's root directory by the `install` or `extension.zip` `ninja` targets.
+- __gse_schemas__
 This meson variable can be used for GSettings schemas that need to be included.  If your extension's schema is stored in `schemas/org.gnome.shell.extensions.`_meson project name_`.gschema.xml`, it will be automatically included.
 Example:
-`extension_schemas += files('schemas/other-schema.xml')`
-The `extension_data` files are installed in the extension's `schemas` directory by the `install` or `extension.zip` `ninja` targets.
-- __extension_dbus_interfaces__
+`gse_schemas += files('schemas/other-schema.xml')`
+The `gse_data` files are installed in the extension's `schemas` directory by the `install` or `extension.zip` `ninja` targets.
+- __gse_dbus_interfaces__
 If your extension requires to be shipped with some missing or private DBus interfaces, you can use this meson variable.
 Example:
-`extension_dbus_interfaces += files('dbus-interfaces/private.xml')`
-The `extension_dbus_interfaces` files are installed in the extension's `dbus-interfaces` directory by the `install` or `extension.zip` `ninja` targets.
+`gse_dbus_interfaces += files('dbus-interfaces/private.xml')`
+The `gse_dbus_interfaces` files are installed in the extension's `dbus-interfaces` directory by the `install` or `extension.zip` `ninja` targets.
 
 #### The `src/metadata.json.in` file
 This is a template for the extension's `metadata.json` file.
@@ -86,7 +87,7 @@ Meson will fill in some variables automagically.  All variables expansions are s
 ##### Available `metadata.json.in`  expansions
 - `@uuid@` fills in your extension's uuid.
 - `@gettext_domain@` will be replaced by your extension's gettext domain.  This is typically your meson project name / extension name.
-- `@version@` by your extension's version as declared in the `gse_lib_project()` statement.
+- `@version@` by your extension's version as declared in the `gse_project()` statement.
 - `@VCS_TAG@` will be the current git revision number.
 
 ### Run the `meson-gse/meson-gse` tool, `meson` and `ninja`
@@ -99,7 +100,7 @@ ninja -C build extension.zip # Builds the extension in build/extension.zip
 
 ## Examples
 ### Simple project
-I'm working on project _simple_, version _1_.
+I'm working on project _simple_, version _1_ and my extension's domain is `example.com`.
 If your file layout is:
 - `schemas/org.gnome.shell.extensions.simple.gschema.xml`
 - `src/extension.js`
