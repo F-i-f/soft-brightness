@@ -29,7 +29,7 @@ fi
 
 exitcode=0
 target="$project_base/meson.build"
-m4 -P -I "$project_base" "$gse_lib_base/meson.build.m4" > "$target"
+m4 -P "$gse_lib_base/meson.build.m4" "$project_base/meson.build.gse-lib" > "$target"  || exitcode=$?
 if [ $exitcode -ne 0 ]
 then
   rm -f "$target"

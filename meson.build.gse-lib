@@ -14,8 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-extension_sources	  = [files('src/extension.js', 'src/prefs.js', 'src/utils.js')]
-extension_libs		  = [extension_lib_convenience]
-extension_data		  = [files('src/stylesheet.css')]
-extension_schemas	  = [files('schemas/org.gnome.shell.extensions.'+ meson.project_name() + '.gschema.xml')]
-extension_dbus_interfaces = [files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml')]
+gse_lib_project({soft-brightness},
+		{3},
+{
+extension_sources	  += files('src/utils.js')
+extension_libs		  += extension_lib_convenience
+extension_data		  += []
+extension_schemas	  += []
+extension_dbus_interfaces += [files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml')]
+})
