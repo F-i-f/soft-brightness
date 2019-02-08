@@ -39,9 +39,9 @@ meson-gse/git-subtree-push
 ```
 
 ### Create required files
-You need to create two files: `meson.build.meson-gse` and `src/metadata.json.in`
+You need to create two files: `meson-gse.build` and `src/metadata.json.in`
 
-#### The `meson.build.meson-gse` file
+#### The `meson-gse.build` file
 ##### Syntax
 `# You can put a header here`
 `# But no meson directives can be used`
