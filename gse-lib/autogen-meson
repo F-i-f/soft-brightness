@@ -27,4 +27,11 @@ then
   cp -a "$gse_lib_base"/po/meson.build "$project_base/po/"
 fi
 
-m4 -P -I "$project_base" "$gse_lib_base/meson.build.m4" > "$project_base/meson.build"
+exitcode=0
+target="$project_base/meson.build"
+m4 -P -I "$project_base" "$gse_lib_base/meson.build.m4" > "$target"
+if [ $exitcode -ne 0 ]
+then
+  rm -f "$target"
+  exit $exitcode
+fi
