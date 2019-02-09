@@ -9,6 +9,10 @@ Gnome Shell extensions.
 This repository is supposed to be included in the `meson-gse` top-level
 directory of your extension (with git-subtree and/or git-submodule).
 
+## Gnome Shell Extensions using meson-gse
+
+- [Soft Brightness](https://github.com/F-i-f/soft-brightness/)
+
 ## Usage
 ### Expected layout
 meson-gse expects your project to have a certain layout:
