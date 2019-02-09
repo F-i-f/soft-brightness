@@ -40,19 +40,20 @@ gse_data	    = []
 gse_schemas	    = []
 gse_dbus_interfaces = []
 
-gse_sources_prefs   = files('src/prefs.js')
-if gse_sources_prefs != []
-  gse_sources += gse_sources_prefs
+gse_run_command_obj = run_command('test', '-f', 'src/prefs.js')
+if gse_run_command_obj.returncode() == 0
+  gse_sources += files('src/prefs.js')
 endif
 
-gse_data_stylesheet = files('src/stylesheet.css')
-if gse_data_stylesheet != []
-  gse_data += gse_data_stylesheet
+gse_run_command_obj = run_command('test', '-f', 'src/stylesheet.css')
+if gse_run_command_obj.returncode() == 0
+  gse_data += files('src/stylesheet.css')
 endif
 
-gse_schema_main = files('schemas/org.gnome.shell.extensions.'+ meson.project_name() + '.gschema.xml')
-if gse_schema_main != []
-  gse_schemas += gse_schema_main
+gse_schema_main = 'schemas/org.gnome.shell.extensions.'+ meson.project_name() + '.gschema.xml'
+gse_run_command_obj = run_command('test', '-f', gse_schema_main)
+if gse_run_command_obj.returncode() == 0
+  gse_schemas += files(gse_schema_main)
 endif
 
 # Include extension-specific settings
@@ -60,11 +61,11 @@ $4m4_dnl
 # End of extension-specific settings
 
 # Boilerplate
-run_home = run_command('sh', '-c', 'echo $HOME')
-if run_home.returncode() != 0
-  error('HOME not found, exit=@0@'.format(run_home.returncode()))
+gse_run_command_obj = run_command('sh', '-c', 'echo $HOME')
+if gse_run_command_obj.returncode() != 0
+  error('HOME not found, exit=@0@'.format(gse_run_command_obj.returncode()))
 endif
-home     = run_home.stdout().strip()
+home     = gse_run_command_obj.stdout().strip()
 
 gse_uuid		 = meson.project_name() + '@$2'
 gse_target_dir		 = home + '/.local/share/gnome-shell/extensions/' + gse_uuid
@@ -97,15 +98,17 @@ gse_data += configure_file(input:         'src/metadata.json.in',
 #			     fallback: 'unknown')
 #gse_data += gse_metadata
 
-custom_target('gse-gschemas.compiled',
-	      build_by_default: true,
-	      command:          ['sh', '-c', 'glib-compile-schemas --targetdir . $(dirname @INPUT0@)'],
-	      input:            gse_schemas,
-	      output:           'gschemas.compiled',
-	      install:          true,
-	      install_dir:      gse_target_dir_schemas)
-install_data(gse_schemas,
-	     install_dir: gse_target_dir_schemas)
+if gse_schemas != []
+  custom_target('gse-gschemas.compiled',
+		build_by_default: true,
+		command:          ['sh', '-c', 'glib-compile-schemas --targetdir . $(dirname @INPUT0@)'],
+		input:            gse_schemas,
+		output:           'gschemas.compiled',
+		install:          true,
+		install_dir:      gse_target_dir_schemas)
+  install_data(gse_schemas,
+	       install_dir: gse_target_dir_schemas)
+endif
 
 install_data(gse_sources + gse_data + gse_libs,
 	     install_dir: gse_target_dir)
@@ -119,4 +122,7 @@ custom_target('gse-extension.zip',
 	      command: [files(join_paths(meson_extra_scripts, 'make-extension')), gse_target_dir, '@OUTDIR@', '@OUTPUT@'],
 	      output:  'extension.zip')
 
-subdir('po')})
+gse_run_command_obj = run_command('test', '-d', 'po')
+if gse_run_command_obj.returncode() == 0
+  subdir('po')
+endif})
