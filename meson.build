@@ -37,7 +37,7 @@
 
 # Boilerplate
 project('soft-brightness',
-	version: '3',
+	version: '4',
 	meson_version: '>= 0.44.0',
 	license: 'GPL3' )
 
@@ -45,6 +45,7 @@ gnome = import('gnome')
 i18n  = import('i18n')
 
 gse_lib_convenience = files('meson-gse/lib/convenience.js')
+gse_lib_logger      = files('meson-gse/lib/logger.js')
 
 gse_gettext_domain  = meson.project_name()
 gse_sources	    = files('src/extension.js')
@@ -71,7 +72,7 @@ endif
 # Include extension-specific settings
 
 gse_sources	    += files('src/utils.js')
-gse_libs	    += gse_lib_convenience
+gse_libs	    += [gse_lib_convenience, gse_lib_logger]
 gse_data	    += []
 gse_schemas	    += []
 gse_dbus_interfaces += [files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml')]
@@ -84,13 +85,13 @@ if run_home.returncode() != 0
 endif
 home     = run_home.stdout().strip()
 
-gse_uuid		       = meson.project_name() + '@fifi.org'
-gse_target_dir	       = home + '/.local/share/gnome-shell/extensions/' + gse_uuid
+gse_uuid		 = meson.project_name() + '@fifi.org'
+gse_target_dir		 = home + '/.local/share/gnome-shell/extensions/' + gse_uuid
 gse_target_dir_schemas   = join_paths(gse_target_dir, 'schemas')
 gse_target_locale_dir    = join_paths(gse_target_dir, 'locale')
 gse_target_dir_dbus_intf = join_paths(gse_target_dir, 'dbus-interfaces')
 
-meson_extra_scripts            = 'meson-gse/meson-scripts'
+meson_extra_scripts      = 'meson-gse/meson-scripts'
 
 gse_metadata_conf = configuration_data()
 git_rev_cmd = run_command('git', 'rev-parse', 'HEAD')

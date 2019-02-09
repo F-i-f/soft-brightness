@@ -25,29 +25,15 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 const Convenience = Me.imports.convenience;
 const Utils = Me.imports.utils;
+const Logger = Me.imports.logger;
 const Indicator = imports.ui.status.brightness.Indicator;
 const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 
-let first_log = true;
-let debug = null;
+let logger = new Logger.Logger('Soft-Brightness');
 let enabled = null;
 let settings = null;
 let debugSettingChangedConnection = null;
 let modifiedIndicator = null;
-
-function log(what) {
-    if (first_log) {
-	first_log = false;
-	log('version '+Me.metadata['version']+' / git '+Me.metadata['vcs_revision']);
-    }
-    global.log('Soft-Brightness: '+what);
-}
-
-function log_debug(what) {
-    if (debug) {
-	log(what);
-    }
-}
 
 let ModifiedIndicator = new Lang.Class({
     Name: 'ModifiedBrightnessIndicator',
@@ -81,10 +67,10 @@ let ModifiedIndicator = new Lang.Class({
 	    }
 	}
 	if (menuIndex == null) {
-	    log('_swapMenu(): Cannot find brightness indicator');
+	    logger.log('_swapMenu(): Cannot find brightness indicator');
 	    return false;
 	}
-	log_debug('_swapMenu(): Replacing brightness menu item at index '+menuIndex);
+	logger.log_debug('_swapMenu(): Replacing brightness menu item at index '+menuIndex);
 	menuItems.splice(menuIndex, 1);
 	oldIndicator._proxy.run_dispose();
 	oldIndicator.menu.destroy();
@@ -94,7 +80,7 @@ let ModifiedIndicator = new Lang.Class({
     },
 
     _enable() {
-	log_debug('_enable()');
+	logger.log_debug('_enable()');
 
 	if (! this._swapMenu(AggregateMenu._brightness, this)) {
 	    return;
@@ -103,10 +89,10 @@ let ModifiedIndicator = new Lang.Class({
 	this._monitorManager = Meta.MonitorManager.get();
 	Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
 	    if (error) {
-		log("newDisplayConfig() callback: Cannot get Display Config: " + error);
+		logger.log("newDisplayConfig() callback: Cannot get Display Config: " + error);
 		return;
 	    }
-	    log_debug('newDisplayConfig() callback');
+	    logger.log_debug('newDisplayConfig() callback');
 	    this._displayConfigProxy = proxy;
 	    this._on_monitors_change();
 	}));
@@ -128,7 +114,7 @@ let ModifiedIndicator = new Lang.Class({
     },
 
     _disable() {
-	log_debug('_disable()');
+	logger.log_debug('_disable()');
 
 	let standardIndicator = new imports.ui.status.brightness.Indicator();
 	this._swapMenu(this, standardIndicator);
@@ -144,19 +130,19 @@ let ModifiedIndicator = new Lang.Class({
     },
 
     _sliderChanged(slider, value) {
-	log_debug("_sliderChanged(slide, "+value+")");
+	logger.log_debug("_sliderChanged(slide, "+value+")");
 	this._storeBrightnessLevel(value);
     },
 
     _sync() {
-	log_debug("_sync()");
+	logger.log_debug("_sync()");
 	this._on_brightness_change(false);
 	this._slider.setValue(this._getBrightnessLevel());
     },
 
     _preventUnredirect() {
 	if (! this._unredirectPrevented) {
-	    log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect='+settings.get_string('prevent-unredirect'));
+	    logger.log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect='+settings.get_string('prevent-unredirect'));
 	    Meta.disable_unredirect_for_display(global.display);
 	    this._unredirectPrevented = true;
 	}
@@ -164,7 +150,7 @@ let ModifiedIndicator = new Lang.Class({
 
     _allowUnredirect() {
 	if (this._unredirectPrevented) {
-	    log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect='+settings.get_string('prevent-unredirect'));
+	    logger.log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect='+settings.get_string('prevent-unredirect'));
 	    Meta.enable_unredirect_for_display(global.display);
 	    this._unredirectPrevented = false;
 	}
@@ -172,7 +158,7 @@ let ModifiedIndicator = new Lang.Class({
 
     _hideOverlays(forceUnpreventUnredirect) {
 	if (this._overlays != null) {
-	    log_debug("_hideOverlays(): drop overlays, count="+this._overlays.length);
+	    logger.log_debug("_hideOverlays(): drop overlays, count="+this._overlays.length);
 	    for (let i=0; i < this._overlays.length; ++i) {
 		global.stage.remove_actor(this._overlays[i]);
 	    }
@@ -191,29 +177,29 @@ let ModifiedIndicator = new Lang.Class({
 	    this._allowUnredirect();
 	    break;
 	default:
-	    log('_hideOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
+	    logger.log('_hideOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
 	    break;
 	}
     },
 
     _showOverlays(opacity, force) {
-	log_debug('_showOverlays('+opacity+', '+force+')');
+	logger.log_debug('_showOverlays('+opacity+', '+force+')');
 	if (this._overlays == null || force) {
 	    let enabledMonitors = settings.get_string('monitors');
 	    let monitors;
-	    log_debug('_showOverlays(): enabledMonitors="'+enabledMonitors+'"');
+	    logger.log_debug('_showOverlays(): enabledMonitors="'+enabledMonitors+'"');
 	    if (enabledMonitors == "all") {
 		monitors = Main.layoutManager.monitors;
 	    } else if (enabledMonitors == "built-in" || enabledMonitors == "external") {
 		if (this._monitorNames == null) {
-		    log_debug("_showOverlays(): skipping run as _monitorNames hasn't been set yet.");
+		    logger.log_debug("_showOverlays(): skipping run as _monitorNames hasn't been set yet.");
 		    return;
 		}
 		let builtinMonitorName = settings.get_string('builtin-monitor');
-		log_debug('_showOverlays(): builtinMonitorName="'+builtinMonitorName+'"');
+		logger.log_debug('_showOverlays(): builtinMonitorName="'+builtinMonitorName+'"');
 		if (builtinMonitorName == "" || builtinMonitorName == null) {
 		    builtinMonitorName = this._monitorNames[Main.layoutManager.primaryIndex];
-		    log_debug('_showOverlays(): no builtin monitor, setting to "'+builtinMonitorName+'" and skipping run');
+		    logger.log_debug('_showOverlays(): no builtin monitor, setting to "'+builtinMonitorName+'" and skipping run');
 		    settings.set_string('builtin-monitor', builtinMonitorName);
 		    return;
 		}
@@ -225,7 +211,7 @@ let ModifiedIndicator = new Lang.Class({
 		    }
 		}
 	    } else {
-		log("_showOverlays(): Unhandled \"monitors\" setting = "+enabledMonitors);
+		logger.log("_showOverlays(): Unhandled \"monitors\" setting = "+enabledMonitors);
 		return;
 	    }
 	    if (force) {
@@ -241,14 +227,14 @@ let ModifiedIndicator = new Lang.Class({
 		this._allowUnredirect();
 		break;
 	    default:
-		log('_showOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
+		logger.log('_showOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
 		break;
 	    }
 
 	    this._overlays = [];
 	    for (let i=0; i < monitors.length; ++i) {
 		let monitor = monitors[i];
-		log_debug('Create overlay #'+i+': '+monitor.width+'x'+monitor.height+'@'+monitor.x+','+monitor.y);
+		logger.log_debug('Create overlay #'+i+': '+monitor.width+'x'+monitor.height+'@'+monitor.x+','+monitor.y);
 		let overlay = new St.Label({
 		    style_class: 'brightness-overlay',
 		    text: "",
@@ -265,7 +251,7 @@ let ModifiedIndicator = new Lang.Class({
 	}
 
 	for (let i=0; i < this._overlays.length; ++i) {
-	    log_debug('_showOverlay(): set opacity '+opacity+' on overlay #'+i);
+	    logger.log_debug('_showOverlay(): set opacity '+opacity+' on overlay #'+i);
 	    this._overlays[i].opacity = opacity;
 	}
     },
@@ -273,10 +259,10 @@ let ModifiedIndicator = new Lang.Class({
     _storeBrightnessLevel(value) {
 	if (settings.get_boolean('use-backlight') && this._proxy.Brightness >= 0) {
 	    let convertedBrightness = Math.min(100, Math.round(value * 100.0)+1);
-	    log_debug('_storeBrightnessLevel('+value+') by proxy -> '+convertedBrightness);
+	    logger.log_debug('_storeBrightnessLevel('+value+') by proxy -> '+convertedBrightness);
 	    this._proxy.Brightness = convertedBrightness;
 	} else {
-	    log_debug('_storeBrightnessLevel('+value+') by setting');
+	    logger.log_debug('_storeBrightnessLevel('+value+') by setting');
 	    settings.set_double('current-brightness', value);
 	}
     },
@@ -285,11 +271,11 @@ let ModifiedIndicator = new Lang.Class({
 	let brightness = this._proxy.Brightness;
 	if (settings.get_boolean('use-backlight') && brightness != brightness >= 0) {
 	    let convertedBrightness = brightness / 100.0;
-	    log_debug('_getBrightnessLevel() by proxy = '+convertedBrightness+' <- '+brightness);
+	    logger.log_debug('_getBrightnessLevel() by proxy = '+convertedBrightness+' <- '+brightness);
 	    return convertedBrightness;
 	} else {
 	    brightness = settings.get_double('current-brightness');
-	    log_debug('_getBrightnessLevel() by setting = '+brightness);
+	    logger.log_debug('_getBrightnessLevel() by setting = '+brightness);
 	    return brightness;
 	}
     },
@@ -298,7 +284,7 @@ let ModifiedIndicator = new Lang.Class({
 	let curBrightness = this._getBrightnessLevel();
 	let minBrightness = settings.get_double('min-brightness');
 
-	log_debug("_on_brightness_change: current-brightness="+curBrightness+", min-brightness="+minBrightness);
+	logger.log_debug("_on_brightness_change: current-brightness="+curBrightness+", min-brightness="+minBrightness);
 	if (curBrightness < minBrightness) {
 	    curBrightness = minBrightness;
 	    if (! settings.get_boolean('use-backlight')) {
@@ -311,27 +297,27 @@ let ModifiedIndicator = new Lang.Class({
 	    this._hideOverlays(false);
 	} else {
 	    let opacity = (1-curBrightness)*255;
-	    log_debug("_on_brightness_change: opacity="+opacity);
+	    logger.log_debug("_on_brightness_change: opacity="+opacity);
 	    this._showOverlays(opacity, force);
 	}
     },
 
     _on_monitors_change() {
 	if (this._displayConfigProxy == null) {
-	    log_debug("_on_monitors_change(): skipping run as the proxy hasn't been set up yet.");
+	    logger.log_debug("_on_monitors_change(): skipping run as the proxy hasn't been set up yet.");
 	    return;
 	}
-	log_debug("_on_monitors_change()");
+	logger.log_debug("_on_monitors_change()");
 	Utils.getMonitorConfig(this._displayConfigProxy, Lang.bind(this, function(result, error) {
 	    if (error) {
-		log("_on_monitors_change(): cannot get Monitor Config: "+error);
+		logger.log("_on_monitors_change(): cannot get Monitor Config: "+error);
 		return;
 	    }
 	    let monitorNames = [];
 	    for (let i=0; i < result.length; ++i) {
 		let [monitorName, connectorName] = result[i];
 		let monitorIndex = this._monitorManager.get_monitor_for_connector(connectorName);
-		log_debug('_on_monitors_change(): monitor="'+monitorName+'", connector="'+connectorName+'", index='+monitorIndex);
+		logger.log_debug('_on_monitors_change(): monitor="'+monitorName+'", connector="'+connectorName+'", index='+monitorIndex);
 		if (monitorIndex >= 0) {
 		    monitorNames[monitorIndex] = monitorName;
 		}
@@ -342,7 +328,7 @@ let ModifiedIndicator = new Lang.Class({
     },
 
     _on_use_backlight_change() {
-	log_debug('_on_use_backlight_change()');
+	logger.log_debug('_on_use_backlight_change()');
 	if (settings.get_boolean('use-backlight')) {
 	    this._storeBrightnessLevel(settings.get_double('current-brightness'));
 	} else if (this._proxy.Brightness != null && this._proxy.Brightness >= 0) {
@@ -353,43 +339,43 @@ let ModifiedIndicator = new Lang.Class({
 });
 
 function on_debug_change() {
-    debug = settings.get_boolean('debug');
-    log('debug = '+debug);
+    logger.set_debug(settings.get_boolean('debug'));
+    logger.log('debug = '+logger.get_debug());
 }
 
 function init() {
-    log_debug('init()');
+    logger.log_debug('init()');
     Convenience.initTranslations();
 }
 
 function enable() {
     if (enabled) {
-	log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
+	logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
     } else {
 	settings = Convenience.getSettings();
 	debugSettingChangedConnection = settings.connect('changed::debug', on_debug_change);
-	debug = settings.get_boolean('debug');
-	log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
+	logger.set_debug(settings.get_boolean('debug'));
+	logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
 	modifiedIndicator = new ModifiedIndicator();
 	modifiedIndicator._enable();
 
 	enabled = true;
-	log_debug('Extension enabled');
+	logger.log_debug('Extension enabled');
     }
 }
 
 function disable() {
     if (Main.sessionMode.currentMode == 'unlock-dialog') {
-	log_debug('disable() skipped as session-mode = unlock-dialog');
+	logger.log_debug('disable() skipped as session-mode = unlock-dialog');
     } else if (enabled) {
-	log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
+	logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
 	settings.disconnect(debugSettingChangedConnection);
 	modifiedIndicator._disable();
 	modifiedIndicator = null;
 	settings.run_dispose();
 	enabled = false;
-	log_debug('Extension disabled');
+	logger.log_debug('Extension disabled');
     } else {
-	log('disabled() called when not enabled');
+	logger.log('disabled() called when not enabled');
     }
 }
