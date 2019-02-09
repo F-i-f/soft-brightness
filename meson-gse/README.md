@@ -31,7 +31,7 @@ In your extension's top-level directory, run:
 git subtree add -P meson-gse -m "Pull from meson-gse as a subtree." --squash git@github.com:F-i-f/meson-gse.git master
 ```
 As a convenience, when pulling update from the project, two
-convenience commands automate pushing and pulling:
+commands automate pushing and pulling:
 
 ``` shell
 meson-gse/git-subtree-pull
@@ -61,6 +61,7 @@ The `gse_sources` files are installed in the extension's root directory by the `
 - __gse_libs__
 This meson variable is intended for external javascript libraries.  The difference between `gse_sources` and `gse_libs` is that the `gse_sources` javascript files will be checked for syntax when running `ninja check` while the `gse_libs` javascript files won't.
 The very commonly used `convenience.js` file is included in the meson-gse distribution and its path is available in the meson variable `gse_lib_convenience`.
+A very [basic logging class](https://github.com/F-i-f/meson-gse/blob/master/lib/logger.js) is also provided, and its path is available in the `gse_lib_logger` meson variable.
 Example:
 `gse_libs += gse_lib_convenience`
 `gse_libs += files('lib/other-library.js')`
