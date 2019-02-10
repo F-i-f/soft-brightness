@@ -52,7 +52,6 @@ class SoftBrightnessSettings extends Gtk.Grid {
 	this.enabled_label.set_tooltip_text(descr);
 	this.enabled_control = new Gtk.Switch({halign: Gtk.Align.END});
 	this.enabled_control.set_tooltip_text(descr);
-	this.enabled_label.set_tooltip_text(this._settings.settings_schema.get_key('use-backlight').get_description());
 	this.attach(this.enabled_label,   1, ypos, 1, 1);
 	this.attach(this.enabled_control, 2, ypos, 1, 1);
 	this._settings.bind('use-backlight', this.enabled_control, 'active', Gio.SettingsBindFlags.DEFAULT);
