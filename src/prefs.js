@@ -32,8 +32,8 @@ function init() {
     Convenience.initTranslations();
 }
 
-const TransparentWindowMovingSettings = GObject.registerClass(
-class TransparentWindowMovingSettings extends Gtk.Grid {
+const SoftBrightnessSettings = GObject.registerClass(
+class SoftBrightnessSettings extends Gtk.Grid {
     _init(params) {
 	super._init(params);
 
@@ -173,7 +173,7 @@ class TransparentWindowMovingSettings extends Gtk.Grid {
 });
 
 function buildPrefsWidget() {
-    let widget = new TransparentWindowMovingSettings();
+    let widget = new SoftBrightnessSettings();
     widget.show_all();
 
     return widget;
