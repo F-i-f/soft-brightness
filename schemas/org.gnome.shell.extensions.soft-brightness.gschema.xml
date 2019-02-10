@@ -1,4 +1,4 @@
-<schemalist gettext-domain="gnome-shell-extensions">
+<schemalist gettext-domain="soft-brightness">
   <enum id="org.gnome.shell.extensions.soft-brightness.monitors">
     <value value="0" nick="all"/>
     <value value="1" nick="built-in"/>
