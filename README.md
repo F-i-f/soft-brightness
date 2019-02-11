@@ -314,7 +314,7 @@ And your extension is installed and ready to be enabled in Tweaks.
 
 ### More complex examples
 
-Refer to the [projects using meson-gse](#Gnome-Shell-Extensions-using-meson-gse).
+Refer to the [projects using meson-gse](#gnome-shell-extensions-using-meson-gse).
 
 ## Requirements
 
