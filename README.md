@@ -5,7 +5,7 @@ Soft Brightness uses an alpha overlay to control the brightness on all
 or some of your monitors.  It integrates smoothly
 Common uses are:
 
-- Your laptop has no backlight, maybe because it's not supported, or
+- Your laptop has no back-light, maybe because it's not supported, or
   you have an OLED display.
 
 - You want to control the brightness level of external monitor like
@@ -41,7 +41,7 @@ Check-out the GitHub [releases page](https://github.com/F-i-f/soft-brightness/re
 
 - Run meson: `meson build`
 
-- To install in your your gnome shell extensions's directory (~/.local/share/gnome-shell/extensions), run ninja: `ninja -C build install`
+- To install in your your gnome shell extensions' directory (~/.local/share/gnome-shell/extensions), run ninja: `ninja -C build install`
 
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
@@ -51,7 +51,7 @@ Check-out the GitHub [releases page](https://github.com/F-i-f/soft-brightness/re
 #### February 11, 2019
 
 - README.md: Meson 0.44.0 or later is required.
-- README.md: Add creadits.
+- README.md: Add credits.
 - Drop duplicate shipped file in lib/convenience.js.
 - Add GPLv3 in LICENSE.
 - Use meson-gse for building: custom scripts moved there.
@@ -85,7 +85,7 @@ Check-out the GitHub [releases page](https://github.com/F-i-f/soft-brightness/re
 #### Notes
 
 The git release shows as 3 in the source code, but the extension (as built by the [Gnome Shell Extensions website](https://extensions.gnome.org/)) shows the release at 2.
-Let's call it release v2 then.
+Let's call it release 2 then.
 
 ### Version 1
 #### February 2, 2019
@@ -96,3 +96,7 @@ First public release.
 
 - The [`meson-gse` credits](https://github.com/F-i-f/meson-gse/) are
   included here by reference.
+
+<!--  LocalWords:  OLED VSync extensions' Changelog README md GPLv3
+LocalWords:  gse gettext DND
+-->
