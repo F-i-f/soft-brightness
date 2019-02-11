@@ -8,61 +8,75 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-07 09:16-0800\n"
+"POT-Creation-Date: 2019-02-11 10:03-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/prefs.js:51
+#: src/prefs.js:57
+msgid "Soft Brightness"
+msgstr ""
+
+#: src/prefs.js:67
+msgid "Version"
+msgstr ""
+
+#: src/prefs.js:90
 msgid "Use backlight control:"
 msgstr ""
 
-#: src/prefs.js:65
+#: src/prefs.js:101
 msgid "Monitor(s):"
 msgstr ""
 
-#: src/prefs.js:69
+#: src/prefs.js:105
 msgid "All"
 msgstr ""
 
-#: src/prefs.js:70
+#: src/prefs.js:106
 msgid "Built-in"
 msgstr ""
 
-#: src/prefs.js:71
+#: src/prefs.js:107
 msgid "External"
 msgstr ""
 
-#: src/prefs.js:79
+#: src/prefs.js:115
 msgid "Built-in monitor:"
 msgstr ""
 
-#: src/prefs.js:102
+#: src/prefs.js:138
 msgid "Full-screen behavior:"
 msgstr ""
 
-#: src/prefs.js:106
+#: src/prefs.js:142
 msgid "Do not enforce brightness in full-screen"
 msgstr ""
 
-#: src/prefs.js:107
+#: src/prefs.js:143
 msgid "Brightness enforced in full-screen"
 msgstr ""
 
-#: src/prefs.js:108
+#: src/prefs.js:144
 msgid "Brightness enforced in full-screen, always tear-free"
 msgstr ""
 
-#: src/prefs.js:116
+#: src/prefs.js:152
 msgid "Minimum brightness (0..1):"
 msgstr ""
 
-#: src/prefs.js:135
+#: src/prefs.js:171
 msgid "Debug:"
+msgstr ""
+
+#: src/prefs.js:184
+msgid ""
+"Copyright © 2019 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</"
+"a> on GitHub)"
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
@@ -74,7 +88,7 @@ msgid "Use the regular backlight control."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:20
-msgid "Monitors"
+msgid "Monitors."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
@@ -82,7 +96,7 @@ msgid "The monitors whose brigthness should be adjusted."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:25
-msgid "Builtin monitor"
+msgid "Builtin monitor."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:26
@@ -90,7 +104,7 @@ msgid "The name of the built-in monitor."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:30
-msgid "Prevent window unredirecting behavior"
+msgid "Prevent window unredirecting behavior."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
@@ -103,7 +117,7 @@ msgid ""
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:41
-msgid "Minimum brightness"
+msgid "Minimum brightness."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:42
@@ -111,7 +125,7 @@ msgid "Minimum brightness level."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:47
-msgid "Current brightness level"
+msgid "Current brightness level."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:48
@@ -119,7 +133,7 @@ msgid "The current brightness level."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
-msgid "Debugging"
+msgid "Debugging."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
