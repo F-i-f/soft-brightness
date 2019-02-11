@@ -36,7 +36,7 @@ meson-gse expects your project to have a certain layout:
 
 - `src/`
 
-  - javascript and css goes here
+  - JavaScript and CSS goes here
 
   - `src/extension.js` This file is mandatory for a Gnome-shell
 	extension.  **[auto-included]**
@@ -76,7 +76,7 @@ You need to create two files: `meson-gse.build` and
 ```shell
 # You can put a header here
 # But no meson directives can be used
-gse_project({extension name}, {extension uuid domain}, {extension version}, {gse assigments, meson code block})
+gse_project({extension name}, {extension uuid domain}, {extension version}, {gse assignments, meson code block})
 # You can put other comments or meson directives after the gse_project statement
 ```
 
@@ -89,14 +89,14 @@ gse_project({extension name}, {extension uuid domain}, {extension version}, {gse
 - _extension_version_ must be a single integer as it will be used in
   the Gnome Shell extension's `metadata.json` file.
 
-- _gse_assigments, meson code block_ can be any meson code, but you're
+- _gse_assignments, meson code block_ can be any meson code, but you're
   expected to fill in some meson-gse variables as described below.
 
 ##### Available meson-gse variables
 
 - __gse_sources__
 
-  You can add any javascript files to this meson variable.  Note that
+  You can add any JavaScript files to this meson variable.  Note that
   the `src/extension.js` and `src/prefs.js` (if it exists) files are
   automatically included.
 
@@ -111,10 +111,10 @@ gse_project({extension name}, {extension uuid domain}, {extension version}, {gse
 
 - __gse_libs__
 
-  This meson variable is intended for external javascript libraries.
+  This meson variable is intended for external JavaScript libraries.
   The difference between `gse_sources` and `gse_libs` is that the
-  `gse_sources` javascript files will be checked for syntax when
-  running `ninja check` while the `gse_libs` javascript files won't.
+  `gse_sources` JavaScript files will be checked for syntax when
+  running `ninja check` while the `gse_libs` JavaScript files won't.
 
   The very commonly used `convenience.js` file is included in the
   meson-gse distribution and its path is available in the meson
@@ -137,7 +137,7 @@ gse_project({extension name}, {extension uuid domain}, {extension version}, {gse
 
 - __gse_data__
 
-  This meson variable can be used for other non-javascript data files.
+  This meson variable can be used for other non-JavaScript data files.
   The `src/stylesheet.css` file is automatically included if it
   exists.
 
@@ -184,7 +184,7 @@ gse_project({extension name}, {extension uuid domain}, {extension version}, {gse
 #### The `src/metadata.json.in` file
 
 This is a template for the extension's `metadata.json` file.  Meson
-will fill in some variables automagically.  All variables expansions
+will fill in some variables automatically.  All variables expansions
 are surrounded with `@` signs, like in `@variable@`.
 
 ##### Available `metadata.json.in`  expansions
@@ -204,7 +204,7 @@ are surrounded with `@` signs, like in `@variable@`.
 ```shell
 meson-gse/meson-gse
 meson build
-ninja -C build test          # Checks syntax of javascript files
+ninja -C build test          # Checks syntax of JavaScript files
 ninja -C build install       # Install to $HOME/.local/share/gnome-shell/extensions
 ninja -C build extension.zip # Builds the extension in build/extension.zip
 ```
@@ -318,7 +318,7 @@ Refer to the [projects using meson-gse](#gnome-shell-extensions-using-meson-gse)
 
 ## Requirements
 
-- [GNU m4](https://www.gnu.org/software/m4/m4.html)
+- [GNU M4](https://www.gnu.org/software/m4/m4.html)
 
   M4 is needed to generate `meson.build` from `meson-gse.build`.
 
@@ -331,3 +331,8 @@ Refer to the [projects using meson-gse](#gnome-shell-extensions-using-meson-gse)
 
 - meson-gse includes the `convenience.js` file from Giovanni Campagna
   <scampa.giovanni@gmail.com>.
+
+<!--  LocalWords:  gse subtree submodule GSettings CSS metadata uuid
+LocalWords:  libs schemas dbus DBus gettext M4 Florian Müllner
+LocalWords:  Campagna
+-->
