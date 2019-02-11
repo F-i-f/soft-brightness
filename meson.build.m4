@@ -56,6 +56,8 @@ if gse_run_command_obj.returncode() == 0
   gse_schemas += files(gse_schema_main)
 endif
 
+gse_js60 = find_program('js60', required: false)
+
 # Include extension-specific settings
 $4m4_dnl
 # End of extension-specific settings
@@ -108,6 +110,14 @@ if gse_schemas != []
 		install_dir:      gse_target_dir_schemas)
   install_data(gse_schemas,
 	       install_dir: gse_target_dir_schemas)
+endif
+
+if (gse_js60.found())
+  foreach gse_source : gse_sources
+    test('Checking syntax of ' + '@0@'.format(gse_source),
+	 gse_js60,
+	 args: ['-s', '-c', gse_source])
+  endforeach
 endif
 
 install_data(gse_sources + gse_data + gse_libs,
