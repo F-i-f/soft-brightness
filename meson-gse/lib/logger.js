@@ -29,10 +29,14 @@ var Logger = new Lang.Class({
 	this._debug = false;
     },
 
+    get_version: function() {
+	return Me.metadata['version']+' / git '+Me.metadata['vcs_revision'];
+    },
+
     log: function(text) {
 	if (this._first_log) {
 	    this._first_log = false;
-	    this.log('version '+Me.metadata['version']+' / git '+Me.metadata['vcs_revision']);
+	    this.log('version '+this.get_version());
 	}
 	global.log(''+this._title+': '+text);
     },
