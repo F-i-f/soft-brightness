@@ -1,7 +1,7 @@
 # -*- meson -*-
 
 # Soft-brightness - Control the display's brightness via an alpha channel.
-# Copyright (C) 2019 Philippe Troin <phil@fifi.org>
+# Copyright (C) 2019 Philippe Troin (F-i-f on Github)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # This file has been generated from meson-gse/meson.build.m4 and meson-gse.build
 
 # meson-gse - Library for gnome-shell extensions
-# Copyright (C) 2019 Philippe Troin <phil@fifi.org>
+# Copyright (C) 2019 Philippe Troin (F-i-f on Github)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
