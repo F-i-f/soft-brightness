@@ -32,7 +32,7 @@ meson-gse expects your project to have a certain layout:
 ### Import meson-gse in your git tree
 In your extension's top-level directory, run:
 ``` shell
-git subtree add -P meson-gse -m "Pull from meson-gse as a subtree." --squash git@github.com:F-i-f/meson-gse.git master
+git subtree add -P meson-gse -m "Pull from meson-gse as a subtree." git@github.com:F-i-f/meson-gse.git master
 ```
 As a convenience, when pulling update from the project, two
 commands automate pushing and pulling:
