@@ -27,25 +27,64 @@ const Utils = Me.imports.utils;
 const Gettext = imports.gettext.domain(Me.metadata['gettext-domain']);
 const _ = Gettext.gettext;
 
+const Logger = Me.imports.logger;
 
-function init() {
-    Convenience.initTranslations();
-}
+const SoftBrightnessSettings = new Lang.Class({
+    Name: 'SoftBrightnessSettings',
+    Extends: Gtk.Grid,
 
-const SoftBrightnessSettings = GObject.registerClass(
-class SoftBrightnessSettings extends Gtk.Grid {
     _init(params) {
-	super._init(params);
+	this.parent(params);
 
-	this.margin = 24;
+	this.margin_top = 12;
+	this.margin_bottom = this.margin_top;
+	this.margin_left = 48;
+	this.margin_right = this.margin_left;
 	this.row_spacing = 6;
-	this.column_spacing = 6;
+	this.column_spacing = this.row_spacing;
 	this.orientation = Gtk.Orientation.VERTICAL;
 
 	this._settings = Convenience.getSettings();
+	this._logger = new Logger.Logger('Soft-Brightness');
+	this._logger.set_debug(this._settings.get_boolean('debug'));
 
 	let ypos = 1;
 	let descr;
+
+	this.title_label = new Gtk.Label({
+	    use_markup: true,
+	    label: '<span size="large" weight="heavy">'
+		+_('Soft Brightness')+'</span>',
+	    hexpand: true,
+	    halign: Gtk.Align.CENTER
+	});
+	this.attach(this.title_label, 1, ypos, 2, 1);
+
+	ypos += 1;
+
+	this.version_label = new Gtk.Label({
+	    use_markup: true,
+	    label: '<span size="small">'+_('Version')
+		+ ' ' + this._logger.get_version() + '</span>',
+	    hexpand: true,
+	    halign: Gtk.Align.CENTER,
+	});
+	this.attach(this.version_label, 1, ypos, 2, 1);
+
+	ypos += 1;
+
+	this.version_label = new Gtk.Label({
+	    use_markup: true,
+	    label: '<span size="small"><a href="'+Me.metadata.url+'">'
+		+ Me.metadata.url + '</a></span>',
+	    hexpand: true,
+	    halign: Gtk.Align.CENTER,
+	    margin_bottom: this.margin_bottom
+	});
+	this.attach(this.version_label, 1, ypos, 2, 1);
+
+	ypos += 1;
+
 
 	descr = _(this._settings.settings_schema.get_key('use-backlight').get_description());
 	this.enabled_label = new Gtk.Label({label: _("Use backlight control:"), halign: Gtk.Align.START});
@@ -136,15 +175,30 @@ class SoftBrightnessSettings extends Gtk.Grid {
 	this.attach(this.debug_label,   1, ypos, 1, 1);
 	this.attach(this.debug_control, 2, ypos, 1, 1);
 	this._settings.bind('debug', this.debug_control, 'active', Gio.SettingsBindFlags.DEFAULT);
-    }
+
+	ypos += 1;
+
+	this.version_label = new Gtk.Label({
+	    use_markup: true,
+	    label: '<span size="small">'
+		+ _('Copyright © 2019 Philippe Troin (<a href="https://github.com/F-i-f">F-i-f</a> on GitHub)')
+		+ '</span>',
+	    hexpand: true,
+	    halign: Gtk.Align.CENTER,
+	    margin_top: this.margin_bottom
+	});
+	this.attach(this.version_label, 1, ypos, 2, 1);
+
+	ypos += 1;
+    },
 
     _bindBuiltinMonitorControl() {
 	this._settings.bind('builtin-monitor', this.builtin_monitor_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
-    }
+    },
 
     _unbindBuiltinMonitorControl() {
 	Gio.Settings.unbind(this.builtin_monitor_control, 'active-id');
-    }
+    },
 
     _refreshMonitors() {
 	Utils.getMonitorConfig(this.displayConfigProxy, Lang.bind(this, function(result, error) {
@@ -170,6 +224,10 @@ class SoftBrightnessSettings extends Gtk.Grid {
 	}));
     }
 });
+
+function init() {
+    Convenience.initTranslations();
+}
 
 function buildPrefsWidget() {
     let widget = new SoftBrightnessSettings();
