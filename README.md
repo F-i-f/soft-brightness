@@ -47,6 +47,20 @@ Check-out the GitHub [releases page](https://github.com/F-i-f/soft-brightness/re
 
 ## Changelog
 
+### Version 4
+#### February 11, 2019
+
+- README.md: Meson 0.44.0 or later is required.
+- README.md: Add creadits.
+- Drop duplicate shipped file in lib/convenience.js.
+- Add GPLv3 in LICENSE.
+- Use meson-gse for building: custom scripts moved there.
+- Fix french translations not showing up.
+- Beautify preferences dialog.
+- Fix a few strings for consistency.
+- Fix wrong gettext-domain in schema file.
+- Remove all global variables from extension.
+
 ### Version 3
 #### February 6, 2019
 
