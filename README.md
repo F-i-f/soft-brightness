@@ -1,4 +1,7 @@
 # Soft Brightness Gnome Shell Extension
+
+![Brightness slider in Gnome Shell's system menu](docs/soft-brightness.png)
+
 ## Overview
 
 Soft Brightness uses an alpha overlay to control the brightness on all
@@ -22,6 +25,8 @@ Bonus features:
 Soft Brightness comes with a configuration panel, which can be
 accessed from the "Tweaks" application or the [Gnome Shell Extensions
 page](https://extensions.gnome.org/local/).
+
+![Soft Brightness preference panel](docs/preferences.png)
 
 ## Download
 
