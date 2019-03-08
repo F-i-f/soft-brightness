@@ -97,7 +97,7 @@ gse_target_dir_dbus_intf = join_paths(gse_target_dir, 'dbus-interfaces')
 meson_extra_scripts      = 'meson-gse/meson-scripts'
 
 gse_metadata_conf = configuration_data()
-git_rev_cmd = run_command('git', 'rev-parse', 'HEAD')
+git_rev_cmd = run_command('git', 'describe', '--tags', '--long', '--always')
 if git_rev_cmd.returncode() != 0
   warning('git rev-parse exit=@0@'.format(git_rev_cmd.returncode()))
   gse_metadata_conf.set('VCS_TAG', 'unknown')
