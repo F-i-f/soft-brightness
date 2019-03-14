@@ -80,6 +80,16 @@ const SoftBrightnessExtension = new Lang.Class({
     },
 
     enable: function() {
+        if (this._monitorsChangedConnection == null) {
+	    this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
+            if (this._enabled) {
+		// We may have skipped a monitor change during lock.
+                this._on_monitors_change();
+            }
+        } else {
+	    this._logger.log('enable() called twice without disable()? (_monitorsChangedConnection != null)');
+        }
+            
 	if (this._enabled) {
 	    this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
 	} else {
@@ -95,6 +105,11 @@ const SoftBrightnessExtension = new Lang.Class({
     },
 
     disable: function() {
+        if (this._monitorsChangedConnection != null) {
+	    Main.layoutManager.disconnect(this._monitorsChangedConnection);
+            this._monitorsChangedConnection = null;
+        }
+        
 	if (Main.sessionMode.currentMode == 'unlock-dialog') {
 	    this._logger.log_debug('disable() skipped as session-mode = unlock-dialog');
 	} else if (this._enabled) {
@@ -152,7 +167,6 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._on_monitors_change();
 	}));
 
-	this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
 	this._minBrightnessSettingChangedConnection = this._settings.connect('changed::min-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
 	this._currentBrightnessSettingChangedConnection = this._settings.connect('changed::current-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
 	this._monitorsSettingChangedConnection = this._settings.connect('changed::monitors', Lang.bind(this, function() { this._on_brightness_change(true); }));
@@ -175,7 +189,6 @@ const SoftBrightnessExtension = new Lang.Class({
 	this._swapMenu(this._brightnessIndicator, standardIndicator);
 	this._brightnessIndicator = null;
 
-	Main.layoutManager.disconnect(this._monitorsChangedConnection);
 	this._settings.disconnect(this._minBrightnessSettingChangedConnection);
 	this._settings.disconnect(this._currentBrightnessSettingChangedConnection);
 	this._settings.disconnect(this._monitorsSettingChangedConnection);
@@ -355,6 +368,10 @@ const SoftBrightnessExtension = new Lang.Class({
     _on_monitors_change() {
 	if (this._displayConfigProxy == null) {
 	    this._logger.log_debug("_on_monitors_change(): skipping run as the proxy hasn't been set up yet.");
+	    return;
+	}
+	if (this._monitorManager == null) {
+	    this._logger.log_debug("_on_monitors_change(): skipping run as the monitor manager hasn't been set up yet.");
 	    return;
 	}
 	this._logger.log_debug("_on_monitors_change()");
