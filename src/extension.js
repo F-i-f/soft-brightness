@@ -34,12 +34,34 @@ const ModifiedBrightnessIndicator = new Lang.Class({
     Name: 'ModifiedBrightnessIndicator',
     Extends: Indicator,
 
-    _init() {
+    _init(softBrightnessExtension) {
+	this._softBrightnessExtension = softBrightnessExtension;
+	this.parent();
+    },
+
+    _sliderChanged(slider, value) {
+	this._softBrightnessExtension._logger.log_debug("_sliderChanged(slide, "+value+")");
+	this._softBrightnessExtension._storeBrightnessLevel(value);
+    },
+
+    _sync() {
+	this._softBrightnessExtension._logger.log_debug("_sync()");
+	this._softBrightnessExtension._on_brightness_change(false);
+	this._slider.setValue(this._softBrightnessExtension._getBrightnessLevel());
+    }
+
+});
+
+const SoftBrightnessExtension = new Lang.Class({
+    Name: 'SoftBrightnessExtension',
+
+    _init: function() {
 	this.parent();
 
 	this._enabled = false;
 	this._logger = null;
 	this._settings = null;
+	this._brightnessIndicator = null;
 	this._debugSettingChangedConnection = null;
 
 	this._unredirectPrevented = false;
@@ -114,7 +136,8 @@ const ModifiedBrightnessIndicator = new Lang.Class({
     _enable() {
 	this._logger.log_debug('_enable()');
 
-	if (! this._swapMenu(AggregateMenu._brightness, this)) {
+	this._brightnessIndicator = new ModifiedBrightnessIndicator(this);
+	if (! this._swapMenu(AggregateMenu._brightness, this._brightnessIndicator)) {
 	    return;
 	}
 
@@ -138,10 +161,10 @@ const ModifiedBrightnessIndicator = new Lang.Class({
 	this._preventUnredirectChangedConnection = this._settings.connect('changed::prevent-unredirect', Lang.bind(this, function() { this._on_brightness_change(true); }));
 
 	// If we use the backlight and the Brightness proxy is null, it's still connecting and we'll get a _sync later.
-	if (! this._settings.get_boolean('use-backlight') || this._proxy.Brightness != null) {
+	if (! this._settings.get_boolean('use-backlight') || this._brightnessIndicator._proxy.Brightness != null) {
 	    let curBrightness = this._getBrightnessLevel();
-	    this._sliderChanged(this._slider, curBrightness);
-	    this._slider.setValue(curBrightness);
+	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider, curBrightness);
+	    this._brightnessIndicator._slider.setValue(curBrightness);
 	}
     },
 
@@ -149,7 +172,8 @@ const ModifiedBrightnessIndicator = new Lang.Class({
 	this._logger.log_debug('_disable()');
 
 	let standardIndicator = new imports.ui.status.brightness.Indicator();
-	this._swapMenu(this, standardIndicator);
+	this._swapMenu(this._brightnessIndicator, standardIndicator);
+	this._brightnessIndicator = null;
 
 	Main.layoutManager.disconnect(this._monitorsChangedConnection);
 	this._settings.disconnect(this._minBrightnessSettingChangedConnection);
@@ -159,17 +183,6 @@ const ModifiedBrightnessIndicator = new Lang.Class({
 	this._settings.disconnect(this._useBacklightSettingChangedConnection);
 	this._settings.disconnect(this._preventUnredirectChangedConnection);
 	this._hideOverlays(true);
-    },
-
-    _sliderChanged(slider, value) {
-	this._logger.log_debug("_sliderChanged(slide, "+value+")");
-	this._storeBrightnessLevel(value);
-    },
-
-    _sync() {
-	this._logger.log_debug("_sync()");
-	this._on_brightness_change(false);
-	this._slider.setValue(this._getBrightnessLevel());
     },
 
     _preventUnredirect() {
@@ -289,10 +302,10 @@ const ModifiedBrightnessIndicator = new Lang.Class({
     },
 
     _storeBrightnessLevel(value) {
-	if (this._settings.get_boolean('use-backlight') && this._proxy.Brightness >= 0) {
+	if (this._settings.get_boolean('use-backlight') && this._brightnessIndicator._proxy.Brightness >= 0) {
 	    let convertedBrightness = Math.min(100, Math.round(value * 100.0)+1);
 	    this._logger.log_debug('_storeBrightnessLevel('+value+') by proxy -> '+convertedBrightness);
-	    this._proxy.Brightness = convertedBrightness;
+	    this._brightnessIndicator._proxy.Brightness = convertedBrightness;
 	} else {
 	    this._logger.log_debug('_storeBrightnessLevel('+value+') by setting');
 	    this._settings.set_double('current-brightness', value);
@@ -300,7 +313,7 @@ const ModifiedBrightnessIndicator = new Lang.Class({
     },
 
     _getBrightnessLevel() {
-	let brightness = this._proxy.Brightness;
+	let brightness = this._brightnessIndicator._proxy.Brightness;
 	if (this._settings.get_boolean('use-backlight') && brightness != brightness >= 0) {
 	    let convertedBrightness = brightness / 100.0;
 	    this._logger.log_debug('_getBrightnessLevel() by proxy = '+convertedBrightness+' <- '+brightness);
@@ -320,7 +333,7 @@ const ModifiedBrightnessIndicator = new Lang.Class({
 	if (curBrightness < minBrightness) {
 	    curBrightness = minBrightness;
 	    if (! this._settings.get_boolean('use-backlight')) {
-		this._slider.setValue(curBrightness);
+		this._brightnessIndicator._slider.setValue(curBrightness);
 	    }
 	    this._storeBrightnessLevel(minBrightness);
 	    return;
@@ -368,13 +381,13 @@ const ModifiedBrightnessIndicator = new Lang.Class({
 	this._logger.log_debug('_on_use_backlight_change()');
 	if (this._settings.get_boolean('use-backlight')) {
 	    this._storeBrightnessLevel(this._settings.get_double('current-brightness'));
-	} else if (this._proxy.Brightness != null && this._proxy.Brightness >= 0) {
-	    this._storeBrightnessLevel(this._proxy.Brightness / 100.0);
+	} else if (this._brightnessIndicator._proxy.Brightness != null && this._brightnessIndicator._proxy.Brightness >= 0) {
+	    this._storeBrightnessLevel(this._brightnessIndicator._proxy.Brightness / 100.0);
 	}
     }
 
 });
 
 function init() {
-    return new ModifiedBrightnessIndicator();
+    return new SoftBrightnessExtension();
 }
