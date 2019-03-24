@@ -13,9 +13,13 @@ git-submodule).
 
 ## Gnome Shell Extensions using meson-gse
 
+- [SSH Search Provider Reborn](https://github.com/F-i-f/ssh-search-provider/)
+
 - [Soft Brightness](https://github.com/F-i-f/soft-brightness/)
 
 - [Tweaks in System Menu](https://github.com/F-i-f/tweaks-system-menu/)
+
+- [Weeks Start on Monday Again...](https://github.com/F-i-f/weeks-start-on-monday/)
 
 ## Usage
 
