@@ -81,9 +81,9 @@ const ModifiedBrightnessIndicator = new Lang.Class({
 	    this._disable();
 	    this._settings.run_dispose();
 	    this._settings = null;
-	    this._logger = null;
 	    this._enabled = false;
 	    this._logger.log_debug('Extension disabled');
+	    this._logger = null;
 	} else {
 	    this._logger.log('disabled() called when not enabled');
 	}
