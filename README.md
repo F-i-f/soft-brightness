@@ -28,9 +28,16 @@ page](https://extensions.gnome.org/local/).
 
 ![Soft Brightness preference panel](docs/preferences.png)
 
-## Download
+## Download / Install
 
-Check-out the GitHub [releases page](https://github.com/F-i-f/soft-brightness/releases).
+Install directly from the [Gnome Shell Extensions
+site](https://extensions.gnome.org/extension/1625/soft-brightness/).
+
+Or download the zip file from the GitHub [releases
+page](https://github.com/F-i-f/soft-brightness/releases) and unzip
+[the
+file](https://github.com/F-i-f/soft-brightness/releases/download/v4/soft-brightness@fifi.org.v4.shell-extension.zip)
+in your `~/.local/share/gnome-shell/extensions/` directory.
 
 ## Building from source
 
