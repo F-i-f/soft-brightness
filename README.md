@@ -37,7 +37,9 @@ Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
 file](https://github.com/F-i-f/soft-brightness/releases/download/v5/soft-brightness@fifi.org.v5.shell-extension.zip)
-in your `~/.local/share/gnome-shell/extensions/` directory.
+in the
+`~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
+directory (you may have to create the directory).
 
 ## Building from source
 
