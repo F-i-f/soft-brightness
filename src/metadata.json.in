@@ -1,5 +1,5 @@
 {
-    "description": "Use the brightness slider to change the brightness via an alpha layer (and stop using the backlight, if you have one).",
+    "description": "Use the brightness slider to change the brightness via an alpha layer (and stop using the backlight, if you have one).\n\nNote that this extension will keep running on the lock screen, as you'd also want the brightness setting to apply to the lock screen as well. Please comment if this gives you any trouble.",
     "name": "Soft brightness",
     "shell-version": [
 	"3.30"
