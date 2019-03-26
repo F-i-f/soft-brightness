@@ -50,8 +50,6 @@ const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends In
 
 const SoftBrightnessExtension = class SoftBrightnessExtension {
     constructor() {
-	super();
-
 	this._enabled = false;
 	this._logger = null;
 	this._settings = null;
