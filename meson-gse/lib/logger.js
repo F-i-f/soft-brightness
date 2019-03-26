@@ -14,44 +14,40 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const Lang = imports.lang;
-
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const Me = ExtensionUtils.getCurrentExtension();
 
-var Logger = new Lang.Class({
-    Name: 'MesonGseLogger',
-
-    _init: function(title) {
+const Logger = class MesonGseLogger {
+    constructor(title) {
 	this._first_log = true;
 	this._title = title;
 	this._debug = false;
-    },
+    }
 
-    get_version: function() {
+    get_version() {
 	return Me.metadata['version']+' / git '+Me.metadata['vcs_revision'];
-    },
+    }
 
-    log: function(text) {
+    log(text) {
 	if (this._first_log) {
 	    this._first_log = false;
 	    this.log('version '+this.get_version());
 	}
 	global.log(''+this._title+': '+text);
-    },
+    }
 
-    log_debug: function(text) {
+    log_debug(text) {
 	if (this._debug) {
 	    this.log(text);
 	}
-    },
+    }
 
-    set_debug: function(debug) {
+    set_debug(debug) {
 	this._debug = debug;
-    },
+    }
 
-    get_debug: function() {
+    get_debug() {
 	return this._debug;
     }
-});
+};
