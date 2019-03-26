@@ -29,12 +29,9 @@ const _ = Gettext.gettext;
 
 const Logger = Me.imports.logger;
 
-const SoftBrightnessSettings = new Lang.Class({
-    Name: 'SoftBrightnessSettings',
-    Extends: Gtk.Grid,
-
+const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSettings extends Gtk.Grid {
     _init(params) {
-	this.parent(params);
+	super._init(params);
 
 	this.margin_top = 12;
 	this.margin_bottom = this.margin_top;
@@ -190,15 +187,15 @@ const SoftBrightnessSettings = new Lang.Class({
 	this.attach(this.copyright_label, 1, ypos, 2, 1);
 
 	ypos += 1;
-    },
+    }
 
     _bindBuiltinMonitorControl() {
 	this._settings.bind('builtin-monitor', this.builtin_monitor_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
-    },
+    }
 
     _unbindBuiltinMonitorControl() {
 	Gio.Settings.unbind(this.builtin_monitor_control, 'active-id');
-    },
+    }
 
     _refreshMonitors() {
 	Utils.getMonitorConfig(this.displayConfigProxy, Lang.bind(this, function(result, error) {

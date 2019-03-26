@@ -30,33 +30,27 @@ const Indicator = imports.ui.status.brightness.Indicator;
 const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 
 
-const ModifiedBrightnessIndicator = new Lang.Class({
-    Name: 'ModifiedBrightnessIndicator',
-    Extends: Indicator,
-
-    _init(softBrightnessExtension) {
+const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends Indicator {
+    constructor(softBrightnessExtension) {
 	this._softBrightnessExtension = softBrightnessExtension;
-	this.parent();
-    },
+	super();
+    }
 
     _sliderChanged(slider, value) {
 	this._softBrightnessExtension._logger.log_debug("_sliderChanged(slide, "+value+")");
 	this._softBrightnessExtension._storeBrightnessLevel(value);
-    },
+    }
 
     _sync() {
 	this._softBrightnessExtension._logger.log_debug("_sync()");
 	this._softBrightnessExtension._on_brightness_change(false);
 	this._slider.setValue(this._softBrightnessExtension._getBrightnessLevel());
     }
+};
 
-});
-
-const SoftBrightnessExtension = new Lang.Class({
-    Name: 'SoftBrightnessExtension',
-
-    _init: function() {
-	this.parent();
+const SoftBrightnessExtension = class SoftBrightnessExtension {
+    constructor() {
+	super();
 
 	this._enabled = false;
 	this._logger = null;
@@ -77,9 +71,9 @@ const SoftBrightnessExtension = new Lang.Class({
 	this._builtinMonitorSettingChangedConnection = null;
 	this._useBacklightSettingChangedConnection = null;
 	this._preventUnredirectChangedConnection = null;
-    },
+    }
 
-    enable: function() {
+    enable() {
 	if (this._enabled) {
 	    this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
 	} else {
@@ -92,9 +86,9 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._enabled = true;
 	    this._logger.log_debug('Extension enabled');
 	}
-    },
+    }
 
-    disable: function() {
+    disable() {
 	if (Main.sessionMode.currentMode == 'unlock-dialog') {
 	    this._logger.log_debug('disable() skipped as session-mode = unlock-dialog');
 	} else if (this._enabled) {
@@ -109,7 +103,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	} else {
 	    this._logger.log('disabled() called when not enabled');
 	}
-    },
+    }
 
     _swapMenu(oldIndicator, newIndicator) {
 	let menuItems = AggregateMenu.menu._getMenuItems();
@@ -131,7 +125,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	AggregateMenu.menu.addMenuItem(newIndicator.menu, menuIndex);
 	AggregateMenu._brightness = newIndicator;
 	return true;
-    },
+    }
 
     _enable() {
 	this._logger.log_debug('_enable()');
@@ -166,7 +160,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider, curBrightness);
 	    this._brightnessIndicator._slider.setValue(curBrightness);
 	}
-    },
+    }
 
     _disable() {
 	this._logger.log_debug('_disable()');
@@ -183,7 +177,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	this._settings.disconnect(this._useBacklightSettingChangedConnection);
 	this._settings.disconnect(this._preventUnredirectChangedConnection);
 	this._hideOverlays(true);
-    },
+    }
 
     _preventUnredirect() {
 	if (! this._unredirectPrevented) {
@@ -191,7 +185,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    Meta.disable_unredirect_for_display(global.display);
 	    this._unredirectPrevented = true;
 	}
-    },
+    }
 
     _allowUnredirect() {
 	if (this._unredirectPrevented) {
@@ -199,7 +193,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    Meta.enable_unredirect_for_display(global.display);
 	    this._unredirectPrevented = false;
 	}
-    },
+    }
 
     _hideOverlays(forceUnpreventUnredirect) {
 	if (this._overlays != null) {
@@ -225,7 +219,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._logger.log('_hideOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
 	    break;
 	}
-    },
+    }
 
     _showOverlays(opacity, force) {
 	this._logger.log_debug('_showOverlays('+opacity+', '+force+')');
@@ -299,7 +293,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._logger.log_debug('_showOverlay(): set opacity '+opacity+' on overlay #'+i);
 	    this._overlays[i].opacity = opacity;
 	}
-    },
+    }
 
     _storeBrightnessLevel(value) {
 	if (this._settings.get_boolean('use-backlight') && this._brightnessIndicator._proxy.Brightness >= 0) {
@@ -310,7 +304,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._logger.log_debug('_storeBrightnessLevel('+value+') by setting');
 	    this._settings.set_double('current-brightness', value);
 	}
-    },
+    }
 
     _getBrightnessLevel() {
 	let brightness = this._brightnessIndicator._proxy.Brightness;
@@ -323,7 +317,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._logger.log_debug('_getBrightnessLevel() by setting = '+brightness);
 	    return brightness;
 	}
-    },
+    }
 
     _on_brightness_change(force) {
 	let curBrightness = this._getBrightnessLevel();
@@ -345,12 +339,12 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._logger.log_debug("_on_brightness_change: opacity="+opacity);
 	    this._showOverlays(opacity, force);
 	}
-    },
+    }
 
-    on_debug_change: function() {
+    on_debug_change() {
 	this._logger.set_debug(this._settings.get_boolean('debug'));
 	this._logger.log('debug = '+this._logger.get_debug());
-    },
+    }
 
     _on_monitors_change() {
 	if (this._displayConfigProxy == null) {
@@ -375,7 +369,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._monitorNames = monitorNames;
 	    this._on_brightness_change(true);
 	}));
-    },
+    }
 
     _on_use_backlight_change() {
 	this._logger.log_debug('_on_use_backlight_change()');
@@ -385,8 +379,7 @@ const SoftBrightnessExtension = new Lang.Class({
 	    this._storeBrightnessLevel(this._brightnessIndicator._proxy.Brightness / 100.0);
 	}
     }
-
-});
+};
 
 function init() {
     return new SoftBrightnessExtension();
