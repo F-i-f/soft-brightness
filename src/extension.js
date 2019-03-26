@@ -32,8 +32,8 @@ const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 
 const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends Indicator {
     constructor(softBrightnessExtension) {
-	this._softBrightnessExtension = softBrightnessExtension;
 	super();
+	this._softBrightnessExtension = softBrightnessExtension;
     }
 
     _sliderChanged(slider, value) {
