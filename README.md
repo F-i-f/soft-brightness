@@ -229,8 +229,7 @@ is _example.com_.  If your file layout is:
 - `src/extension.js`
 
    ```javascript
-   const Lang = imports.lang;
-   const Extension = new Lang.Class({
+   const Extension = class Extension {
 	 Name: 'Hello, world!',
 
 	 enable: function() {
@@ -240,7 +239,7 @@ is _example.com_.  If your file layout is:
 	 disable: function() {
 	   log('Hello world disabled');
 	 }
-   });
+   };
 
    function init() {
 	 return new Extension();
@@ -274,8 +273,7 @@ git init
 echo "gse_project({simple}, {example.com}, {1})" > meson-gse.build
 mkdir src
 cat <<-'EOD' > src/extension.js
-	const Lang = imports.lang;
-	const Extension = new Lang.Class({
+	const Extension = class Extension {
 	  Name: 'Hello, world!',
 
 	  enable: function() {
