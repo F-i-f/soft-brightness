@@ -30,9 +30,8 @@ const _ = Gettext.gettext;
 const Logger = Me.imports.logger;
 
 const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSettings extends Gtk.Grid {
-    _init(params) {
-	super._init(params);
 
+    setup() {
 	this.margin_top = 12;
 	this.margin_bottom = this.margin_top;
 	this.margin_left = 48;
@@ -228,6 +227,7 @@ function init() {
 
 function buildPrefsWidget() {
     let widget = new SoftBrightnessSettings();
+    widget.setup();
     widget.show_all();
 
     return widget;
