@@ -18,7 +18,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 
 const Me = ExtensionUtils.getCurrentExtension();
 
-const Logger = class MesonGseLogger {
+var Logger = class MesonGseLogger {
     constructor(title) {
 	this._first_log = true;
 	this._title = title;
