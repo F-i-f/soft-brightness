@@ -36,7 +36,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v6/soft-brightness@fifi.org.v6.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v7/soft-brightness@fifi.org.v7.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -61,10 +61,15 @@ directory (you may have to create the directory).
 
 ## Changelog
 
+### Version 7
+#### March 30, 2019
+
+- Fix warning in logger.js that was introduced in version 6.
+
 ### Version 6
 #### March 26, 2019
 
-- ES60 / Gnome-Shell 3.32 compatibility (still compatible with 3.30 and lower).
+- ES6 / Gnome-Shell 3.32 compatibility (still compatible with 3.30 and lower).
 - Updated meson-gse to latest.
 - Minor doc updates.
 
@@ -128,5 +133,5 @@ First public release.
   included here by reference.
 
 <!--  LocalWords:  OLED VSync extensions' Changelog README md GPLv3
-LocalWords:  gse gettext DND
+LocalWords:  gse gettext DND js ES6
 -->
