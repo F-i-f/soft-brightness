@@ -41,7 +41,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	this.orientation = Gtk.Orientation.VERTICAL;
 
 	this._settings = Convenience.getSettings();
-	this._logger = new Logger.Logger('Soft-Brightness');
+	this._logger = new Logger.Logger('Soft-Brightness/prefs');
 	this._logger.set_debug(this._settings.get_boolean('debug'));
 
 	let ypos = 1;
@@ -80,7 +80,6 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	this.attach(this.link_label, 1, ypos, 2, 1);
 
 	ypos += 1;
-
 
 	descr = _(this._settings.settings_schema.get_key('use-backlight').get_description());
 	this.enabled_label = new Gtk.Label({label: _("Use backlight control:"), halign: Gtk.Align.START});
