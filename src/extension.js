@@ -19,6 +19,7 @@ const St = imports.gi.St;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
+const ScreenshotService = imports.ui.screenshot.ScreenshotService;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -69,6 +70,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._builtinMonitorSettingChangedConnection = null;
 	this._useBacklightSettingChangedConnection = null;
 	this._preventUnredirectChangedConnection = null;
+
+	this._screenshotServiceScreenshotAsync = null;
+	this._screenshotServiceScreenshotAreaAsync = null;
+	this._screenshotService_onScreenShotComplete = null;
     }
 
     enable() {
@@ -158,6 +163,16 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider, curBrightness);
 	    this._brightnessIndicator._slider.setValue(curBrightness);
 	}
+
+	// Monkey patch some screenshot functions to remove the
+	// overlay during area and desktop screenshots (unnecessary for window screenshots).
+	this._screenshotServiceScreenshotAsync       = ScreenshotService.prototype.ScreenshotAsync;
+	this._screenshotServiceScreenshotAreaAsync   = ScreenshotService.prototype.ScreenshotAreaAsync;
+	this._screenshotService_onScreenShotComplete = ScreenshotService.prototype._onScreenshotComplete;
+
+	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotAsyncWrapper.bind(this);
+	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotAreaAsyncWrapper.bind(this);
+	ScreenshotService.prototype._onScreenshotComplete = this._onScreenshotCompleteWrapper.bind(this);
     }
 
     _disable() {
@@ -175,6 +190,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._settings.disconnect(this._useBacklightSettingChangedConnection);
 	this._settings.disconnect(this._preventUnredirectChangedConnection);
 	this._hideOverlays(true);
+
+	// Undo monkey patching of screenshot functions
+	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
+	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
+	ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenShotComplete;
     }
 
     _preventUnredirect() {
@@ -376,6 +396,25 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	} else if (this._brightnessIndicator._proxy.Brightness != null && this._brightnessIndicator._proxy.Brightness >= 0) {
 	    this._storeBrightnessLevel(this._brightnessIndicator._proxy.Brightness / 100.0);
 	}
+    }
+
+    // Monkey-patched ScreenshotService methods
+    _screenshotAsyncWrapper(...args) {
+	this._logger.log_debug('_screenshotAsyncWrapper()');
+	this._hideOverlays(false);
+	this._screenshotServiceScreenshotAsync.apply(Main.shellDBusService._screenshotService, args);
+    }
+
+    _screenshotAreaAsyncWrapper(...args) {
+	this._logger.log_debug('_screenshotAreaAsyncWrapper()');
+	this._hideOverlays(false);
+	this._screenshotServiceScreenshotAreaAsync.apply(Main.shellDBusService._screenshotService, args);
+    }
+
+    _onScreenshotCompleteWrapper(...args) {
+	this._logger.log_debug('_onScreenshotCompleteWrapper()');
+	this._on_brightness_change(false);
+	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
     }
 };
 
