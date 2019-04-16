@@ -20,6 +20,8 @@ const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const ScreenshotService = imports.ui.screenshot.ScreenshotService;
+const Clutter = imports.gi.Clutter;
+const Magnifier = imports.ui.magnifier;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -30,6 +32,41 @@ const Logger = Me.imports.logger;
 const Indicator = imports.ui.status.brightness.Indicator;
 const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 
+var softBrightnessExtension = null;
+
+const ModifiedMagShaderEffects = class ModifiedMagShaderEffects extends Magnifier.MagShaderEffects {
+    constructor(uiGroupClone) {
+	super(uiGroupClone);
+	softBrightnessExtension._logger.log_debug('ModifiedMagShaderEffects.constructor()');
+	this._softBrightnessEffect = new Clutter.BrightnessContrastEffect();
+	this._magView.add_effect(this._softBrightnessEffect);
+	softBrightnessExtension.addMagShaderEffects(this);
+	softBrightnessExtension._on_brightness_change(false);
+    }
+
+    destroyEffects() {
+	super.destroyEffects();
+	if (softBrightnessExtension) {
+	    if (softBrightnessExtension._logger) {
+		softBrightnessExtension._logger.log_debug('ModifiedMagShaderEffects.destroyEffects()');
+	    }
+	    softBrightnessExtension.removeMagShaderEffects(this);
+	}
+	this._softBrightnessEffect = null;
+    }
+
+    setSoftBrightness(level) {
+	let brightness = {};
+	level -= 1.0;
+	if (this._softBrightnessEffect != null) {
+	    if (softBrightnessExtension && softBrightnessExtension._logger) {
+		softBrightnessExtension._logger.log_debug('ModifiedMagShaderEffects.setSoftBrightness('+level+')');
+	    }
+	    this._softBrightnessEffect.set_brightness_full(level, level, level);
+	    this._softBrightnessEffect.set_enabled(level != 0.0);
+	}
+    }
+};
 
 const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends Indicator {
     constructor(softBrightnessExtension) {
@@ -74,6 +111,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotServiceScreenshotAsync = null;
 	this._screenshotServiceScreenshotAreaAsync = null;
 	this._screenshotService_onScreenShotComplete = null;
+
+	this._magShaderEffectsClass = null;
+	this._magShaderEffectsList = null;
     }
 
     enable() {
@@ -138,6 +178,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    return;
 	}
 
+	// Monkey patch the magnifier
+	this._magShaderEffectsClass = Magnifier.MagShaderEffects;
+	Magnifier.MagShaderEffects = ModifiedMagShaderEffects;
+	this._magShaderEffectsList = [];
+
 	this._monitorManager = Meta.MonitorManager.get();
 	Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
 	    if (error) {
@@ -195,6 +240,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
 	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
 	ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenShotComplete;
+
+	// Undo Monkey patching the magnifier
+	Magnifier.MagShaderEffects = this._magShaderEffectsClass;
+	this._magShaderEffectsList = null;
     }
 
     _preventUnredirect() {
@@ -221,6 +270,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    }
 	    this._overlays = null;
 	}
+
+	for (let i=0; i < this._magShaderEffectsList.length; ++i) {
+	    this._magShaderEffectsList[i].setSoftBrightness(1.0);
+	}
+
 	let preventUnredirect = this._settings.get_string('prevent-unredirect');
 	if (forceUnpreventUnredirect) {
 	    preventUnredirect = 'never';
@@ -239,8 +293,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	}
     }
 
-    _showOverlays(opacity, force) {
-	this._logger.log_debug('_showOverlays('+opacity+', '+force+')');
+    _showOverlays(brightness, force) {
+	this._logger.log_debug('_showOverlays('+brightness+', '+force+')');
 	if (this._overlays == null || force) {
 	    let enabledMonitors = this._settings.get_string('monitors');
 	    let monitors;
@@ -307,9 +361,14 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    }
 	}
 
+	let opacity = (1.0-brightness)*255;
 	for (let i=0; i < this._overlays.length; ++i) {
 	    this._logger.log_debug('_showOverlay(): set opacity '+opacity+' on overlay #'+i);
 	    this._overlays[i].opacity = opacity;
+	}
+
+	for (let i=0; i < this._magShaderEffectsList.length; ++i) {
+	    this._magShaderEffectsList[i].setSoftBrightness(brightness);
 	}
     }
 
@@ -353,9 +412,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	if (curBrightness >= 1) {
 	    this._hideOverlays(false);
 	} else {
-	    let opacity = (1-curBrightness)*255;
-	    this._logger.log_debug("_on_brightness_change: opacity="+opacity);
-	    this._showOverlays(opacity, force);
+	    this._showOverlays(curBrightness, force);
 	}
     }
 
@@ -416,8 +473,33 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._on_brightness_change(false);
 	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
     }
+
+    // Magnifier Effects interface
+    addMagShaderEffects(magShaderEffects) {
+	if (this._magShaderEffectsList != null) {
+	    for (let i=0; i < this._magShaderEffectsList; ++i) {
+		if (this._magShaderEffectsList[i] == magShaderEffects) {
+		    return;
+		}
+	    }
+	    this._magShaderEffectsList.push(magShaderEffects);
+	}
+    }
+
+    removeMagShaderEffects(magShaderEffects) {
+	if (this._magShaderEffectsList != null) {
+	    for (let i=0; i < this._magShaderEffectsList; ++i) {
+		if (this._magShaderEffectsList[i] == magShaderEffects) {
+		    this._magShaderEffectsList.splice(i, 1);
+		    return;
+		}
+	    }
+	}
+    }
+
 };
 
 function init() {
-    return new SoftBrightnessExtension();
+    softBrightnessExtension = new SoftBrightnessExtension();
+    return softBrightnessExtension;
 }
