@@ -347,7 +347,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		let monitor = monitors[i];
 		this._logger.log_debug('Create overlay #'+i+': '+monitor.width+'x'+monitor.height+'@'+monitor.x+','+monitor.y);
 		let overlay = new St.Label({
-		    style_class: 'brightness-overlay',
+		    style: 'border-radius: 0px; background-color: rgba(0,0,0,1);',
 		    text: "",
 		});
 		overlay.set_position(monitor.x, monitor.y);
