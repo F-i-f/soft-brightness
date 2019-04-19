@@ -108,8 +108,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._useBacklightSettingChangedConnection = null;
 	this._preventUnredirectChangedConnection = null;
 
-	this._screenshotServiceScreenshotAsync = null;
-	this._screenshotServiceScreenshotAreaAsync = null;
+	// Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
+	this._screenshotServiceScreenshotAsync       = null;
+	this._screenshotServiceScreenshotAreaAsync   = null;
 	this._screenshotService_onScreenShotComplete = null;
 
 	this._magShaderEffectsClass = null;
@@ -209,15 +210,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._brightnessIndicator._slider.setValue(curBrightness);
 	}
 
-	// Monkey patch some screenshot functions to remove the
-	// overlay during area and desktop screenshots (unnecessary for window screenshots).
-	this._screenshotServiceScreenshotAsync       = ScreenshotService.prototype.ScreenshotAsync;
-	this._screenshotServiceScreenshotAreaAsync   = ScreenshotService.prototype.ScreenshotAreaAsync;
-	this._screenshotService_onScreenShotComplete = ScreenshotService.prototype._onScreenshotComplete;
-
-	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotAsyncWrapper.bind(this);
-	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotAreaAsyncWrapper.bind(this);
-	ScreenshotService.prototype._onScreenshotComplete = this._onScreenshotCompleteWrapper.bind(this);
+	this._enableScreenshotPatch();
     }
 
     _disable() {
@@ -236,10 +229,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._settings.disconnect(this._preventUnredirectChangedConnection);
 	this._hideOverlays(true);
 
-	// Undo monkey patching of screenshot functions
-	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
-	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
-	ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenShotComplete;
+	this._disableScreenshotPatch();
 
 	// Undo Monkey patching the magnifier
 	Magnifier.MagShaderEffects = this._magShaderEffectsClass;
@@ -456,6 +446,33 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     // Monkey-patched ScreenshotService methods
+    _enableScreenshotPatch() {
+	this._logger.log_debug('_enableScreenshotPatch()');
+
+	// Monkey patch some screenshot functions to remove the
+	// overlay during area and desktop screenshots (unnecessary for window screenshots).
+	this._screenshotServiceScreenshotAsync       = ScreenshotService.prototype.ScreenshotAsync;
+	this._screenshotServiceScreenshotAreaAsync   = ScreenshotService.prototype.ScreenshotAreaAsync;
+	this._screenshotService_onScreenShotComplete = ScreenshotService.prototype._onScreenshotComplete;
+
+	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotAsyncWrapper.bind(this);
+	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotAreaAsyncWrapper.bind(this);
+	ScreenshotService.prototype._onScreenshotComplete = this._onScreenshotCompleteWrapper.bind(this);
+    }
+
+    _disableScreenshotPatch() {
+	this._logger.log_debug('_disableScreenshotPatch()');
+
+	// Undo monkey patching of screenshot functions
+	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
+	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
+	ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenShotComplete;
+
+	this._screenshotServiceScreenshotAsync       = null;
+	this._screenshotServiceScreenshotAreaAsync   = null;
+	this._screenshotService_onScreenShotComplete = null;
+    }
+
     _screenshotAsyncWrapper(...args) {
 	this._logger.log_debug('_screenshotAsyncWrapper()');
 	this._hideOverlays(false);
