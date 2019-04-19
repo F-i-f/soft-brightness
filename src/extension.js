@@ -96,8 +96,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// Set/destroyed by _enable/_disable
 	this._brightnessIndicator = null;
 
+	// Set/destroyed by _showOverlays/_hideOverlays
 	this._unredirectPrevented = false;
-	this._overlays = null;
+	this._overlays            = null;
 
 	// Set/destroyed by _enableSettingsMonitoring/_disableSettingsMonitoring
 	this._minBrightnessSettingChangedConnection     = null;
@@ -222,53 +223,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	return true;
     }
 
-    _preventUnredirect() {
-	if (! this._unredirectPrevented) {
-	    this._logger.log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
-	    Meta.disable_unredirect_for_display(global.display);
-	    this._unredirectPrevented = true;
-	}
-    }
-
-    _allowUnredirect() {
-	if (this._unredirectPrevented) {
-	    this._logger.log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
-	    Meta.enable_unredirect_for_display(global.display);
-	    this._unredirectPrevented = false;
-	}
-    }
-
-    _hideOverlays(forceUnpreventUnredirect) {
-	if (this._overlays != null) {
-	    this._logger.log_debug("_hideOverlays(): drop overlays, count="+this._overlays.length);
-	    for (let i=0; i < this._overlays.length; ++i) {
-		global.stage.remove_actor(this._overlays[i]);
-	    }
-	    this._overlays = null;
-	}
-
-	for (let i=0; i < this._magShaderEffectsList.length; ++i) {
-	    this._magShaderEffectsList[i].setSoftBrightness(1.0);
-	}
-
-	let preventUnredirect = this._settings.get_string('prevent-unredirect');
-	if (forceUnpreventUnredirect) {
-	    preventUnredirect = 'never';
-	}
-	switch(preventUnredirect) {
-	case "always":
-	    this._preventUnredirect();
-	    break;
-	case "when-correcting":
-	case "never":
-	    this._allowUnredirect();
-	    break;
-	default:
-	    this._logger.log('_hideOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
-	    break;
-	}
-    }
-
+    // Core functions to show & hide overlays
     _showOverlays(brightness, force) {
 	this._logger.log_debug('_showOverlays('+brightness+', '+force+')');
 	if (this._overlays == null || force) {
@@ -348,6 +303,56 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	}
     }
 
+    _hideOverlays(forceUnpreventUnredirect) {
+	if (this._overlays != null) {
+	    this._logger.log_debug("_hideOverlays(): drop overlays, count="+this._overlays.length);
+	    for (let i=0; i < this._overlays.length; ++i) {
+		global.stage.remove_actor(this._overlays[i]);
+	    }
+	    this._overlays = null;
+	}
+
+	for (let i=0; i < this._magShaderEffectsList.length; ++i) {
+	    this._magShaderEffectsList[i].setSoftBrightness(1.0);
+	}
+
+	let preventUnredirect = this._settings.get_string('prevent-unredirect');
+	if (forceUnpreventUnredirect) {
+	    preventUnredirect = 'never';
+	}
+	switch(preventUnredirect) {
+	case "always":
+	    this._preventUnredirect();
+	    break;
+	case "when-correcting":
+	case "never":
+	    this._allowUnredirect();
+	    break;
+	default:
+	    this._logger.log('_hideOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
+	    break;
+	}
+    }
+
+    _preventUnredirect() {
+	if (! this._unredirectPrevented) {
+	    this._logger.log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
+	    Meta.disable_unredirect_for_display(global.display);
+	    this._unredirectPrevented = true;
+	}
+    }
+
+    _allowUnredirect() {
+	if (this._unredirectPrevented) {
+	    this._logger.log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
+	    Meta.enable_unredirect_for_display(global.display);
+	    this._unredirectPrevented = false;
+	}
+    }
+
+    // Utility functions to manage the stored brightness value.
+    // If using the backlight, then we use the indicator as the brightness value store, which is linked to gsd.
+    // If not using the backlight, the brightness is stored in the extension setting.
     _storeBrightnessLevel(value) {
 	if (this._settings.get_boolean('use-backlight') && this._brightnessIndicator._proxy.Brightness >= 0) {
 	    let convertedBrightness = Math.min(100, Math.round(value * 100.0)+1);
