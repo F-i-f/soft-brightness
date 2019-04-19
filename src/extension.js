@@ -14,14 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const Lang = imports.lang;
-const St = imports.gi.St;
-const Meta = imports.gi.Meta;
-const Main = imports.ui.main;
-const Shell = imports.gi.Shell;
-const ScreenshotService = imports.ui.screenshot.ScreenshotService;
+const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 const Clutter = imports.gi.Clutter;
+const Indicator = imports.ui.status.brightness.Indicator;
+const Lang = imports.lang;
 const Magnifier = imports.ui.magnifier;
+const Main = imports.ui.main;
+const Meta = imports.gi.Meta;
+const PointerWatcher = imports.ui.pointerWatcher;
+const ScreenshotService = imports.ui.screenshot.ScreenshotService;
+const Shell = imports.gi.Shell;
+const St = imports.gi.St;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -29,8 +32,6 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 const Utils = Me.imports.utils;
 const Logger = Me.imports.logger;
-const Indicator = imports.ui.status.brightness.Indicator;
-const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 
 var softBrightnessExtension = null;
 
