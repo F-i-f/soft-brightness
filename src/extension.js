@@ -87,11 +87,14 @@ const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends In
 
 const SoftBrightnessExtension = class SoftBrightnessExtension {
     constructor() {
-	this._enabled = false;
-	this._logger = null;
-	this._settings = null;
-	this._brightnessIndicator = null;
+	// Set/destroyed by enable/disable
+	this._enabled			    = false;
+	this._logger			    = null;
+	this._settings			    = null;
 	this._debugSettingChangedConnection = null;
+
+	// Set/destroyed by _enable/_disable
+	this._brightnessIndicator = null;
 
 	this._unredirectPrevented = false;
 	this._overlays = null;
@@ -120,13 +123,14 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._magShaderEffectsList  = null;
     }
 
+    // Base functionality: set-up and tear down logger, settings and debug setting monitoring
     enable() {
 	if (this._enabled) {
 	    this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
 	} else {
 	    this._logger = new Logger.Logger('Soft-Brightness');
 	    this._settings = Convenience.getSettings();
-	    this._debugSettingChangedConnection = this._settings.connect('changed::debug', this.on_debug_change.bind(this));
+	    this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
 	    this._logger.set_debug(this._settings.get_boolean('debug'));
 	    this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
 	    this._enable();
@@ -152,28 +156,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	}
     }
 
-    _swapMenu(oldIndicator, newIndicator) {
-	let menuItems = AggregateMenu.menu._getMenuItems();
-	let menuIndex = null;
-	for (let i = 0; i < menuItems.length; i++) {
-	    if (oldIndicator.menu == menuItems[i]) {
-		menuIndex = i;
-		break;
-	    }
-	}
-	if (menuIndex == null) {
-	    this._logger.log('_swapMenu(): Cannot find brightness indicator');
-	    return false;
-	}
-	this._logger.log_debug('_swapMenu(): Replacing brightness menu item at index '+menuIndex);
-	menuItems.splice(menuIndex, 1);
-	oldIndicator._proxy.run_dispose();
-	oldIndicator.menu.destroy();
-	AggregateMenu.menu.addMenuItem(newIndicator.menu, menuIndex);
-	AggregateMenu._brightness = newIndicator;
-	return true;
+    _on_debug_change() {
+	this._logger.set_debug(this._settings.get_boolean('debug'));
+	this._logger.log('debug = '+this._logger.get_debug());
     }
 
+    // Main enable / disable switch
     _enable() {
 	this._logger.log_debug('_enable()');
 
@@ -210,6 +198,28 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	this._disableScreenshotPatch();
 	this._disableMagnifierPatch();
+    }
+
+    _swapMenu(oldIndicator, newIndicator) {
+	let menuItems = AggregateMenu.menu._getMenuItems();
+	let menuIndex = null;
+	for (let i = 0; i < menuItems.length; i++) {
+	    if (oldIndicator.menu == menuItems[i]) {
+		menuIndex = i;
+		break;
+	    }
+	}
+	if (menuIndex == null) {
+	    this._logger.log('_swapMenu(): Cannot find brightness indicator');
+	    return false;
+	}
+	this._logger.log_debug('_swapMenu(): Replacing brightness menu item at index '+menuIndex);
+	menuItems.splice(menuIndex, 1);
+	oldIndicator._proxy.run_dispose();
+	oldIndicator.menu.destroy();
+	AggregateMenu.menu.addMenuItem(newIndicator.menu, menuIndex);
+	AggregateMenu._brightness = newIndicator;
+	return true;
     }
 
     _preventUnredirect() {
@@ -360,11 +370,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._logger.log_debug('_getBrightnessLevel() by setting = '+brightness);
 	    return brightness;
 	}
-    }
-
-    on_debug_change() {
-	this._logger.set_debug(this._settings.get_boolean('debug'));
-	this._logger.log('debug = '+this._logger.get_debug());
     }
 
     // Settings monitoring
