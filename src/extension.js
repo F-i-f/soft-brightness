@@ -94,18 +94,20 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._debugSettingChangedConnection = null;
 
 	this._unredirectPrevented = false;
-	this._monitorManager = null;
-	this._displayConfigProxy = null;
-	this._monitorNames = null;
 	this._overlays = null;
 
-	this._monitorsChangedConnection = null;
 	this._minBrightnessSettingChangedConnection = null;
 	this._currentBrightnessSettingChangedConnection = null;
 	this._monitorsSettingChangedConnection = null;
 	this._builtinMonitorSettingChangedConnection = null;
 	this._useBacklightSettingChangedConnection = null;
 	this._preventUnredirectChangedConnection = null;
+
+	// Set/destroyed by _enableMonitor2ing/_disableMonitor2ing
+	this._monitorManager            = null;
+	this._displayConfigProxy        = null;
+	this._monitorsChangedConnection = null;
+	this._monitorNames              = null;
 
 	// Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
 	this._screenshotServiceScreenshotAsync       = null;
@@ -181,18 +183,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	this._enableMagnifierPatch();
 
-	this._monitorManager = Meta.MonitorManager.get();
-	Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
-	    if (error) {
-		this._logger.log("newDisplayConfig() callback: Cannot get Display Config: " + error);
-		return;
-	    }
-	    this._logger.log_debug('newDisplayConfig() callback');
-	    this._displayConfigProxy = proxy;
-	    this._on_monitors_change();
-	}));
+	this._enableMonitor2ing();
 
-	this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
 	this._minBrightnessSettingChangedConnection = this._settings.connect('changed::min-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
 	this._currentBrightnessSettingChangedConnection = this._settings.connect('changed::current-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
 	this._monitorsSettingChangedConnection = this._settings.connect('changed::monitors', Lang.bind(this, function() { this._on_brightness_change(true); }));
@@ -217,7 +209,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._swapMenu(this._brightnessIndicator, standardIndicator);
 	this._brightnessIndicator = null;
 
-	Main.layoutManager.disconnect(this._monitorsChangedConnection);
+	this._disableMonitor2ing();
+
 	this._settings.disconnect(this._minBrightnessSettingChangedConnection);
 	this._settings.disconnect(this._currentBrightnessSettingChangedConnection);
 	this._settings.disconnect(this._monitorsSettingChangedConnection);
@@ -405,6 +398,44 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log('debug = '+this._logger.get_debug());
     }
 
+    _on_use_backlight_change() {
+	this._logger.log_debug('_on_use_backlight_change()');
+	if (this._settings.get_boolean('use-backlight')) {
+	    this._storeBrightnessLevel(this._settings.get_double('current-brightness'));
+	} else if (this._brightnessIndicator._proxy.Brightness != null && this._brightnessIndicator._proxy.Brightness >= 0) {
+	    this._storeBrightnessLevel(this._brightnessIndicator._proxy.Brightness / 100.0);
+	}
+    }
+
+    // Monitor change handling
+    _enableMonitor2ing() {
+	this._logger.log_debug('_enableMonitor2ing()');
+
+	this._monitorManager = Meta.MonitorManager.get();
+	Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
+	    if (error) {
+		this._logger.log("newDisplayConfig() callback: Cannot get Display Config: " + error);
+		return;
+	    }
+	    this._logger.log_debug('newDisplayConfig() callback');
+	    this._displayConfigProxy = proxy;
+	    this._on_monitors_change();
+	}));
+
+	this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
+    }
+
+    _disableMonitor2ing() {
+	this._logger.log_debug('_disableMonitor2ing()');
+
+	Main.layoutManager.disconnect(this._monitorsChangedConnection);
+
+	this._monitorsChangedConnection = null;
+	this._displayConfigProxy        = null;
+	this._monitorManager            = null;
+	this._monitorNames              = null;
+    }
+
     _on_monitors_change() {
 	if (this._displayConfigProxy == null) {
 	    this._logger.log_debug("_on_monitors_change(): skipping run as the proxy hasn't been set up yet.");
@@ -428,15 +459,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._monitorNames = monitorNames;
 	    this._on_brightness_change(true);
 	}));
-    }
-
-    _on_use_backlight_change() {
-	this._logger.log_debug('_on_use_backlight_change()');
-	if (this._settings.get_boolean('use-backlight')) {
-	    this._storeBrightnessLevel(this._settings.get_double('current-brightness'));
-	} else if (this._brightnessIndicator._proxy.Brightness != null && this._brightnessIndicator._proxy.Brightness >= 0) {
-	    this._storeBrightnessLevel(this._brightnessIndicator._proxy.Brightness / 100.0);
-	}
     }
 
     // Monkey-patched ScreenshotService methods
