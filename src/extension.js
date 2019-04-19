@@ -96,12 +96,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._unredirectPrevented = false;
 	this._overlays = null;
 
-	this._minBrightnessSettingChangedConnection = null;
+	// Set/destroyed by _enableSettingsMonitoring/_disableSettingsMonitoring
+	this._minBrightnessSettingChangedConnection     = null;
 	this._currentBrightnessSettingChangedConnection = null;
-	this._monitorsSettingChangedConnection = null;
-	this._builtinMonitorSettingChangedConnection = null;
-	this._useBacklightSettingChangedConnection = null;
-	this._preventUnredirectChangedConnection = null;
+	this._monitorsSettingChangedConnection          = null;
+	this._builtinMonitorSettingChangedConnection    = null;
+	this._useBacklightSettingChangedConnection      = null;
+	this._preventUnredirectChangedConnection        = null;
 
 	// Set/destroyed by _enableMonitor2ing/_disableMonitor2ing
 	this._monitorManager            = null;
@@ -182,15 +183,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	}
 
 	this._enableMagnifierPatch();
-
 	this._enableMonitor2ing();
-
-	this._minBrightnessSettingChangedConnection = this._settings.connect('changed::min-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
-	this._currentBrightnessSettingChangedConnection = this._settings.connect('changed::current-brightness', Lang.bind(this, function() { this._on_brightness_change(false); }));
-	this._monitorsSettingChangedConnection = this._settings.connect('changed::monitors', Lang.bind(this, function() { this._on_brightness_change(true); }));
-	this._builtinMonitorSettingChangedConnection = this._settings.connect('changed::builtin-monitor', Lang.bind(this, function() { this._on_brightness_change(true); }));
-	this._useBacklightSettingChangedConnection = this._settings.connect('changed::use-backlight', this._on_use_backlight_change.bind(this));
-	this._preventUnredirectChangedConnection = this._settings.connect('changed::prevent-unredirect', Lang.bind(this, function() { this._on_brightness_change(true); }));
+	this._enableSettingsMonitoring();
 
 	// If we use the backlight and the Brightness proxy is null, it's still connecting and we'll get a _sync later.
 	if (! this._settings.get_boolean('use-backlight') || this._brightnessIndicator._proxy.Brightness != null) {
@@ -210,13 +204,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._brightnessIndicator = null;
 
 	this._disableMonitor2ing();
+	this._disableSettingsMonitoring();
 
-	this._settings.disconnect(this._minBrightnessSettingChangedConnection);
-	this._settings.disconnect(this._currentBrightnessSettingChangedConnection);
-	this._settings.disconnect(this._monitorsSettingChangedConnection);
-	this._settings.disconnect(this._builtinMonitorSettingChangedConnection);
-	this._settings.disconnect(this._useBacklightSettingChangedConnection);
-	this._settings.disconnect(this._preventUnredirectChangedConnection);
 	this._hideOverlays(true);
 
 	this._disableScreenshotPatch();
@@ -373,6 +362,44 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	}
     }
 
+    on_debug_change() {
+	this._logger.set_debug(this._settings.get_boolean('debug'));
+	this._logger.log('debug = '+this._logger.get_debug());
+    }
+
+    // Settings monitoring
+    _enableSettingsMonitoring() {
+	this._logger.log_debug('_enableSettingsMonitoring()');
+
+	let brightnessChange       = Lang.bind(this, function() { this._on_brightness_change(false); });
+	let forcedBrightnessChange = Lang.bind(this, function() { this._on_brightness_change(true); });
+
+	this._minBrightnessSettingChangedConnection     = this._settings.connect('changed::min-brightness',     brightnessChange);
+	this._currentBrightnessSettingChangedConnection = this._settings.connect('changed::current-brightness', brightnessChange);
+	this._monitorsSettingChangedConnection          = this._settings.connect('changed::monitors',           forcedBrightnessChange);
+	this._builtinMonitorSettingChangedConnection    = this._settings.connect('changed::builtin-monitor',    forcedBrightnessChange);
+	this._useBacklightSettingChangedConnection      = this._settings.connect('changed::use-backlight',      this._on_use_backlight_change.bind(this));
+	this._preventUnredirectChangedConnection        = this._settings.connect('changed::prevent-unredirect', forcedBrightnessChange);
+    }
+
+    _disableSettingsMonitoring() {
+	this._logger.log_debug('_disableSettingsMonitoring()');
+
+	this._settings.disconnect(this._minBrightnessSettingChangedConnection);
+	this._settings.disconnect(this._currentBrightnessSettingChangedConnection);
+	this._settings.disconnect(this._monitorsSettingChangedConnection);
+	this._settings.disconnect(this._builtinMonitorSettingChangedConnection);
+	this._settings.disconnect(this._useBacklightSettingChangedConnection);
+	this._settings.disconnect(this._preventUnredirectChangedConnection);
+
+	this._minBrightnessSettingChangedConnection     = null;
+	this._currentBrightnessSettingChangedConnection = null;
+	this._monitorsSettingChangedConnection          = null;
+	this._builtinMonitorSettingChangedConnection    = null;
+	this._useBacklightSettingChangedConnection      = null;
+	this._preventUnredirectChangedConnection        = null;
+    }
+
     _on_brightness_change(force) {
 	let curBrightness = this._getBrightnessLevel();
 	let minBrightness = this._settings.get_double('min-brightness');
@@ -391,11 +418,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	} else {
 	    this._showOverlays(curBrightness, force);
 	}
-    }
-
-    on_debug_change() {
-	this._logger.set_debug(this._settings.get_boolean('debug'));
-	this._logger.log('debug = '+this._logger.get_debug());
     }
 
     _on_use_backlight_change() {
