@@ -56,7 +56,6 @@ const ModifiedMagShaderEffects = class ModifiedMagShaderEffects extends Magnifie
     }
 
     setSoftBrightness(level) {
-	let brightness = {};
 	level -= 1.0;
 	if (this._softBrightnessEffect != null) {
 	    if (softBrightnessExtension && softBrightnessExtension._logger) {
@@ -113,8 +112,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotServiceScreenshotAreaAsync   = null;
 	this._screenshotService_onScreenShotComplete = null;
 
+	// Set/destroyed by _enableMagnifierPatch/_disableMagnifierPatch
 	this._magShaderEffectsClass = null;
-	this._magShaderEffectsList = null;
+	this._magShaderEffectsList  = null;
     }
 
     enable() {
@@ -179,10 +179,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    return;
 	}
 
-	// Monkey patch the magnifier
-	this._magShaderEffectsClass = Magnifier.MagShaderEffects;
-	Magnifier.MagShaderEffects = ModifiedMagShaderEffects;
-	this._magShaderEffectsList = [];
+	this._enableMagnifierPatch();
 
 	this._monitorManager = Meta.MonitorManager.get();
 	Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
@@ -230,10 +227,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._hideOverlays(true);
 
 	this._disableScreenshotPatch();
-
-	// Undo Monkey patching the magnifier
-	Magnifier.MagShaderEffects = this._magShaderEffectsClass;
-	this._magShaderEffectsList = null;
+	this._disableMagnifierPatch();
     }
 
     _preventUnredirect() {
@@ -492,6 +486,24 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     // Magnifier Effects interface
+    _enableMagnifierPatch() {
+	this._logger.log_debug('_enableMagnifierPatch()');
+
+	// Monkey patch the magnifier
+	this._magShaderEffectsClass = Magnifier.MagShaderEffects;
+	Magnifier.MagShaderEffects = ModifiedMagShaderEffects;
+	this._magShaderEffectsList = [];
+    }
+
+    _disableMagnifierPatch() {
+	this._logger.log_debug('_disableMagnifierPatch()');
+
+	// Undo Monkey patching the magnifier
+	Magnifier.MagShaderEffects = this._magShaderEffectsClass;
+	this._magShaderEffectsClass = null;
+	this._magShaderEffectsList = null;
+    }
+
     addMagShaderEffects(magShaderEffects) {
 	if (this._magShaderEffectsList != null) {
 	    for (let i=0; i < this._magShaderEffectsList; ++i) {
