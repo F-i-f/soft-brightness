@@ -395,13 +395,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _getBrightnessLevel() {
-	let brightness = this._brightnessIndicator._proxy.Brightness;
-	if (this._settings.get_boolean('use-backlight') && brightness != brightness >= 0) {
+	if (this._settings.get_boolean('use-backlight')) {
+	    let brightness = this._brightnessIndicator._proxy.Brightness;
 	    let convertedBrightness = brightness / 100.0;
 	    this._logger.log_debug('_getBrightnessLevel() by proxy = '+convertedBrightness+' <- '+brightness);
 	    return convertedBrightness;
 	} else {
-	    brightness = this._settings.get_double('current-brightness');
+	    let brightness = this._settings.get_double('current-brightness');
 	    this._logger.log_debug('_getBrightnessLevel() by setting = '+brightness);
 	    return brightness;
 	}
