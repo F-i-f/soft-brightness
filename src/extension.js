@@ -134,6 +134,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// Set/destroyed by _enableMagnifierPatch/_disableMagnifierPatch
 	this._magShaderEffectsClass = null;
 	this._magShaderEffectsList  = null;
+	// Set/destroyed by addMagShaderEffects/removeMagShaderEffects
+	this._magShaderCursorEffect = null;
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
@@ -318,6 +320,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	for (let i=0; i < this._magShaderEffectsList.length; ++i) {
 	    this._magShaderEffectsList[i].setSoftBrightness(brightness);
 	}
+
+	if (this._magShaderCursorEffect != null) {
+	    let level = brightness-1.0;
+	    this._magShaderCursorEffect.set_brightness_full(level, level, level);
+	    this._magShaderCursorEffect.set_enabled(level != 0.0);
+	}
     }
 
     _hideOverlays(forceUnpreventUnredirect) {
@@ -331,6 +339,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	for (let i=0; i < this._magShaderEffectsList.length; ++i) {
 	    this._magShaderEffectsList[i].setSoftBrightness(1.0);
+	}
+
+	if (this._magShaderCursorEffect != null) {
+	    this._magShaderCursorEffect.set_brightness_full(1.0, 1.0, 1.0);
+	    this._magShaderCursorEffect.set_enabled(false);
 	}
 
 	let preventUnredirect = this._settings.get_string('prevent-unredirect');
@@ -688,6 +701,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		}
 	    }
 	    this._magShaderEffectsList.push(magShaderEffects);
+	    if (this._magShaderCursorEffect == null) {
+		this._magShaderCursorEffect = new Clutter.BrightnessContrastEffect();
+		Main.magnifier._cursorRoot.add_effect(this._magShaderCursorEffect);
+	    }
 	}
     }
 
@@ -696,6 +713,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    for (let i=0; i < this._magShaderEffectsList; ++i) {
 		if (this._magShaderEffectsList[i] == magShaderEffects) {
 		    this._magShaderEffectsList.splice(i, 1);
+		    if (this._magShaderCursorEffect != null) {
+			Main.magnifier._cursorRoot.remove_effect(this._magShaderCursorEffect);
+			this._magShaderCursorEffect = null;
+		    }
 		    return;
 		}
 	    }
