@@ -97,7 +97,7 @@ directory (you may have to create the directory).
 #### April 20, 2019
 
 - The mouse pointer is now affected by the brightness.
-- Better & simplier Magnifier handling.
+- Better & simpler Magnifier handling.
 - Fix bugs.
 - Improved code maintainability.
 
