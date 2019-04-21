@@ -96,6 +96,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	// Set/destroyed by _enable/_disable
 	this._brightnessIndicator = null;
+	this._actorGroup          = null;
 
 	// Set/destroyed by _showOverlays/_hideOverlays
 	this._unredirectPrevented = false;
@@ -180,6 +181,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _enable() {
 	this._logger.log_debug('_enable()');
 
+	this._actorGroup = new St.Widget({ name: 'soft-brightness-overlays' });
+	global.stage.add_actor(this._actorGroup);
+
 	this._enableCloningMouse();
 
 	this._brightnessIndicator = new ModifiedBrightnessIndicator(this);
@@ -218,6 +222,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	this._disableScreenshotPatch();
 	this._disableMagnifierPatch();
+
+	global.stage.remove_actor(this._actorGroup);
+	this._actorGroup.destroy();
+	this._actorGroup = null;
     }
 
     _swapMenu(oldIndicator, newIndicator) {
@@ -304,7 +312,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		overlay.set_width(monitor.width);
 		overlay.set_height(monitor.height);
 
-		global.stage.add_actor(overlay);
+		this._actorGroup.add_actor(overlay);
 		Shell.util_set_hidden_from_pick(overlay, true);
 
 		this._overlays.push(overlay);
@@ -332,7 +340,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	if (this._overlays != null) {
 	    this._logger.log_debug("_hideOverlays(): drop overlays, count="+this._overlays.length);
 	    for (let i=0; i < this._overlays.length; ++i) {
-		global.stage.remove_actor(this._overlays[i]);
+		this._actorGroup.remove_actor(this._overlays[i]);
 	    }
 	    this._overlays = null;
 	}
@@ -567,10 +575,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    // stacking order for the cursor and overlay actors to be
 	    // swapped around.  Reassert stacking over whenever the
 	    // pointer should become visible again.
-	    if (this._overlays != null) {
-		for (let i=0; i < this._overlays.length; ++i) {
-		    global.stage.raise_child(this._overlays[i], this._cursorActor);
-		}
+	    this._actorGroup.raise_top();
+	    for (let i=0; i < this._overlays.length; ++i) {
+		this._overlays[i].raise_top();
 	    }
 	} else {
 	    this._stopCloningMouse();
@@ -582,7 +589,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_startCloningMouse()');
 	if (this._cursorWatch == null ) {
 
-	    global.stage.add_actor(this._cursorActor);
+	    this._actorGroup.add_actor(this._cursorActor);
 	    this._cursorChangedConnection = this._cursorTracker.connect('cursor-changed', this._updateMouseSprite.bind(this));
 	    let interval = 1000 / Clutter.get_default_frame_rate();
 	    this._cursorWatch = this._cursorWatcher.addWatch(interval, this._updateMousePosition.bind(this));
@@ -609,7 +616,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._cursorTracker.disconnect(this._cursorChangedConnection);
 	    this._cursorChangedConnection = null;
 
-	    global.stage.remove_actor(this._cursorActor);
+	    this._actorGroup.remove_actor(this._cursorActor);
 	}
     }
 
