@@ -85,6 +85,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._monitorNames              = null;
 
 	// Set/destroyed by _enableCloningMouse/_disableCloningMouse
+	this._cursorWantedVisible                 = null;
 	this._cursorTracker			  = null;
 	this._cursorTrackerSetPointerVisible	  = null;
 	this._cursorTrackerSetPointerVisibleBound = null;
@@ -226,6 +227,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    for (let i=0; i < this._overlays.length; ++i) {
 		this._overlays[i].raise_top();
 	    }
+	    this._setPointerVisible(false);
 	}
     }
 
@@ -425,7 +427,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._hideOverlays(false);
 	    this._stopCloningShowMouse();
 	} else {
-	    this._startCloningMouse(); // Must be called before _showOverlays so that the overlay is on top.
+	    if (this._cursorWantedVisible) {
+		this._startCloningMouse(); // Must be called before _showOverlays so that the overlay is on top.
+	    }
 	    this._showOverlays(curBrightness, force);
 	}
     }
@@ -497,6 +501,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _enableCloningMouse() {
 	this._logger.log_debug('_enableCloningMouse()');
 
+	this._cursorWantedVisible = true;
 	this._cursorTracker = Meta.CursorTracker.get_for_display(global.display);
 	this._cursorTrackerSetPointerVisible = Meta.CursorTracker.prototype.set_pointer_visible;
 	this._cursorTrackerSetPointerVisibleBound = this._cursorTrackerSetPointerVisible.bind(this._cursorTracker);
@@ -513,6 +518,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisible;
 
+	this._cursorWantedVisible                 = null;
 	this._cursorTracker			  = null;
 	this._cursorTrackerSetPointerVisible	  = null;
 	this._cursorTrackerSetPointerVisibleBound = null;
@@ -540,6 +546,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._stopCloningMouse();
 	    this._setPointerVisible(false);
 	}
+	this._cursorWantedVisible = visible;
     }
 
     _startCloningMouse() {
