@@ -18,7 +18,6 @@ const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 const Clutter = imports.gi.Clutter;
 const Indicator = imports.ui.status.brightness.Indicator;
 const Lang = imports.lang;
-const Magnifier = imports.ui.magnifier;
 const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
 const PointerWatcher = imports.ui.pointerWatcher;
@@ -34,39 +33,6 @@ const Utils = Me.imports.utils;
 const Logger = Me.imports.logger;
 
 var softBrightnessExtension = null;
-
-const ModifiedMagShaderEffects = class ModifiedMagShaderEffects extends Magnifier.MagShaderEffects {
-    constructor(uiGroupClone) {
-	super(uiGroupClone);
-	softBrightnessExtension._logger.log_debug('ModifiedMagShaderEffects.constructor()');
-	this._softBrightnessEffect = new Clutter.BrightnessContrastEffect();
-	this._magView.add_effect(this._softBrightnessEffect);
-	softBrightnessExtension.addMagShaderEffects(this);
-	softBrightnessExtension._on_brightness_change(false);
-    }
-
-    destroyEffects() {
-	super.destroyEffects();
-	if (softBrightnessExtension) {
-	    if (softBrightnessExtension._logger) {
-		softBrightnessExtension._logger.log_debug('ModifiedMagShaderEffects.destroyEffects()');
-	    }
-	    softBrightnessExtension.removeMagShaderEffects(this);
-	}
-	this._softBrightnessEffect = null;
-    }
-
-    setSoftBrightness(level) {
-	level -= 1.0;
-	if (this._softBrightnessEffect != null) {
-	    if (softBrightnessExtension && softBrightnessExtension._logger) {
-		softBrightnessExtension._logger.log_debug('ModifiedMagShaderEffects.setSoftBrightness('+level+')');
-	    }
-	    this._softBrightnessEffect.set_brightness_full(level, level, level);
-	    this._softBrightnessEffect.set_enabled(level != 0.0);
-	}
-    }
-};
 
 const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends Indicator {
     constructor(softBrightnessExtension) {
@@ -95,8 +61,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._debugSettingChangedConnection = null;
 
 	// Set/destroyed by _enable/_disable
-	this._brightnessIndicator = null;
-	this._actorGroup          = null;
+	this._brightnessIndicator    = null;
+	this._actorGroup             = null;
+	this._actorAddedConnection   = null;
+	this._actorRemovedConnection = null;
 
 	// Set/destroyed by _showOverlays/_hideOverlays
 	this._unredirectPrevented = false;
@@ -131,12 +99,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotServiceScreenshotAsync       = null;
 	this._screenshotServiceScreenshotAreaAsync   = null;
 	this._screenshotService_onScreenShotComplete = null;
-
-	// Set/destroyed by _enableMagnifierPatch/_disableMagnifierPatch
-	this._magShaderEffectsClass = null;
-	this._magShaderEffectsList  = null;
-	// Set/destroyed by addMagShaderEffects/removeMagShaderEffects
-	this._magShaderCursorEffect = null;
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
@@ -184,6 +146,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._actorGroup = new St.Widget({ name: 'soft-brightness-overlays' });
 	global.stage.add_actor(this._actorGroup);
 
+	this._actorAddedConnection   = global.stage.connect('actor-added',   this._restackOverlays.bind(this));
+	this._actorRemovedConnection = global.stage.connect('actor-removed', this._restackOverlays.bind(this));
+
 	this._enableCloningMouse();
 
 	this._brightnessIndicator = new ModifiedBrightnessIndicator(this);
@@ -191,7 +156,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    return;
 	}
 
-	this._enableMagnifierPatch();
 	this._enableMonitor2ing();
 	this._enableSettingsMonitoring();
 
@@ -221,7 +185,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._disableCloningMouse(); // Must be called after _stopCloningShowMouse
 
 	this._disableScreenshotPatch();
-	this._disableMagnifierPatch();
+
+	global.stage.disconnect(this._actorAddedConnection);
+	global.stage.disconnect(this._actorRemovedConnection);
+
+	this._actorAddedConnection   = null;
+	this._actorRemovedConnection = null;
 
 	global.stage.remove_actor(this._actorGroup);
 	this._actorGroup.destroy();
@@ -248,6 +217,16 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	AggregateMenu.menu.addMenuItem(newIndicator.menu, menuIndex);
 	AggregateMenu._brightness = newIndicator;
 	return true;
+    }
+
+    _restackOverlays() {
+	this._logger.log_debug('_restackOverlays()');
+	this._actorGroup.raise_top();
+	if (this._overlays != null) {
+	    for (let i=0; i < this._overlays.length; ++i) {
+		this._overlays[i].raise_top();
+	    }
+	}
     }
 
     // Core functions to show & hide overlays
@@ -324,16 +303,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._logger.log_debug('_showOverlay(): set opacity '+opacity+' on overlay #'+i);
 	    this._overlays[i].opacity = opacity;
 	}
-
-	for (let i=0; i < this._magShaderEffectsList.length; ++i) {
-	    this._magShaderEffectsList[i].setSoftBrightness(brightness);
-	}
-
-	if (this._magShaderCursorEffect != null) {
-	    let level = brightness-1.0;
-	    this._magShaderCursorEffect.set_brightness_full(level, level, level);
-	    this._magShaderCursorEffect.set_enabled(level != 0.0);
-	}
     }
 
     _hideOverlays(forceUnpreventUnredirect) {
@@ -343,15 +312,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		this._actorGroup.remove_actor(this._overlays[i]);
 	    }
 	    this._overlays = null;
-	}
-
-	for (let i=0; i < this._magShaderEffectsList.length; ++i) {
-	    this._magShaderEffectsList[i].setSoftBrightness(1.0);
-	}
-
-	if (this._magShaderCursorEffect != null) {
-	    this._magShaderCursorEffect.set_brightness_full(1.0, 1.0, 1.0);
-	    this._magShaderCursorEffect.set_enabled(false);
 	}
 
 	let preventUnredirect = this._settings.get_string('prevent-unredirect');
@@ -575,10 +535,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    // stacking order for the cursor and overlay actors to be
 	    // swapped around.  Reassert stacking over whenever the
 	    // pointer should become visible again.
-	    this._actorGroup.raise_top();
-	    for (let i=0; i < this._overlays.length; ++i) {
-		this._overlays[i].raise_top();
-	    }
+	    this._restackOverlays();
 	} else {
 	    this._stopCloningMouse();
 	    this._setPointerVisible(false);
@@ -679,55 +636,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_onScreenshotCompleteWrapper()');
 	this._on_brightness_change(false);
 	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
-    }
-
-    // Magnifier Effects interface
-    _enableMagnifierPatch() {
-	this._logger.log_debug('_enableMagnifierPatch()');
-
-	// Monkey patch the magnifier
-	this._magShaderEffectsClass = Magnifier.MagShaderEffects;
-	Magnifier.MagShaderEffects = ModifiedMagShaderEffects;
-	this._magShaderEffectsList = [];
-    }
-
-    _disableMagnifierPatch() {
-	this._logger.log_debug('_disableMagnifierPatch()');
-
-	// Undo Monkey patching the magnifier
-	Magnifier.MagShaderEffects = this._magShaderEffectsClass;
-	this._magShaderEffectsClass = null;
-	this._magShaderEffectsList = null;
-    }
-
-    addMagShaderEffects(magShaderEffects) {
-	if (this._magShaderEffectsList != null) {
-	    for (let i=0; i < this._magShaderEffectsList; ++i) {
-		if (this._magShaderEffectsList[i] == magShaderEffects) {
-		    return;
-		}
-	    }
-	    this._magShaderEffectsList.push(magShaderEffects);
-	    if (this._magShaderCursorEffect == null) {
-		this._magShaderCursorEffect = new Clutter.BrightnessContrastEffect();
-		Main.magnifier._cursorRoot.add_effect(this._magShaderCursorEffect);
-	    }
-	}
-    }
-
-    removeMagShaderEffects(magShaderEffects) {
-	if (this._magShaderEffectsList != null) {
-	    for (let i=0; i < this._magShaderEffectsList; ++i) {
-		if (this._magShaderEffectsList[i] == magShaderEffects) {
-		    this._magShaderEffectsList.splice(i, 1);
-		    if (this._magShaderCursorEffect != null) {
-			Main.magnifier._cursorRoot.remove_effect(this._magShaderCursorEffect);
-			this._magShaderCursorEffect = null;
-		    }
-		    return;
-		}
-	    }
-	}
     }
 
 };
