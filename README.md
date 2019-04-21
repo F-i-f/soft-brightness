@@ -28,6 +28,115 @@ page](https://extensions.gnome.org/local/).
 
 ![Soft Brightness preference panel](docs/preferences.png)
 
+### Configuration Settings
+
+#### _Use backlight control_
+
+When enabled, Soft Brightness will work together with your computer's
+back-light.  The brightness slider and keyboard brightness hotkeys
+will control both the back-light and the Soft Brightness overlays.
+This is most useful:
+
+- if you have a back-light and  _Monitors_ is set to _External_, or
+
+- if a back-light is detected by Gnome but is not working (like some
+  OLED panel laptops which report having a back-light brightness which
+  doesn't exist).  In that latter case _Monitors_ should be set to
+  _All_.
+
+If _Use backlight control_ is disabled, the Brightness slider will
+only control the Soft Brightness overlays.  The keyboard brightness
+hotkeys will keep their default bindings.
+
+#### _Monitor(s)_
+
+- If set to _All_, a brightness overlay will be added to all attached
+  monitors.
+
+- If set to _Built-in_, the brightness overlay will only be added to
+  the built-in monitor, which is the setting right below _Monitor(s)_.
+
+- If set to _External_, a brightness overlay will only be added to all
+  monitors which are not the built-in monitor, defined in the setting
+  right below _Monitor(s)_.
+
+#### _Built-in monitor_
+
+A list of currently attached monitors is displayed.  Pick from the
+list which monitor should be considered the built-in monitor.
+
+The setting only has an effect if _Monitor(s)_ is set to _Built-in_ or
+_External_.
+
+#### _Full-screen behavior_
+
+Choose one of:
+
+- _Do not enforce brightness in full-screen_: When an application
+  enters full-screen mode, remove the brightness overlays.  You may
+  want to try this setting if your applications' refresh rate is
+  lagging in full-screen.  The application will unredirect its window
+  and will bypass Gnome Shell's compositing (this is the default for
+  full-screen applications in Gnome Shell unless changed by another
+  extension).
+
+- _Brightness enforced in full-screen_: The brightness overlay stays
+  active when an application enters full-screen mode.  This also
+  prevents the app from unredirecting its window (its surface will be
+  composited with Gnome Shell, and as a side-effect, will be subjected
+  to vertical refresh synchronization, ensuring tear-free rendering).
+  This is the default.
+
+- _Brightness enforced in full-screen, always tear-free_: Works like
+  _Brightness enforced in full-screen_, but will still prevent
+  full-screen applications from unredirecting their windows even if no
+  brightness overlay is active (brightness is 100%).  Applications
+  will then always be rendered tear-free, whatever the brightness may
+  be. In this mode, Soft Brightness can be used as a replacement for
+  extensions like _Fix Fullscreen Tearing_.
+
+#### _Minimum brightness_
+
+Sets the minimum allowable brightness for the display where _0_ is
+completely dark and _1_ completely bright. Defaults to _0.1_ (10%).
+
+The minimum brightness will also be enforced for the panel back-light
+if _Use backlight control_ is on.
+
+When the brightness is set to 0%, the display will go completely dark,
+it may be hard to reset the brightness with the slider then.
+
+#### _Debug_
+
+When toggled on, Soft Brightness will log extra debugging information
+to the system journal (or syslog).
+
+This will be useful if you encounter a bug:  In that case, please turn
+_Debug_ on, and try to reproduce the issue with that setting before
+capturing the debug logging.
+
+Soft Brightness's debug messages can be watched with:
+
+```
+journalctl -f | grep 'gnome-shell.*Soft-Brightness'
+```
+
+### Effect on power consumption
+
+Soft Brightness will cause extra load on the hardware and therefore
+slightly increase power usage, as it needs to add extra alpha layers
+and track the mouse among other things.  This is true of any Gnome
+Shell extension.
+
+If Soft Brightness controls an LCD panel, changing the brightness will
+not change at all the panel's power consumption.  Use the back-light
+instead:  Changing the back-light brightness will affect power
+consumption, the lower the brightness, the lower the power usage.
+
+If Soft Brightness controls an OLED panel, changing the brightness
+will affect power consumption, the lower the brightness, the lower the
+power usage.
+
 ### Common use cases and usage scenarios
 
 #### You have a desktop computer
@@ -39,9 +148,9 @@ attached monitors:
 
 - Set _Monitor(s)_ to _All_.
 
-#### You have a laptop computer with a backlight
+#### You have a laptop computer with a back-light
 
-You can leave the control of your attached display to the backlight
+You can leave the control of your attached display to the back-light
 and use Soft Brightness to control the brightness of external
 displays:
 
@@ -51,9 +160,9 @@ displays:
 
 - Configure _Built-in monitor_ to your built-in panel's name.
 
-#### You have a laptop computer without a backlight
+#### You have a laptop computer without a back-light
 
-For example an OLED panel or non-functional backlight.  Have
+For example an OLED panel or non-functional back-light.  Have
 Soft-Brightness control the brightness for all your monitors:
 
 - Set _Use backlight control_ to _On_.
@@ -182,5 +291,10 @@ First public release.
   included here by reference.
 
 <!--  LocalWords:  OLED VSync extensions' Changelog README md GPLv3
-LocalWords:  gse gettext DND js ES6 backlight
 -->
+<!--  LocalWords:  gse gettext DND js ES6 backlight applications' syslog
+-->
+<!--  LocalWords:  unredirect compositing unredirecting composited
+ -->
+<!--  LocalWords:  Fullscreen
+ -->
