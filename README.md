@@ -28,6 +28,38 @@ page](https://extensions.gnome.org/local/).
 
 ![Soft Brightness preference panel](docs/preferences.png)
 
+### Common use cases and usage scenarios
+
+#### You have a desktop computer
+
+Soft Brightness can be used to control the brightness of all your
+attached monitors:
+
+- Set _Use backlight control_ to _Off_.
+
+- Set _Monitor(s)_ to _All_.
+
+#### You have a laptop computer with a backlight
+
+You can leave the control of your attached display to the backlight
+and use Soft Brightness to control the brightness of external
+displays:
+
+- Set _Use backlight control_ to _On_.
+
+- Set _Monitor(s)_ to _External_.
+
+- Configure _Built-in monitor_ to your built-in panel's name.
+
+#### You have a laptop computer without a backlight
+
+For example an OLED panel or non-functional backlight.  Have
+Soft-Brightness control the brightness for all your monitors:
+
+- Set _Use backlight control_ to _On_.
+
+- Set _Monitor(s)_ to _All_.
+
 ## Download / Install
 
 Install directly from the [Gnome Shell Extensions
@@ -142,5 +174,5 @@ First public release.
   included here by reference.
 
 <!--  LocalWords:  OLED VSync extensions' Changelog README md GPLv3
-LocalWords:  gse gettext DND js ES6
+LocalWords:  gse gettext DND js ES6 backlight
 -->
