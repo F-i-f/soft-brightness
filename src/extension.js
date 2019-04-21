@@ -652,14 +652,20 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _screenshotAsyncWrapper(...args) {
 	this._logger.log_debug('_screenshotAsyncWrapper()');
-	this._hideOverlays(false);
+	this._screenshotStart();
 	this._screenshotServiceScreenshotAsync.apply(Main.shellDBusService._screenshotService, args);
     }
 
     _screenshotAreaAsyncWrapper(...args) {
 	this._logger.log_debug('_screenshotAreaAsyncWrapper()');
-	this._hideOverlays(false);
+	this._screenshotStart();
 	this._screenshotServiceScreenshotAreaAsync.apply(Main.shellDBusService._screenshotService, args);
+    }
+
+    _screenshotStart() {
+	this._hideOverlays(false);
+	this._stopCloningMouse();
+	this._setPointerVisible(false);
     }
 
     _onScreenshotCompleteWrapper(...args) {
