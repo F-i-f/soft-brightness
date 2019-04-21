@@ -95,6 +95,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// Set/destroyed by _startCloningMouse / _stopCloningMouse
 	this._cursorWatch			  = null;
 	this._cursorChangedConnection		  = null;
+	// Set/destroyed by _delayedSetPointerInvisible/_clearRedrawConnection
+	this._redrawConnection                    = null;
 
 	// Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
 	this._screenshotServiceScreenshotAsync       = null;
@@ -525,6 +527,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorSprite			  = null;
 	this._cursorActor			  = null;
 	this._cursorWatcher			  = null;
+
+	this._clearRedrawConnection();
     }
 
     _setPointerVisible(visible) {
@@ -587,7 +591,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// this._logger.log_debug('_updateMousePosition()');
 	let [x, y, mask] = global.get_pointer();
 	this._cursorActor.set_position(x, y);
-	this._setPointerVisible(false);
+	this._delayedSetPointerInvisible();
     }
 
     _updateMouseSprite() {
@@ -595,7 +599,27 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	Shell.util_cursor_tracker_to_clutter(this._cursorTracker, this._cursorSprite);
 	let [xHot, yHot] = this._cursorTracker.get_hot();
 	this._cursorSprite.set_anchor_point(xHot, yHot);
+	this._delayedSetPointerInvisible();
+    }
+
+    _delayedSetPointerInvisible() {
+	// this._logger.log('_delayedSetPointerInvisible()');
 	this._setPointerVisible(false);
+
+	if (this._redrawConnection == null) {
+	    this._redrawConnection = this._actorGroup.connect('paint', () => {
+		// this._logger.log('_delayedSetPointerInvisible::paint()');
+		this._clearRedrawConnection();
+		this._setPointerVisible(false);
+	    });
+	}
+    }
+
+    _clearRedrawConnection() {
+	if (this._redrawConnection != null) {
+	    this._actorGroup.disconnect(this._redrawConnection);
+	    this._redrawConnection = null;
+	}
     }
 
     // Monkey-patched ScreenshotService methods
