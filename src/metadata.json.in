@@ -1,5 +1,5 @@
 {
-  "description": "Use the brightness slider to change the brightness via an alpha layer (and stop using the backlight, if you have one).\n\nKeywords: dimmer\n\nNote that this extension will keep running on the lock screen, as you'd also want the brightness setting to apply to the lock screen as well. Please comment if this gives you any trouble.",
+  "description": "Add or override the brightness slider to change the brightness via an alpha layer (and optionally stop using or cooperate with the exising backlight, if present).\nEither internal, external or all monitors can be dimmed.\nSee the GitHub page for details.\n\nNote that this extension will keep running on the lock screen, as you'd also want the brightness setting to apply to the lock screen as well. Please report on GitHub if this gives you any trouble.",
   "gettext-domain": "@gettext_domain@",
   "name": "Soft brightness",
   "settings-schema": "org.gnome.shell.extensions.soft-brightness",
