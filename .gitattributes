@@ -1,0 +1,4 @@
+/docs/**	linguist-documentation
+/meson-gse/**	linguist-vendored
+/meson.build	linguist-generated
+/po/meson.build	linguist-generated
