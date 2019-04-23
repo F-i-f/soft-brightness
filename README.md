@@ -177,7 +177,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v9/soft-brightness@fifi.org.v9.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v10/soft-brightness@fifi.org.v10.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -201,6 +201,20 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 10
+#### April 23, 2019
+
+- Fix extension errors on Gnome Shell 3.32.
+- Fix cursor disappearing when external monitors are plugged in or the
+  _Monitor(s)_ preference setting is changed.
+- Fix flickering on Gnome Shell 3.32 when mouse hovers non-overlayed
+  display sections but overlays are active on other monitors.
+- Fix mouse still being tracked unnecessarily when the overlays should
+  activate but don't because the monitors they would apply to are not
+  connected.
+- Gnome Shell 3.28 compatibility.
+- Expand documentation.
 
 ### Version 9
 #### April 20, 2019
@@ -296,5 +310,5 @@ First public release.
 -->
 <!--  LocalWords:  unredirect compositing unredirecting composited
  -->
-<!--  LocalWords:  Fullscreen
+<!--  LocalWords:  fullscreen overlayed
  -->
