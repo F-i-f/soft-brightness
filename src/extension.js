@@ -148,6 +148,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_enable()');
 
 	this._actorGroup = new St.Widget({ name: 'soft-brightness-overlays' });
+	this._actorGroup.set_size(global.screen_width, global.screen_height);
 	global.stage.add_actor(this._actorGroup);
 
 	this._actorAddedConnection   = global.stage.connect('actor-added',   this._restackOverlays.bind(this));
@@ -508,6 +509,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		}
 	    }
 	    this._monitorNames = monitorNames;
+	    this._actorGroup.set_size(global.screen_width, global.screen_height);
 	    this._on_brightness_change(true);
 	}));
     }
