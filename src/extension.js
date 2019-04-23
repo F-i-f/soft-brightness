@@ -527,7 +527,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._cursorTracker = Meta.CursorTracker.get_for_display(global.display);
 	} else {
 	    // Shell 3.28
-	    this._cursorTracker = new Meta.CursorTracker();
+	    this._cursorTracker = Meta.CursorTracker.get_for_screen(global.screen);
 	}
 	this._cursorTrackerSetPointerVisible = Meta.CursorTracker.prototype.set_pointer_visible;
 	this._cursorTrackerSetPointerVisibleBound = this._cursorTrackerSetPointerVisible.bind(this._cursorTracker);
