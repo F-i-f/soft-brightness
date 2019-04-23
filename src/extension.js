@@ -510,7 +510,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorTrackerSetPointerVisibleBound = this._cursorTrackerSetPointerVisible.bind(this._cursorTracker);
 	Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisibleReplacement.bind(this);
 
-	if (Magnifier.MouseSpriteContent != null) {
+	if (Magnifier.MouseSpriteContent) {
 	    this._logger.log_debug('_enableCloningMouse(): using Gnome Shell 3.32 method');
 	    this._cursorSprite = new Clutter.Actor({ request_mode: Clutter.RequestMode.CONTENT_SIZE });
 	    this._cursorSprite.content = new Magnifier.MouseSpriteContent();
@@ -605,7 +605,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _updateMouseSprite() {
 	// this._logger.log_debug('_updateMouseSprite()');
-	if (Magnifier.MouseSpriteContent != null) {
+	if (Magnifier.MouseSpriteContent) {
 	    let sprite = this._cursorTracker.get_sprite();
 	    if (sprite) {
 		this._cursorSprite.content.texture = sprite;
