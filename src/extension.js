@@ -554,8 +554,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorSprite			  = null;
 	this._cursorActor			  = null;
 	this._cursorWatcher			  = null;
-
-	this._clearRedrawConnection();
     }
 
     _setPointerVisible(visible) {
@@ -612,6 +610,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	    this._actorGroup.remove_actor(this._cursorActor);
 	}
+
+	this._clearRedrawConnection();
     }
 
     _updateMousePosition(actor, event) {
