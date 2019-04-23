@@ -19,6 +19,7 @@ const Clutter = imports.gi.Clutter;
 const Indicator = imports.ui.status.brightness.Indicator;
 const Lang = imports.lang;
 const Main = imports.ui.main;
+const Magnifier = imports.ui.magnifier;
 const Meta = imports.gi.Meta;
 const PointerWatcher = imports.ui.pointerWatcher;
 const ScreenshotService = imports.ui.screenshot.ScreenshotService;
@@ -509,7 +510,15 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorTrackerSetPointerVisibleBound = this._cursorTrackerSetPointerVisible.bind(this._cursorTracker);
 	Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisibleReplacement.bind(this);
 
-	this._cursorSprite = new Clutter.Texture();
+	if (Magnifier.MouseSpriteContent != null) {
+	    this._logger.log_debug('_enableCloningMouse(): using Gnome Shell 3.32 method');
+	    this._cursorSprite = new Clutter.Actor({ request_mode: Clutter.RequestMode.CONTENT_SIZE });
+	    this._cursorSprite.content = new Magnifier.MouseSpriteContent();
+	} else {
+	    this._logger.log_debug('_enableCloningMouse(): using Gnome Shell 3.30 method');
+	    this._cursorSprite = new Clutter.Texture();
+	}
+
 	this._cursorActor = new Clutter.Actor();
 	this._cursorActor.add_actor(this._cursorSprite);
 	this._cursorWatcher = PointerWatcher.getPointerWatcher();
@@ -596,7 +605,17 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _updateMouseSprite() {
 	// this._logger.log_debug('_updateMouseSprite()');
-	Shell.util_cursor_tracker_to_clutter(this._cursorTracker, this._cursorSprite);
+	if (Magnifier.MouseSpriteContent != null) {
+	    let sprite = this._cursorTracker.get_sprite();
+	    if (sprite) {
+		this._cursorSprite.content.texture = sprite;
+		this._cursorSprite.show();
+	    } else {
+		this._cursorSprite.hide();
+	    }
+	} else {
+	    Shell.util_cursor_tracker_to_clutter(this._cursorTracker, this._cursorSprite);
+	}
 	let [xHot, yHot] = this._cursorTracker.get_hot();
 	this._cursorSprite.set_anchor_point(xHot, yHot);
 	this._delayedSetPointerInvisible();
