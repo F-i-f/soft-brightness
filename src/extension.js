@@ -447,6 +447,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		this._startCloningMouse(); // Must be called before _showOverlays so that the overlay is on top.
 	    }
 	    this._showOverlays(curBrightness, force);
+	    if (this._overlays.length == 0) {
+		this._stopCloningShowMouse();
+	    }
 	}
     }
 
