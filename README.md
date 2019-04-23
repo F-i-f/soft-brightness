@@ -177,7 +177,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v10/soft-brightness@fifi.org.v10.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v11/soft-brightness@fifi.org.v11.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -201,6 +201,15 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 11
+#### April 23, 2019
+
+- Fix bug where the cursor sprite changes were not tracked correctly
+  on Gnome Shell 3.28.
+- Fix regression crash by infinite recursion when attempting to "Use
+  backlight" without a hardware backlight.  If that happens, the
+  extension will use its internal setting for the brightness value.
 
 ### Version 10
 #### April 23, 2019
