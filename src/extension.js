@@ -654,6 +654,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _clearRedrawConnection() {
 	if (this._redrawConnection != null) {
+	    // this._logger.log_debug('_clearRedrawConnection()');
 	    this._actorGroup.disconnect(this._redrawConnection);
 	    this._redrawConnection = null;
 	}
