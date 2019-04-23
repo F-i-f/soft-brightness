@@ -208,7 +208,7 @@ directory (you may have to create the directory).
 - Fix extension errors on Gnome Shell 3.32.
 - Fix cursor disappearing when external monitors are plugged in or the
   _Monitor(s)_ preference setting is changed.
-- Fix flickering on Gnome Shell 3.32 when mouse hovers non-overlayed
+- Fix flickering on Gnome Shell 3.32 when mouse hovers non-overlaid
   display sections but overlays are active on other monitors.
 - Fix mouse still being tracked unnecessarily when the overlays should
   activate but don't because the monitors they would apply to are not
@@ -310,5 +310,5 @@ First public release.
 -->
 <!--  LocalWords:  unredirect compositing unredirecting composited
  -->
-<!--  LocalWords:  fullscreen overlayed
+<!--  LocalWords:  fullscreen
  -->
