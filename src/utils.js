@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+const ByteArray = imports.byteArray;
 const Lang = imports.lang;
 const Gio = imports.gi.Gio;
 
@@ -22,6 +23,20 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 let cachedDisplayConfigProxy = null;
 
+// ByteArray.toString() doesn't work as expected in Gnome-Shell 3.28-
+// Test & provide a wrapper
+var ByteArray_toString;
+
+if (ByteArray.toString(ByteArray.fromString('X')) == 'X') {
+    ByteArray_toString = function(x) {
+	return ByteArray.toString(x);
+    }
+} else {
+    ByteArray_toString = function(x) {
+	return String(x);
+    }
+}
+
 function getDisplayConfigProxy() {
     if (cachedDisplayConfigProxy == null) {
 	let xml = null;
@@ -29,7 +44,7 @@ function getDisplayConfigProxy() {
 	try {
 	    let [ok, bytes] = file.load_contents(null);
 	    if (ok) {
-		xml = imports.byteArray.toString(bytes);
+		xml = ByteArray_toString(bytes);
 	    }
 	} catch(e) {
 	    log('failed to load DisplayConfig interface XML');
