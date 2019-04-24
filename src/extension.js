@@ -149,6 +149,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	this._actorGroup = new St.Widget({ name: 'soft-brightness-overlays' });
 	this._actorGroup.set_size(global.screen_width, global.screen_height);
+	Shell.util_set_hidden_from_pick(this._actorGroup, true);
 	global.stage.add_actor(this._actorGroup);
 
 	this._actorAddedConnection   = global.stage.connect('actor-added',   this._restackOverlays.bind(this));
@@ -298,8 +299,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		overlay.set_height(monitor.height);
 
 		this._actorGroup.add_actor(overlay);
-		Shell.util_set_hidden_from_pick(overlay, true);
-
 		this._overlays.push(overlay);
 	    }
 	}
