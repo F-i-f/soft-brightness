@@ -5,7 +5,11 @@
 ## Overview
 
 Soft Brightness uses an alpha overlay to control the brightness on all
-or some of your monitors.  It integrates smoothly
+or some of your monitors.  It integrates smoothly and does not
+interfere with other Gnome Shell features.  It works flawlessly with
+the _Night Light_, the _Magnifier_ from the Accessibility Services, or
+with screen captures (as long as they are initiated by Gnome Shell).
+
 Common uses are:
 
 - Your laptop has no back-light, maybe because it's not supported, or
@@ -19,6 +23,8 @@ Bonus features:
 - Minimum brightness level: do not get lost in the dark.
 
 - Can operate the shell in tear-free (VSync) mode at all time.
+
+- Disables itself temporarily when a screen shot is taken.
 
 ## Configuration
 
