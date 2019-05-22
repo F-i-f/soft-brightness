@@ -1,5 +1,7 @@
 # Soft Brightness Gnome Shell Extension
 
+[![Build Status](https://travis-ci.org/F-i-f/soft-brightness.svg?branch=master)](https://travis-ci.org/F-i-f/soft-brightness)
+
 ![Brightness slider in Gnome Shell's system menu](docs/soft-brightness.png)
 
 ## Overview
