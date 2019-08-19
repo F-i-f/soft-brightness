@@ -50,7 +50,17 @@ const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends In
     _sync() {
 	this._softBrightnessExtension._logger.log_debug("_sync()");
 	this._softBrightnessExtension._on_brightness_change(false);
-	this._slider.setValue(this._softBrightnessExtension._getBrightnessLevel());
+	this.setSliderValue(this._softBrightnessExtension._getBrightnessLevel());
+    }
+
+    setSliderValue(value) {
+	if (this._slider._setCurrentValue !== undefined) {
+	    // Gnome-Shell 3.33.90+
+	    this._slider._setCurrentValue(value);
+	} else {
+	    // Gnome-Shell 3.32-
+	    this._slider.setValue(value);
+	}
     }
 };
 
@@ -170,7 +180,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	if (! this._settings.get_boolean('use-backlight') || this._brightnessIndicator._proxy.Brightness != null) {
 	    let curBrightness = this._getBrightnessLevel();
 	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider, curBrightness);
-	    this._brightnessIndicator._slider.setValue(curBrightness);
+	    this._brightnessIndicator.setSliderValue(curBrightness);
 	}
 
 	this._enableScreenshotPatch();
@@ -434,7 +444,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	if (curBrightness < minBrightness) {
 	    curBrightness = minBrightness;
 	    if (! this._settings.get_boolean('use-backlight')) {
-		this._brightnessIndicator._slider.setValue(curBrightness);
+		this._brightnessIndicator.setSliderValue(curBrightness);
 	    }
 	    this._storeBrightnessLevel(minBrightness);
 	    return;
