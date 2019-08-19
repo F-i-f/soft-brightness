@@ -41,7 +41,8 @@ const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends In
 	this._softBrightnessExtension = softBrightnessExtension;
     }
 
-    _sliderChanged(slider, value) {
+    _sliderChanged(slider) {
+	let value = this._slider.value;
 	this._softBrightnessExtension._logger.log_debug("_sliderChanged(slide, "+value+")");
 	this._softBrightnessExtension._storeBrightnessLevel(value);
     }
