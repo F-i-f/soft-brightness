@@ -54,12 +54,14 @@ const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends In
     }
 
     setSliderValue(value) {
-	if (this._slider._setCurrentValue !== undefined) {
-	    // Gnome-Shell 3.33.90+
-	    this._slider._setCurrentValue(value);
-	} else {
+	if (this._slider.setValue !== undefined) {
 	    // Gnome-Shell 3.32-
+	    this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.32-]");
 	    this._slider.setValue(value);
+	} else {
+	    // Gnome-Shell 3.33.90+
+	    this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
+	    this._slider.value = value;
 	}
     }
 };
@@ -179,8 +181,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// If we use the backlight and the Brightness proxy is null, it's still connecting and we'll get a _sync later.
 	if (! this._settings.get_boolean('use-backlight') || this._brightnessIndicator._proxy.Brightness != null) {
 	    let curBrightness = this._getBrightnessLevel();
-	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider, curBrightness);
 	    this._brightnessIndicator.setSliderValue(curBrightness);
+	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider);
 	}
 
 	this._enableScreenshotPatch();
