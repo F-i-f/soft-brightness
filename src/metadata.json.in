@@ -6,7 +6,8 @@
   "shell-version": [
     "3.28",
     "3.30",
-    "3.32"
+    "3.32",
+    "3.33.90"
   ],
   "url": "https://github.com/F-i-f/soft-brightness",
   "uuid": "@uuid@",
