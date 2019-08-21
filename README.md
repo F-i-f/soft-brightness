@@ -200,7 +200,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v13/soft-brightness@fifi.org.v13.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v14/soft-brightness@fifi.org.v14.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -225,9 +225,18 @@ directory (you may have to create the directory).
 
 ## Changelog
 
+### Version 14
+#### August 21, 2019
+
+Fixed broken version 13 update.
+- Fix slider not up-to-date at start on GS 3.33.90.
+- Fix broken GS 3.32 compatibility code.
+
 ### Version 13
 #### August 19, 2019
 
+- _Note that this version is broken._  Please use versions 12 (on
+  Gnome-Shell 3.32 and lower), or version 14 (all Shell versions).
 - Gnome-shell 3.33 compatibility.
 
 ### Version 12
