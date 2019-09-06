@@ -200,8 +200,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	this._hideOverlays(true);
 
-	this._stopCloningShowMouse();
-	this._disableCloningMouse(); // Must be called after _stopCloningShowMouse
+	this._disableCloningMouse();
 
 	this._disableScreenshotPatch();
 
@@ -560,6 +559,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _disableCloningMouse() {
+	this._stopCloningShowMouse();
 	this._logger.log_debug('_disableCloningMouse()');
 
 	Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisible;
