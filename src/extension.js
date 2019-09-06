@@ -122,6 +122,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     enable() {
 	if (this._enabled) {
 	    this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
+	    this._bounceCloningMouse();
 	} else {
 	    this._logger = new Logger.Logger('Soft-Brightness');
 	    this._settings = Convenience.getSettings();
@@ -137,6 +138,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     disable() {
 	if (Main.sessionMode.currentMode == 'unlock-dialog') {
 	    this._logger.log_debug('disable() skipped as session-mode = unlock-dialog');
+	    this._bounceCloningMouse();
 	} else if (this._enabled) {
 	    this._logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
 	    this._settings.disconnect(this._debugSettingChangedConnection);
@@ -571,6 +573,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorSprite			  = null;
 	this._cursorActor			  = null;
 	this._cursorWatcher			  = null;
+    }
+
+    _bounceCloningMouse() {
+	this._logger.log_debug('_bounceCloningMouse()');
+        this._stopCloningMouse();
+        this._on_brightness_change(true);
     }
 
     _setPointerVisible(visible) {
