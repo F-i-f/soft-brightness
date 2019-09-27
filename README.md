@@ -28,6 +28,20 @@ Bonus features:
 
 - Disables itself temporarily when a screen shot is taken.
 
+## Known Issues:
+
+Gnome-Shell 3.34.0 with Wayland does not run properly when Soft
+Brightness is active and the brightness is less than 100%.  The same
+issue manifests itself when the screen magnifier is on, and is a
+Gnome-Shell bug, tracked as [Issue
+#1719](https://gitlab.gnome.org/GNOME/gnome-shell/issues/1719) on the
+[Gnome-Shell Gitlab](https://gitlab.gnome.org/GNOME/gnome-shell).
+
+As a work-around, when using Gnome-Shell 3.34.0, run a _Gnome on Xorg_
+session instead of a regular _Gnome_ session: when login in in gdm,
+select the gear icon displayed on the password screen and select
+_Gnome on Xorg_.
+
 ## Configuration
 
 Soft Brightness comes with a configuration panel, which can be
@@ -361,5 +375,5 @@ First public release.
  -->
 <!--  LocalWords:  unredirect compositing unredirecting composited eg
  -->
-<!--  LocalWords:  fullscreen merchantability
+<!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
  -->
