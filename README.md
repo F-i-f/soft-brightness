@@ -33,9 +33,12 @@ Bonus features:
 Gnome-Shell 3.34.0 with Wayland does not run properly when Soft
 Brightness is active and the brightness is less than 100%.  The same
 issue manifests itself when the screen magnifier is on, and is a
-Gnome-Shell bug, tracked as [Issue
+~~Gnome-Shell bug, tracked as [Issue
 #1719](https://gitlab.gnome.org/GNOME/gnome-shell/issues/1719) on the
-[Gnome-Shell Gitlab](https://gitlab.gnome.org/GNOME/gnome-shell).
+[Gnome-Shell Gitlab](https://gitlab.gnome.org/GNOME/gnome-shell)~~.
+The issue actually stems from
+[Mutter](https://gitlab.gnome.org/GNOME/mutter/) and is tracked with
+[Mutter issue #826](https://gitlab.gnome.org/GNOME/mutter/issues/826).
 
 As a work-around, when using Gnome-Shell 3.34.0, run a _Gnome on Xorg_
 session instead of a regular _Gnome_ session: when login in in gdm,
