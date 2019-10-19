@@ -610,9 +610,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _stopCloningShowMouse() {
-	this._logger.log_debug('_stopCloningShowMouse()');
+	this._logger.log_debug('_stopCloningShowMouse(), restoring cursor visibility to '+this._cursorWantedVisible);
 	this._stopCloningMouse();
-	this._setPointerVisible(true);
+	this._setPointerVisible(this._cursorWantedVisible);
     }
 
     _stopCloningMouse() {
