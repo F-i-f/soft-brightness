@@ -17,6 +17,7 @@
 const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 const Clutter = imports.gi.Clutter;
 const Indicator = imports.ui.status.brightness.Indicator;
+const GLib = imports.gi.GLib;
 const Lang = imports.lang;
 const Main = imports.ui.main;
 const Magnifier = imports.ui.magnifier;
@@ -75,6 +76,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._debugSettingChangedConnection = null;
 
 	// Set/destroyed by _enable/_disable
+	this._cloneMouse	     = null;
 	this._brightnessIndicator    = null;
 	this._actorGroup             = null;
 	this._actorAddedConnection   = null;
@@ -160,6 +162,26 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _enable() {
 	this._logger.log_debug('_enable()');
 
+	this._cloneMouse = true;
+	let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
+	if (gnomeShellVersion != undefined) {
+	    this._logger.log_debug('_enable(): gnome-shell v.'+gnomeShellVersion);
+	    let matchGroups = /^([0-9]+)\.([0-9]+)(\.([0-9]+)(\..*)?)?$/.exec(gnomeShellVersion);
+	    if (matchGroups != null) {
+		let major = Number(matchGroups[1]);
+		let minor = Number(matchGroups[2]);
+		let patch = (matchGroups[4] == undefined || matchGroups[4] == '') ? 0 : Number(matchGroups[4]);
+		this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch);
+		if ( GLib.getenv('XDG_SESSION_TYPE') == 'wayland'
+		     && ( major > 3
+			  || (major == 3 && (minor > 33
+					     || (minor == 33 && patch > 90))))) {
+		    this._cloneMouse = false;
+		    this._logger.log('mouse cloning disabled on gnome-shell '+gnomeShellVersion+' running on Wayland');
+		}
+	    }
+	}
+
 	this._actorGroup = new St.Widget({ name: 'soft-brightness-overlays' });
 	this._actorGroup.set_size(global.screen_width, global.screen_height);
 	Shell.util_set_hidden_from_pick(this._actorGroup, true);
@@ -213,6 +235,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	global.stage.remove_actor(this._actorGroup);
 	this._actorGroup.destroy();
 	this._actorGroup = null;
+	this._cloneMouse = null;
     }
 
     _swapMenu(oldIndicator, newIndicator) {
@@ -530,6 +553,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     // Cursor handling
     _enableCloningMouse() {
+	if (!this._cloneMouse) return;
 	this._logger.log_debug('_enableCloningMouse()');
 
 	this._cursorWantedVisible = true;
@@ -559,6 +583,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _disableCloningMouse() {
+	if (!this._cloneMouse) return;
 	this._stopCloningShowMouse();
 	this._logger.log_debug('_disableCloningMouse()');
 
@@ -574,6 +599,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _setPointerVisible(visible) {
+	if (!this._cloneMouse) return;
 	// this._logger.log_debug('_setPointerVisible('+visible+')');
 	let boundFunc = this._cursorTrackerSetPointerVisibleBound;
 	boundFunc(visible);
@@ -596,6 +622,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _startCloningMouse() {
+	if (!this._cloneMouse) return;
 	this._logger.log_debug('_startCloningMouse()');
 	if (this._cursorWatch == null ) {
 
@@ -610,12 +637,14 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _stopCloningShowMouse() {
+	if (!this._cloneMouse) return;
 	this._logger.log_debug('_stopCloningShowMouse(), restoring cursor visibility to '+this._cursorWantedVisible);
 	this._stopCloningMouse();
 	this._setPointerVisible(this._cursorWantedVisible);
     }
 
     _stopCloningMouse() {
+	if (!this._cloneMouse) return;
 	if (this._cursorWatch != null ) {
 	    this._logger.log_debug('_stopCloningMouse()');
 
