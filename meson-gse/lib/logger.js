@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const ExtensionUtils = imports.misc.extensionUtils;
+const GLib = imports.gi.GLib;
 
 const Me = ExtensionUtils.getCurrentExtension();
 
@@ -32,7 +33,16 @@ var Logger = class MesonGseLogger {
     log(text) {
 	if (this._first_log) {
 	    this._first_log = false;
-	    this.log('version '+this.get_version());
+	    let msg = 'version ' + this.get_version();
+	    let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
+	    if (gnomeShellVersion != undefined) {
+		msg += ' on Gnome-Shell ' + gnomeShellVersion;
+            }
+	    let sessionType = GLib.getenv('XDG_SESSION_TYPE');
+            if (sessionType != undefined) {
+                msg += ' / ' + sessionType;
+            }
+	    this.log(msg);
 	}
 	global.log(''+this._title+': '+text);
     }
