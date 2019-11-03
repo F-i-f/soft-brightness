@@ -216,7 +216,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v14/soft-brightness@fifi.org.v14.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v15/soft-brightness@fifi.org.v15.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -240,6 +240,17 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 15
+#### October 27, 2019
+
+- Now compatible with GS 3.34 and GS 3.35.1.
+- Do not clone mouse on GS > 3.33.90 when running under Wayland
+  (work-around [Mutter issue
+  #826](https://gitlab.gnome.org/GNOME/mutter/issues/826)).
+- Minor code clean-ups.
+- Show GS version and session type (Wayland/X11) at start-up when
+  debugging.
 
 ### Version 14
 #### August 21, 2019
@@ -371,7 +382,7 @@ First public release.
 - The [`meson-gse` credits](https://github.com/F-i-f/meson-gse/) are
   included here by reference.
 
-<!--  LocalWords:  OLED VSync extensions' Changelog README md GPLv3
+<!--  LocalWords:  OLED VSync extensions' Changelog README md GPLv3 X11
  -->
 <!--  LocalWords:  gse gettext DND js ES6 backlight applications' syslog
  -->
