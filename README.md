@@ -28,22 +28,21 @@ Bonus features:
 
 - Disables itself temporarily when a screen shot is taken.
 
-## Known Issues:
+## Known Issues with Gnome-Shell 3.34:
 
-Gnome-Shell 3.34.0 with Wayland does not run properly when Soft
-Brightness is active and the brightness is less than 100%.  The same
-issue manifests itself when the screen magnifier is on, and is a
-~~Gnome-Shell bug, tracked as [Issue
-#1719](https://gitlab.gnome.org/GNOME/gnome-shell/issues/1719) on the
-[Gnome-Shell Gitlab](https://gitlab.gnome.org/GNOME/gnome-shell)~~.
-The issue actually stems from
-[Mutter](https://gitlab.gnome.org/GNOME/mutter/) and is tracked with
+Gnome-Shell 3.34.0 has issues with cursor tracking when running under
+Wayland.  Soft Brightness version 15 and later detect this condition
+and disable cursor cloning.  On buggy gnome-shell versions, the cursor
+will not be affected by the brightness setting.  Alternately, if
+cursor brightness is important, run a _Gnome on Xorg_ session instead
+of a regular _Gnome_ session: when login in in gdm, select the gear
+icon displayed on the password screen and select _Gnome on Xorg_.
+
+The root issue is tracked through [Gnome-Shell Issue
+#1719](https://gitlab.gnome.org/GNOME/gnome-shell/issues/1719) on
+[Gnome-Shell Gitlab](https://gitlab.gnome.org/GNOME/gnome-shell) and
 [Mutter issue #826](https://gitlab.gnome.org/GNOME/mutter/issues/826).
 
-As a work-around, when using Gnome-Shell 3.34.0, run a _Gnome on Xorg_
-session instead of a regular _Gnome_ session: when login in in gdm,
-select the gear icon displayed on the password screen and select
-_Gnome on Xorg_.
 
 ## Configuration
 
