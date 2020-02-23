@@ -1,0 +1,147 @@
+# Czech translations for soft-brightness package.
+# Copyright (C) 2019 THE soft-brightness'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the soft-brightness package.
+# Philippe Troin, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: soft-brightness\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-02-11 10:03-0800\n"
+"PO-Revision-Date: 2020-02-23 11:20-0200\n"
+"Last-Translator: Pavel Borecki\n"
+"Language-Team: none\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: src/prefs.js:57
+msgid "Soft Brightness"
+msgstr "Softwarová regulace jasu"
+
+#: src/prefs.js:67
+msgid "Version"
+msgstr "Verze"
+
+#: src/prefs.js:90
+msgid "Use backlight control:"
+msgstr "Použít ovládání podsvětlení:"
+
+#: src/prefs.js:101
+msgid "Monitor(s):"
+msgstr "Monitory:"
+
+#: src/prefs.js:105
+msgid "All"
+msgstr "Všechny"
+
+#: src/prefs.js:106
+msgid "Built-in"
+msgstr "Vestavěný"
+
+#: src/prefs.js:107
+msgid "External"
+msgstr "Externí"
+
+#: src/prefs.js:115
+msgid "Built-in monitor:"
+msgstr "Vestavěný displej:"
+
+#: src/prefs.js:138
+msgid "Full-screen behavior:"
+msgstr "Chování v celoobrazovkovém režimu:"
+
+#: src/prefs.js:142
+msgid "Do not enforce brightness in full-screen"
+msgstr "Nevynucovat jas v celoobrazovkovém režimu"
+
+#: src/prefs.js:143
+msgid "Brightness enforced in full-screen"
+msgstr "Vynutit úroveň jasu v celoobrazovkovém režimu"
+
+#: src/prefs.js:144
+msgid "Brightness enforced in full-screen, always tear-free"
+msgstr "Vynutit úroveň jasu v celoobrazovkovém režimu, bez zaškubávání"
+
+#: src/prefs.js:152
+msgid "Minimum brightness (0..1):"
+msgstr "Minimální jas (0..1):"
+
+#: src/prefs.js:171
+msgid "Debug:"
+msgstr "Ladění:"
+
+#: src/prefs.js:184
+msgid ""
+"Copyright © 2019 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</"
+"a> on GitHub)"
+msgstr ""
+"Autorská práva © 2019 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</"
+"a> na portálu GitHub)"
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
+msgid "Use backlight control."
+msgstr "Použít ovládání podsvícení."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:16
+msgid "Use the regular backlight control."
+msgstr "Použít ovládání jasu v hardware."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:20
+msgid "Monitors."
+msgstr "Monitory."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
+msgid "The monitors whose brigthness should be adjusted."
+msgstr "Monitory, kterých jas upravit."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:25
+msgid "Builtin monitor."
+msgstr "Vestavěný displej."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:26
+msgid "The name of the built-in monitor."
+msgstr "Název pro vestavěný displej."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:30
+msgid "Prevent window unredirecting behavior."
+msgstr "Prevence nepřesměrovávání oken."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
+msgid ""
+"If set to never, unredirection is never prevent. If set to when-correcting, "
+"unredirection will be prevent when the brightness is not at the maximum "
+"setting (and an alpha layer is lowering the brightness). If set to always, "
+"window unredirection will always be prevented when this extension is active, "
+"allowing tear-free display."
+msgstr ""
+"„never“: nepřesměrování není bráněno. „when-correcting“: nepřsměrování "
+"bude bráněno, když úroveň není na maximu (a alfa vrstva jas snižuje). „always“: "
+"nepřesměrovávání oken bude bráněno vždy, když je toto rozšíření aktivní, "
+"čímž se zabrání záškubům při zobrazování (vertikální synchronizace)."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:41
+msgid "Minimum brightness."
+msgstr "Minimální jas."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:42
+msgid "Minimum brightness level."
+msgstr "Minimální úroveň jasu."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:47
+msgid "Current brightness level."
+msgstr "Stávající úroveň jasu."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:48
+msgid "The current brightness level."
+msgstr "Stávající úroveň jasu."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
+msgid "Debugging."
+msgstr "Ladění."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
+msgid "Enable debugging for the extension."
+msgstr "Zapnout ladící režim rozšíření."
