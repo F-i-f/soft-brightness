@@ -1,7 +1,7 @@
 # -*- meson -*-
 
 # Soft-brightness - Control the display's brightness via an alpha channel.
-# Copyright (C) 2019 Philippe Troin (F-i-f on Github)
+# Copyright (C) 2019, 2020 Philippe Troin (F-i-f on Github)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 
 # Boilerplate
 project('soft-brightness',
-	version: '15',
+	version: '16',
 	meson_version: '>= 0.44.0',
 	license: 'GPL3' )
 

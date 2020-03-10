@@ -200,7 +200,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v15/soft-brightness@fifi.org.v15.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v16/soft-brightness@fifi.org.v16.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -224,6 +224,16 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 16
+#### March 10, 2020
+
+- Re-enable mouse cloning on Wayland GS >= 3.34.1 (work-around only
+  active for 3.33.90 < GS < 3.34.1).
+- Added Czech translation (thanks to p-bo on GitHub).
+- Fix annoying bug on GS 3.34 where the brightness slider will creep
+  back to 100% whenever changed to something lower (only when using
+  backlight control).
 
 ### Version 15
 #### October 27, 2019
@@ -373,4 +383,6 @@ First public release.
 <!--  LocalWords:  unredirect compositing unredirecting composited eg
  -->
 <!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
+ -->
+<!--  LocalWords:  bo
  -->
