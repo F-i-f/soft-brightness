@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-11 10:03-0800\n"
-"PO-Revision-Date: 2019-02-11 11:12-0800\n"
+"POT-Creation-Date: 2020-03-09 18:34-0700\n"
+"PO-Revision-Date: 2020-03-09 18:57-0700\n"
 "Last-Translator: Philippe Troin (F-i-f on Github)\n"
 "Language-Team: none\n"
 "Language: fr\n"
@@ -17,69 +17,67 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/prefs.js:57
+#: src/prefs.js:53
 msgid "Soft Brightness"
 msgstr "Luminosité logicielle"
 
-#: src/prefs.js:67
+#: src/prefs.js:63
 msgid "Version"
 msgstr "Version"
 
-#: src/prefs.js:90
+#: src/prefs.js:85
 msgid "Use backlight control:"
 msgstr "Utiliser le rétroéclairage :"
 
-#: src/prefs.js:101
+#: src/prefs.js:96
 msgid "Monitor(s):"
 msgstr "Moniteur(s) :"
 
-#: src/prefs.js:105
+#: src/prefs.js:100
 msgid "All"
 msgstr "Tous"
 
-#: src/prefs.js:106
+#: src/prefs.js:101
 msgid "Built-in"
 msgstr "Interne"
 
-#: src/prefs.js:107
+#: src/prefs.js:102
 msgid "External"
 msgstr "Externes"
 
-#: src/prefs.js:115
+#: src/prefs.js:110
 msgid "Built-in monitor:"
 msgstr "Écran intégré :"
 
-#: src/prefs.js:138
+#: src/prefs.js:133
 msgid "Full-screen behavior:"
 msgstr "Comportement en plein-écran :"
 
-#: src/prefs.js:142
+#: src/prefs.js:137
 msgid "Do not enforce brightness in full-screen"
 msgstr "Ne pas changer la luminosité en plein-écran"
 
-#: src/prefs.js:143
+#: src/prefs.js:138
 msgid "Brightness enforced in full-screen"
 msgstr "Réglage de luminosité actif en plein-écran"
 
-#: src/prefs.js:144
+#: src/prefs.js:139
 msgid "Brightness enforced in full-screen, always tear-free"
 msgstr "Réglage de luminosité actif en plein-écran, mode sans-déchirures"
 
-#: src/prefs.js:152
+#: src/prefs.js:147
 msgid "Minimum brightness (0..1):"
 msgstr "Luminosité minimale (0..1) :"
 
-#: src/prefs.js:171
+#: src/prefs.js:166
 msgid "Debug:"
 msgstr "Débogage :"
 
-#: src/prefs.js:184
+#: src/prefs.js:179
 msgid ""
-"Copyright © 2019 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</"
-"a> on GitHub)"
-msgstr ""
-"Copyright © 2019 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</"
-"a> sur GitHub)"
+"Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f"
+"\">F-i-f</a> on GitHub)"
+msgstr "Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</a> sur GitHub)"
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
 msgid "Use backlight control."

@@ -1,5 +1,5 @@
 // Soft-brightness - Control the display's brightness via an alpha channel.
-// Copyright (C) 2019 Philippe Troin (F-i-f on Github)
+// Copyright (C) 2019, 2020 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -176,7 +176,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	this.copyright_label = new Gtk.Label({
 	    use_markup: true,
 	    label: '<span size="small">'
-		+ _('Copyright © 2019 Philippe Troin (<a href="https://github.com/F-i-f">F-i-f</a> on GitHub)')
+		+ _('Copyright © 2019, 2020 Philippe Troin (<a href="https://github.com/F-i-f">F-i-f</a> on GitHub)')
 		+ '</span>',
 	    hexpand: true,
 	    halign: Gtk.Align.CENTER,

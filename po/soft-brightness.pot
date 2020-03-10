@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-11 10:03-0800\n"
+"POT-Creation-Date: 2020-03-09 18:34-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,66 +17,66 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/prefs.js:57
+#: src/prefs.js:53
 msgid "Soft Brightness"
 msgstr ""
 
-#: src/prefs.js:67
+#: src/prefs.js:63
 msgid "Version"
 msgstr ""
 
-#: src/prefs.js:90
+#: src/prefs.js:85
 msgid "Use backlight control:"
 msgstr ""
 
-#: src/prefs.js:101
+#: src/prefs.js:96
 msgid "Monitor(s):"
 msgstr ""
 
-#: src/prefs.js:105
+#: src/prefs.js:100
 msgid "All"
 msgstr ""
 
-#: src/prefs.js:106
+#: src/prefs.js:101
 msgid "Built-in"
 msgstr ""
 
-#: src/prefs.js:107
+#: src/prefs.js:102
 msgid "External"
 msgstr ""
 
-#: src/prefs.js:115
+#: src/prefs.js:110
 msgid "Built-in monitor:"
 msgstr ""
 
-#: src/prefs.js:138
+#: src/prefs.js:133
 msgid "Full-screen behavior:"
 msgstr ""
 
-#: src/prefs.js:142
+#: src/prefs.js:137
 msgid "Do not enforce brightness in full-screen"
 msgstr ""
 
-#: src/prefs.js:143
+#: src/prefs.js:138
 msgid "Brightness enforced in full-screen"
 msgstr ""
 
-#: src/prefs.js:144
+#: src/prefs.js:139
 msgid "Brightness enforced in full-screen, always tear-free"
 msgstr ""
 
-#: src/prefs.js:152
+#: src/prefs.js:147
 msgid "Minimum brightness (0..1):"
 msgstr ""
 
-#: src/prefs.js:171
+#: src/prefs.js:166
 msgid "Debug:"
 msgstr ""
 
-#: src/prefs.js:184
+#: src/prefs.js:179
 msgid ""
-"Copyright © 2019 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</"
-"a> on GitHub)"
+"Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f"
+"\">F-i-f</a> on GitHub)"
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-11 10:03-0800\n"
-"PO-Revision-Date: 2020-02-23 11:20-0200\n"
+"POT-Creation-Date: 2020-03-09 18:34-0700\n"
+"PO-Revision-Date: 2020-03-09 18:36-0700\n"
 "Last-Translator: Pavel Borecki\n"
 "Language-Team: none\n"
 "Language: cs\n"
@@ -17,69 +17,67 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/prefs.js:57
+#: src/prefs.js:53
 msgid "Soft Brightness"
 msgstr "Softwarová regulace jasu"
 
-#: src/prefs.js:67
+#: src/prefs.js:63
 msgid "Version"
 msgstr "Verze"
 
-#: src/prefs.js:90
+#: src/prefs.js:85
 msgid "Use backlight control:"
 msgstr "Použít ovládání podsvětlení:"
 
-#: src/prefs.js:101
+#: src/prefs.js:96
 msgid "Monitor(s):"
 msgstr "Monitory:"
 
-#: src/prefs.js:105
+#: src/prefs.js:100
 msgid "All"
 msgstr "Všechny"
 
-#: src/prefs.js:106
+#: src/prefs.js:101
 msgid "Built-in"
 msgstr "Vestavěný"
 
-#: src/prefs.js:107
+#: src/prefs.js:102
 msgid "External"
 msgstr "Externí"
 
-#: src/prefs.js:115
+#: src/prefs.js:110
 msgid "Built-in monitor:"
 msgstr "Vestavěný displej:"
 
-#: src/prefs.js:138
+#: src/prefs.js:133
 msgid "Full-screen behavior:"
 msgstr "Chování v celoobrazovkovém režimu:"
 
-#: src/prefs.js:142
+#: src/prefs.js:137
 msgid "Do not enforce brightness in full-screen"
 msgstr "Nevynucovat jas v celoobrazovkovém režimu"
 
-#: src/prefs.js:143
+#: src/prefs.js:138
 msgid "Brightness enforced in full-screen"
 msgstr "Vynutit úroveň jasu v celoobrazovkovém režimu"
 
-#: src/prefs.js:144
+#: src/prefs.js:139
 msgid "Brightness enforced in full-screen, always tear-free"
 msgstr "Vynutit úroveň jasu v celoobrazovkovém režimu, bez zaškubávání"
 
-#: src/prefs.js:152
+#: src/prefs.js:147
 msgid "Minimum brightness (0..1):"
 msgstr "Minimální jas (0..1):"
 
-#: src/prefs.js:171
+#: src/prefs.js:166
 msgid "Debug:"
 msgstr "Ladění:"
 
-#: src/prefs.js:184
+#: src/prefs.js:179
 msgid ""
-"Copyright © 2019 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</"
-"a> on GitHub)"
-msgstr ""
-"Autorská práva © 2019 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</"
-"a> na portálu GitHub)"
+"Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f"
+"\">F-i-f</a> on GitHub)"
+msgstr "Autorská práva © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</a> na portálu GitHub)"
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
 msgid "Use backlight control."
@@ -117,8 +115,8 @@ msgid ""
 "window unredirection will always be prevented when this extension is active, "
 "allowing tear-free display."
 msgstr ""
-"„never“: nepřesměrování není bráněno. „when-correcting“: nepřsměrování "
-"bude bráněno, když úroveň není na maximu (a alfa vrstva jas snižuje). „always“: "
+"„never“: nepřesměrování není bráněno. „when-correcting“: nepřsměrování bude "
+"bráněno, když úroveň není na maximu (a alfa vrstva jas snižuje). „always“: "
 "nepřesměrovávání oken bude bráněno vždy, když je toto rozšíření aktivní, "
 "čímž se zabrání záškubům při zobrazování (vertikální synchronizace)."
 
