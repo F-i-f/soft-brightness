@@ -1,5 +1,5 @@
 // Soft-brightness - Control the display's brightness via an alpha channel.
-// Copyright (C) 2019 Philippe Troin (F-i-f on Github)
+// Copyright (C) 2019, 2020 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -173,9 +173,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		let patch = (matchGroups[4] == undefined || matchGroups[4] == '') ? 0 : Number(matchGroups[4]);
 		this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch);
 		if ( GLib.getenv('XDG_SESSION_TYPE') == 'wayland'
-		     && ( major > 3
-			  || (major == 3 && (minor > 33
-					     || (minor == 33 && patch > 90))))) {
+		     && major == 3
+		     && (    (minor == 33 && patch > 90)
+			  || (minor == 34 && patch < 1))) {
 		    this._cloneMouse = false;
 		    this._logger.log('mouse cloning disabled on gnome-shell '+gnomeShellVersion+' running on Wayland');
 		}
