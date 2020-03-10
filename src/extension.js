@@ -405,7 +405,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     // If not using the backlight, the brightness is stored in the extension setting.
     _storeBrightnessLevel(value) {
 	if (this._settings.get_boolean('use-backlight') && this._brightnessIndicator._proxy.Brightness >= 0) {
-	    let convertedBrightness = Math.min(100, Math.round(value * 100.0)+1);
+	    let convertedBrightness = Math.min(100, Math.round(value * 100.0));
 	    this._logger.log_debug('_storeBrightnessLevel('+value+') by proxy -> '+convertedBrightness);
 	    this._brightnessIndicator._proxy.Brightness = convertedBrightness;
 	} else {
