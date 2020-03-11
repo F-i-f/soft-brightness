@@ -115,6 +115,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorSprite			  = null;
 	this._cursorActor			  = null;
 	this._cursorWatcher			  = null;
+	this._cursorSeat                          = null;
 	// Set/destroyed by _startCloningMouse / _stopCloningMouse
 	this._cursorWatch			  = null;
 	this._cursorChangedConnection		  = null;
@@ -600,6 +601,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorActor = new Clutter.Actor();
 	this._cursorActor.add_actor(this._cursorSprite);
 	this._cursorWatcher = PointerWatcher.getPointerWatcher();
+
+	if (Clutter.get_default_backend && Clutter.get_default_backend().get_default_seat) {
+	    this._logger.log_debug('_enableCloningMouse(): using GS 3.35.92+ seat control');
+	    this._cursorSeat = Clutter.get_default_backend().get_default_seat();
+	}
     }
 
     _disableCloningMouse() {
@@ -616,9 +622,28 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorSprite			  = null;
 	this._cursorActor			  = null;
 	this._cursorWatcher			  = null;
+	this._cursorSeat                          = null;
     }
 
     _setPointerVisible(visible) {
+	if (!this._cloneMouse) return;
+	this._setPointerVisibleReal(visible);
+
+	if (this._cursorSeat != null) {
+	    if (visible) {
+		if (this._cursorSeat.is_unfocus_inhibited()) {
+		    this._cursorSeat.uninhibit_unfocus();
+		}
+	    } else {
+		if (! this._cursorSeat.is_unfocus_inhibited()) {
+		    this._cursorSeat.inhibit_unfocus();
+		}
+	    }
+	}
+    }
+
+
+    _setPointerVisibleReal(visible) {
 	if (!this._cloneMouse) return;
 	// this._logger.log_debug('_setPointerVisible('+visible+')');
 	let boundFunc = this._cursorTrackerSetPointerVisibleBound;
@@ -636,7 +661,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._restackOverlays();
 	} else {
 	    this._stopCloningMouse();
-	    this._setPointerVisible(false);
+	    this._setPointerVisibleReal(false);
 	}
 	this._cursorWantedVisible = visible;
     }
