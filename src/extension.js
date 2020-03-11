@@ -173,7 +173,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cloneMouse = true;
 	let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
 	if (gnomeShellVersion != undefined) {
-	    this._logger.log_debug('_enable(): gnome-shell v.'+gnomeShellVersion);
 	    let matchGroups = /^([0-9]+)\.([0-9]+)(\.([0-9]+)(\..*)?)?$/.exec(gnomeShellVersion);
 	    if (matchGroups != null) {
 		let major = Number(matchGroups[1]);
