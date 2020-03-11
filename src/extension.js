@@ -38,9 +38,8 @@ const Logger = Me.imports.logger;
 var softBrightnessExtension = null;
 
 const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends Indicator {
-    constructor(softBrightnessExtension) {
-	super();
-	this._softBrightnessExtension = softBrightnessExtension;
+    _setExtension(ext) {
+	this._softBrightnessExtension = ext;
     }
 
     _sliderChanged(slider) {
@@ -200,7 +199,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	this._enableCloningMouse();
 
-	this._brightnessIndicator = new ModifiedBrightnessIndicator(this);
+	this._brightnessIndicator = new ModifiedBrightnessIndicator();
+	this._brightnessIndicator._setExtension(this);
 	if (! this._swapMenu(AggregateMenu._brightness, this._brightnessIndicator)) {
 	    return;
 	}
