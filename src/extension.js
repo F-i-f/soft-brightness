@@ -18,6 +18,7 @@ const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 const Clutter = imports.gi.Clutter;
 const Indicator = imports.ui.status.brightness.Indicator;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 const Main = imports.ui.main;
 const Magnifier = imports.ui.magnifier;
@@ -66,6 +67,13 @@ const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends In
 	}
     }
 };
+
+// In GS 3.35.92, Indicator becomes a GObject, and derived classes
+// must be registered with GObject.  Detect if Indicator is a GObject
+// by looking at the __metaclass__ method.
+if (Indicator.__metaclass__) {
+    GObject.registerClass(ModifiedBrightnessIndicator);
+}
 
 const SoftBrightnessExtension = class SoftBrightnessExtension {
     constructor() {
