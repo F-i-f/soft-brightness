@@ -34,8 +34,8 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
     setup() {
 	this.margin_top = 12;
 	this.margin_bottom = this.margin_top;
-	this.margin_left = 48;
-	this.margin_right = this.margin_left;
+	this.margin_start = 48;
+	this.margin_end = this.margin_start;
 	this.row_spacing = 6;
 	this.column_spacing = this.row_spacing;
 	this.orientation = Gtk.Orientation.VERTICAL;
