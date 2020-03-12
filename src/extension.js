@@ -37,42 +37,46 @@ const Logger = Me.imports.logger;
 
 var softBrightnessExtension = null;
 
-const ModifiedBrightnessIndicator = class ModifiedBrightnessIndicator extends Indicator {
-    _setExtension(ext) {
-	this._softBrightnessExtension = ext;
-    }
-
-    _sliderChanged(slider) {
-	let value = this._slider.value;
-	this._softBrightnessExtension._logger.log_debug("_sliderChanged(slide, "+value+")");
-	this._softBrightnessExtension._storeBrightnessLevel(value);
-    }
-
-    _sync() {
-	this._softBrightnessExtension._logger.log_debug("_sync()");
-	this._softBrightnessExtension._on_brightness_change(false);
-	this.setSliderValue(this._softBrightnessExtension._getBrightnessLevel());
-    }
-
-    setSliderValue(value) {
-	if (this._slider.setValue !== undefined) {
-	    // Gnome-Shell 3.32-
-	    this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.32-]");
-	    this._slider.setValue(value);
-	} else {
-	    // Gnome-Shell 3.33.90+
-	    this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
-	    this._slider.value = value;
+const ModifiedBrightnessIndicator = (function() {
+    let cls = class ModifiedBrightnessIndicator extends Indicator {
+	_setExtension(ext) {
+	    this._softBrightnessExtension = ext;
 	}
-    }
-};
 
-// In GS 3.35.92, Indicator becomes a GObject, and derived classes
-// must be registered with GObject.  Detect if Indicator is a GObject
-// by looking at the __metaclass__ method.
-if (Indicator.__metaclass__) {
-    GObject.registerClass(ModifiedBrightnessIndicator);
-}
+	_sliderChanged(slider) {
+	    let value = this._slider.value;
+	    this._softBrightnessExtension._logger.log_debug("_sliderChanged(slide, "+value+")");
+	    this._softBrightnessExtension._storeBrightnessLevel(value);
+	}
+
+	_sync() {
+	    this._softBrightnessExtension._logger.log_debug("_sync()");
+	    this._softBrightnessExtension._on_brightness_change(false);
+	    this.setSliderValue(this._softBrightnessExtension._getBrightnessLevel());
+	}
+
+	setSliderValue(value) {
+	    if (this._slider.setValue !== undefined) {
+		// Gnome-Shell 3.32-
+		this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.32-]");
+		this._slider.setValue(value);
+	    } else {
+		// Gnome-Shell 3.33.90+
+		this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
+		this._slider.value = value;
+	    }
+	}
+    };
+
+    // In GS 3.35.92, Indicator becomes a GObject, and derived classes
+    // must be registered with GObject.  Detect if Indicator is a GObject
+    // by looking at the get_property method.
+    if (Indicator.prototype.get_property) {
+	cls = GObject.registerClass(cls);
+    }
+
+    return cls;
+})();
 
 const SoftBrightnessExtension = class SoftBrightnessExtension {
     constructor() {
