@@ -200,7 +200,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v16/soft-brightness@fifi.org.v16.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v17/soft-brightness@fifi.org.v17.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -224,6 +224,13 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 17
+#### March 11, 2020
+
+- Gnome-shell 3.36 compatibility.
+- Fix deprecation warning in preferences.
+- Update meson-gse to latest.
 
 ### Version 16
 #### March 10, 2020
