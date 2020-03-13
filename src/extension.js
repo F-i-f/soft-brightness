@@ -638,28 +638,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _setPointerVisible(visible) {
 	if (!this._cloneMouse) return;
-	this._setPointerVisibleReal(visible);
-
-	if (this._cursorTracker.set_keep_focus_while_hidden) {
-	    this._cursorTracker.set_keep_focus_while_hidden(visible);
-	}
-
-	if (this._cursorSeat != null) {
-	    if (visible) {
-		if (this._cursorSeat.is_unfocus_inhibited()) {
-		    this._cursorSeat.uninhibit_unfocus();
-		}
-	    } else {
-		if (! this._cursorSeat.is_unfocus_inhibited()) {
-		    this._cursorSeat.inhibit_unfocus();
-		}
-	    }
-	}
-    }
-
-
-    _setPointerVisibleReal(visible) {
-	if (!this._cloneMouse) return;
 	// this._logger.log_debug('_setPointerVisible('+visible+')');
 	let boundFunc = this._cursorTrackerSetPointerVisibleBound;
 	boundFunc(visible);
@@ -676,7 +654,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._restackOverlays();
 	} else {
 	    this._stopCloningMouse();
-	    this._setPointerVisibleReal(false);
+	    this._setPointerVisible(false);
 	}
 	this._cursorWantedVisible = visible;
     }
@@ -696,6 +674,14 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._updateMousePosition();
 	}
 	this._setPointerVisible(false);
+
+	if (this._cursorTracker.set_keep_focus_while_hidden) {
+	    this._cursorTracker.set_keep_focus_while_hidden(true);
+	}
+
+	if (this._cursorSeat != null && ! this._cursorSeat.is_unfocus_inhibited()) {
+	    this._cursorSeat.inhibit_unfocus();
+	}
     }
 
     _stopCloningShowMouse() {
@@ -703,6 +689,14 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_stopCloningShowMouse(), restoring cursor visibility to '+this._cursorWantedVisible);
 	this._stopCloningMouse();
 	this._setPointerVisible(this._cursorWantedVisible);
+
+	if (this._cursorTracker.set_keep_focus_while_hidden) {
+	    this._cursorTracker.set_keep_focus_while_hidden(false);
+	}
+
+	if (this._cursorSeat != null && this._cursorSeat.is_unfocus_inhibited()) {
+	    this._cursorSeat.uninhibit_unfocus();
+	}
     }
 
     _stopCloningMouse() {
