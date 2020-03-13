@@ -182,13 +182,21 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		let major = Number(matchGroups[1]);
 		let minor = Number(matchGroups[2]);
 		let patch = (matchGroups[4] == undefined || matchGroups[4] == '') ? 0 : Number(matchGroups[4]);
-		this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch);
-		if ( GLib.getenv('XDG_SESSION_TYPE') == 'wayland'
-		     && major == 3
-		     && (    (minor == 33 && patch > 90)
-			  || (minor == 34 && patch < 1))) {
+		let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
+		let onWayland = xdgSessionType == 'wayland';
+		let isPotentiallyBroken = ( major > 3
+					    || (major == 3 && (   (minor == 33 && patch > 90)
+								  || minor > 33 )));
+		let hasSetKeepFocusWhileHidden = Meta.CursorTracker.prototype.set_keep_focus_while_hidden != undefined;
+		let hasDefaultSeat = Clutter.get_default_backend != undefined && Clutter.get_default_backend().get_default_seat != undefined;
+		this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', XDG_SESSION_TYPE='+xdgSessionType);
+		this._logger.log_debug('_enable(): onWayland='+onWayland
+				       +', isPotentiallyBroken='+isPotentiallyBroken
+				       +', hasSetKeepFocusWhileHidden='+hasSetKeepFocusWhileHidden
+				       +', hasDefaultSeat='+hasDefaultSeat);
+		if ( onWayland && isPotentiallyBroken && !hasSetKeepFocusWhileHidden && !hasDefaultSeat) {
 		    this._cloneMouse = false;
-		    this._logger.log('mouse cloning disabled on gnome-shell '+gnomeShellVersion+' running on Wayland');
+		    this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
 		}
 	    }
 	}
@@ -631,6 +639,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _setPointerVisible(visible) {
 	if (!this._cloneMouse) return;
 	this._setPointerVisibleReal(visible);
+
+	if (this._cursorTracker.set_keep_focus_while_hidden) {
+	    this._cursorTracker.set_keep_focus_while_hidden(visible);
+	}
 
 	if (this._cursorSeat != null) {
 	    if (visible) {
