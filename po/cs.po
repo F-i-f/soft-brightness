@@ -1,14 +1,14 @@
 # Czech translations for soft-brightness package.
-# Copyright (C) 2019 THE soft-brightness'S COPYRIGHT HOLDER
+# Copyright (C) 2019, 2020 THE soft-brightness'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the soft-brightness package.
-# Philippe Troin, 2019.
+# Philippe Troin, 2019, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-24 18:28-0700\n"
-"PO-Revision-Date: 2020-03-09 18:36-0700\n"
+"PO-Revision-Date: 2020-04-24 18:46-0700\n"
 "Last-Translator: Pavel Borecki\n"
 "Language-Team: none\n"
 "Language: cs\n"
@@ -70,9 +70,8 @@ msgid "Minimum brightness (0..1):"
 msgstr "Minimální jas (0..1):"
 
 #: src/prefs.js:166
-#, fuzzy
 msgid "Mouse cursor brightness control:"
-msgstr "Použít ovládání podsvětlení:"
+msgstr ""
 
 #: src/prefs.js:177
 msgid "Debug:"
@@ -99,7 +98,6 @@ msgid "Monitors."
 msgstr "Monitory."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
-#, fuzzy
 msgid "The monitors whose brightness should be adjusted."
 msgstr "Monitory, kterých jas upravit."
 
@@ -116,7 +114,6 @@ msgid "Prevent window unredirecting behavior."
 msgstr "Prevence nepřesměrovávání oken."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
-#, fuzzy
 msgid ""
 "If set to never, unredirection is never prevented. If set to when-"
 "correcting, unredirection will be prevented when the brightness is not at "
@@ -146,9 +143,8 @@ msgid "The current brightness level."
 msgstr "Stávající úroveň jasu."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
-#, fuzzy
 msgid "Mouse cursor brightness control."
-msgstr "Stávající úroveň jasu."
+msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
 msgid ""
