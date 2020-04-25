@@ -10,13 +10,8 @@ language: python
 
 python: 3.7
 
-addons:
-  apt:
-    packages:
-      - ninja-build
-
 script:
-  - pip3 install meson
+  - pip3 install ninja meson
   - ./meson-gse/meson-gse
   - meson build
   - ninja -C build test install extension.zip
