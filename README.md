@@ -114,6 +114,21 @@ if _Use backlight control_ is on.
 When the brightness is set to 0%, the display will go completely dark,
 it may be hard to reset the brightness with the slider then.
 
+#### _Mouse cursor brightness control_
+
+Toggles between having the mouse cursor brightness follow the screen
+brightness (on/_true_) and keeping the mouse cursor at full brightness
+(off/_false_).
+
+Gnome Shell's handling of cursor tracking can be sometimes buggy and
+can show the wrong cursor type or size when the mouse cursor
+brightness follows the screen brightness.  It also introduces some
+pointer motion lag.
+
+Note that if an other Gnome Shell component enables mouse tracking
+(for example the Zoom accessibility option), then the mouse cursor
+brightness will always follow the screen's.
+
 #### _Debug_
 
 When toggled on, Soft Brightness will log extra debugging information
