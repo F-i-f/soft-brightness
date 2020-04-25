@@ -1,14 +1,14 @@
 # French translations for soft-brightness package.
-# Copyright (C) 2019 THE soft-brightness'S COPYRIGHT HOLDER
+# Copyright (C) 2019, 2020 THE soft-brightness'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the soft-brightness package.
-# Philippe Troin, 2019.
+# Philippe Troin, 2019, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-24 18:28-0700\n"
-"PO-Revision-Date: 2020-03-09 18:57-0700\n"
+"PO-Revision-Date: 2020-04-24 18:41-0700\n"
 "Last-Translator: Philippe Troin (F-i-f on Github)\n"
 "Language-Team: none\n"
 "Language: fr\n"
@@ -70,9 +70,8 @@ msgid "Minimum brightness (0..1):"
 msgstr "Luminosité minimale (0..1) :"
 
 #: src/prefs.js:166
-#, fuzzy
 msgid "Mouse cursor brightness control:"
-msgstr "Utiliser le rétroéclairage :"
+msgstr "Contrôle de la luminosité du curseur de la souris :"
 
 #: src/prefs.js:177
 msgid "Debug:"
@@ -99,7 +98,6 @@ msgid "Monitors."
 msgstr "Moniteurs."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
-#, fuzzy
 msgid "The monitors whose brightness should be adjusted."
 msgstr "Les moniteurs sur lesquels la luminosité sera changée."
 
@@ -116,7 +114,6 @@ msgid "Prevent window unredirecting behavior."
 msgstr "Eviter la non-redirection des fenêtres."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
-#, fuzzy
 msgid ""
 "If set to never, unredirection is never prevented. If set to when-"
 "correcting, unredirection will be prevented when the brightness is not at "
@@ -146,9 +143,8 @@ msgid "The current brightness level."
 msgstr "La niveau de luminosité actif."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
-#, fuzzy
 msgid "Mouse cursor brightness control."
-msgstr "La niveau de luminosité actif."
+msgstr "Contrôle de la luminosité du curseur de la souris."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
 msgid ""
@@ -159,6 +155,15 @@ msgid ""
 "that if another Gnome Shell component clones the mouse (like the Zoom "
 "accessibility feature), the cursor will follow the screen brightness."
 msgstr ""
+"Activer le contrôle de la luminosité du curseur de la souris. S'il est "
+"actif, la luminosité du curseur de la souris suivra celle de l'écran. S'il "
+"est inactif, le curseur de la souris restera toujours à la luminosité "
+"maximale. Le contrôle de la luminosité du curseur montre parfois le mauvais "
+"curseur et peut entrainer un décalage entre le mouvement de la souris et "
+"celui du curseur à l'écran. En cas de problèmes avec le curseur de la "
+"souris, désactiver l'option.  Noter que si un autre composant de Gnome Shell "
+"(tel que le Zoom) clone le curseur de la souris, celui-ci suivra alors la "
+"luminosité de l'écran."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:65
 msgid "Debugging."
