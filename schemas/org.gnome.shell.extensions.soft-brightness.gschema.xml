@@ -47,6 +47,19 @@
       <summary>Current brightness level.</summary>
       <description>The current brightness level.</description>
     </key>
+    <key name="clone-mouse" type="b">
+      <default>true</default>
+      <summary>Mouse cursor brightness control.</summary>
+      <description>When enabled, the mouse cursor follows the
+      brightness setting.  When disabled, the mouse cursor always
+      remains at full brightness.  Controlling mouse cursor brightness
+      can sometimes show the wrong cursor and introduce cursor lag.
+      You may want to disable it if you encounter cursor issues.  Note
+      that if another Gnome Shell component clones the mouse (like the
+      Zoom accessibility feature), the cursor will follow the screen
+      brightness.
+      </description>
+    </key>
     <key name="debug" type="b">
       <default>false</default>
       <summary>Debugging.</summary>

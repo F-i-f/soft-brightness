@@ -87,11 +87,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._debugSettingChangedConnection = null;
 
 	// Set/destroyed by _enable/_disable
-	this._cloneMouse	     = null;
-	this._brightnessIndicator    = null;
-	this._actorGroup             = null;
-	this._actorAddedConnection   = null;
-	this._actorRemovedConnection = null;
+	this._actorGroup			 = null;
+	this._actorAddedConnection		 = null;
+	this._actorRemovedConnection		 = null;
+	this._cloneMouseOverride		 = null;
+	this._cloneMouseSetting			 = null;
+	this._cloneMouseSettingChangedConnection = null;
+	this._brightnessIndicator                = null;
 
 	// Set/destroyed by _showOverlays/_hideOverlays
 	this._unredirectPrevented = false;
@@ -174,7 +176,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _enable() {
 	this._logger.log_debug('_enable()');
 
-	this._cloneMouse = true;
+	this._cloneMouseOverride = true;
 	let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
 	if (gnomeShellVersion != undefined) {
 	    let matchGroups = /^([0-9]+)\.([0-9]+)(\.([0-9]+)(\..*)?)?$/.exec(gnomeShellVersion);
@@ -195,7 +197,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 				       +', hasSetKeepFocusWhileHidden='+hasSetKeepFocusWhileHidden
 				       +', hasDefaultSeat='+hasDefaultSeat);
 		if ( onWayland && isPotentiallyBroken && !hasSetKeepFocusWhileHidden && !hasDefaultSeat) {
-		    this._cloneMouse = false;
+		    this._cloneMouseOverride = false;
 		    this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
 		}
 	    }
@@ -209,7 +211,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._actorAddedConnection   = global.stage.connect('actor-added',   this._restackOverlays.bind(this));
 	this._actorRemovedConnection = global.stage.connect('actor-removed', this._restackOverlays.bind(this));
 
+	this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
 	this._enableCloningMouse();
+	this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
 
 	this._brightnessIndicator = new ModifiedBrightnessIndicator();
 	this._brightnessIndicator._setExtension(this);
@@ -242,7 +246,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	this._hideOverlays(true);
 
+	this._settings.disconnect(this._cloneMouseSettingChangedConnection);
+	this._cloneMouseSettingChangedConnection = null;
 	this._disableCloningMouse();
+	this._cloneMouseSetting = null;
+	this._cloneMouseOverride = null;
 
 	this._disableScreenshotPatch();
 
@@ -255,7 +263,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	global.stage.remove_actor(this._actorGroup);
 	this._actorGroup.destroy();
 	this._actorGroup = null;
-	this._cloneMouse = null;
     }
 
     _swapMenu(oldIndicator, newIndicator) {
@@ -584,8 +591,36 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     // Cursor handling
+    _isMouseClonable() {
+	return this._cloneMouseOverride && this._cloneMouseSetting;
+    }
+
+    _on_clone_mouse_change() {
+	if (!this._cloneMouseOverride) {
+	    // If we can't clone the mouse because of shell incompatibility, nothing changes.
+	    this._logger.log_debug("_on_clone_mouse_change(): _cloneMouseOverride is false, no change");
+	    return;
+	}
+	let cloneMouse = this._settings.get_boolean('clone-mouse');
+	if (cloneMouse == this._cloneMouseSetting) {
+	    this._logger.log_debug("_on_clone_mouse_change(): no setting change, no change");
+	    return;
+	}
+	if (cloneMouse) {
+	    // Starting to clone mouse
+	    this._logger.log_debug("_on_clone_mouse_change(): starting mouse cloning");
+	    this._cloneMouseSetting = true;
+	    this._enableCloningMouse();
+	    this._on_brightness_change(true);
+	} else {
+	    this._logger.log_debug("_on_clone_mouse_change(): stopping mouse cloning");
+	    this._disableCloningMouse();
+	    this._cloneMouseSetting = false;
+	}
+    }
+
     _enableCloningMouse() {
-	if (!this._cloneMouse) return;
+	if (!this._isMouseClonable()) return;
 	this._logger.log_debug('_enableCloningMouse()');
 
 	this._cursorWantedVisible = true;
@@ -620,7 +655,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _disableCloningMouse() {
-	if (!this._cloneMouse) return;
+	if (!this._isMouseClonable()) return;
 	this._stopCloningShowMouse();
 	this._logger.log_debug('_disableCloningMouse()');
 
@@ -637,7 +672,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _setPointerVisible(visible) {
-	if (!this._cloneMouse) return;
+	if (!this._isMouseClonable()) return;
 	// this._logger.log_debug('_setPointerVisible('+visible+')');
 	let boundFunc = this._cursorTrackerSetPointerVisibleBound;
 	boundFunc(visible);
@@ -660,7 +695,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _startCloningMouse() {
-	if (!this._cloneMouse) return;
+	if (!this._isMouseClonable()) return;
 	this._logger.log_debug('_startCloningMouse()');
 	if (this._cursorWatch == null ) {
 
@@ -685,7 +720,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _stopCloningShowMouse() {
-	if (!this._cloneMouse) return;
+	if (!this._isMouseClonable()) return;
 	this._logger.log_debug('_stopCloningShowMouse(), restoring cursor visibility to '+this._cursorWantedVisible);
 	this._stopCloningMouse();
 	this._setPointerVisible(this._cursorWantedVisible);
@@ -700,7 +735,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _stopCloningMouse() {
-	if (!this._cloneMouse) return;
+	if (!this._isMouseClonable()) return;
 	if (this._cursorWatch != null ) {
 	    this._logger.log_debug('_stopCloningMouse()');
 
