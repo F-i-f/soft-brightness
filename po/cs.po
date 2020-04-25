@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-11 18:39-0700\n"
+"POT-Creation-Date: 2020-04-24 18:28-0700\n"
 "PO-Revision-Date: 2020-03-09 18:36-0700\n"
 "Last-Translator: Pavel Borecki\n"
 "Language-Team: none\n"
@@ -70,10 +70,15 @@ msgid "Minimum brightness (0..1):"
 msgstr "Minimální jas (0..1):"
 
 #: src/prefs.js:166
+#, fuzzy
+msgid "Mouse cursor brightness control:"
+msgstr "Použít ovládání podsvětlení:"
+
+#: src/prefs.js:177
 msgid "Debug:"
 msgstr "Ladění:"
 
-#: src/prefs.js:179
+#: src/prefs.js:190
 msgid ""
 "Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f"
 "\">F-i-f</a> on GitHub)"
@@ -94,7 +99,8 @@ msgid "Monitors."
 msgstr "Monitory."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
-msgid "The monitors whose brigthness should be adjusted."
+#, fuzzy
+msgid "The monitors whose brightness should be adjusted."
 msgstr "Monitory, kterých jas upravit."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:25
@@ -110,12 +116,13 @@ msgid "Prevent window unredirecting behavior."
 msgstr "Prevence nepřesměrovávání oken."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
+#, fuzzy
 msgid ""
-"If set to never, unredirection is never prevent. If set to when-correcting, "
-"unredirection will be prevent when the brightness is not at the maximum "
-"setting (and an alpha layer is lowering the brightness). If set to always, "
-"window unredirection will always be prevented when this extension is active, "
-"allowing tear-free display."
+"If set to never, unredirection is never prevented. If set to when-"
+"correcting, unredirection will be prevented when the brightness is not at "
+"the maximum setting (and an alpha layer is lowering the brightness). If set "
+"to always, window unredirection will always be prevented when this extension "
+"is active, allowing tear-free display."
 msgstr ""
 "„never“: nepřesměrování není bráněno. „when-correcting“: nepřsměrování bude "
 "bráněno, když úroveň není na maximu (a alfa vrstva jas snižuje). „always“: "
@@ -139,9 +146,24 @@ msgid "The current brightness level."
 msgstr "Stávající úroveň jasu."
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
+#, fuzzy
+msgid "Mouse cursor brightness control."
+msgstr "Stávající úroveň jasu."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
+msgid ""
+"When enabled, the mouse cursor follows the brightness setting. When "
+"disabled, the mouse cursor always remains at full brightness. Controlling "
+"mouse cursor brightness can sometimes show the wrong cursor and introduce "
+"cursor lag. You may want to disable it if you encounter cursor issues. Note "
+"that if another Gnome Shell component clones the mouse (like the Zoom "
+"accessibility feature), the cursor will follow the screen brightness."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:65
 msgid "Debugging."
 msgstr "Ladění."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:66
 msgid "Enable debugging for the extension."
 msgstr "Zapnout ladící režim rozšíření."

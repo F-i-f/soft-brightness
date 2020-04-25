@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-11 18:39-0700\n"
+"POT-Creation-Date: 2020-04-24 18:28-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,10 +70,14 @@ msgid "Minimum brightness (0..1):"
 msgstr ""
 
 #: src/prefs.js:166
+msgid "Mouse cursor brightness control:"
+msgstr ""
+
+#: src/prefs.js:177
 msgid "Debug:"
 msgstr ""
 
-#: src/prefs.js:179
+#: src/prefs.js:190
 msgid ""
 "Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f"
 "\">F-i-f</a> on GitHub)"
@@ -92,7 +96,7 @@ msgid "Monitors."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
-msgid "The monitors whose brigthness should be adjusted."
+msgid "The monitors whose brightness should be adjusted."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:25
@@ -109,11 +113,11 @@ msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
 msgid ""
-"If set to never, unredirection is never prevent. If set to when-correcting, "
-"unredirection will be prevent when the brightness is not at the maximum "
-"setting (and an alpha layer is lowering the brightness). If set to always, "
-"window unredirection will always be prevented when this extension is active, "
-"allowing tear-free display."
+"If set to never, unredirection is never prevented. If set to when-"
+"correcting, unredirection will be prevented when the brightness is not at "
+"the maximum setting (and an alpha layer is lowering the brightness). If set "
+"to always, window unredirection will always be prevented when this extension "
+"is active, allowing tear-free display."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:41
@@ -133,9 +137,23 @@ msgid "The current brightness level."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
-msgid "Debugging."
+msgid "Mouse cursor brightness control."
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
+msgid ""
+"When enabled, the mouse cursor follows the brightness setting. When "
+"disabled, the mouse cursor always remains at full brightness. Controlling "
+"mouse cursor brightness can sometimes show the wrong cursor and introduce "
+"cursor lag. You may want to disable it if you encounter cursor issues. Note "
+"that if another Gnome Shell component clones the mouse (like the Zoom "
+"accessibility feature), the cursor will follow the screen brightness."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:65
+msgid "Debugging."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:66
 msgid "Enable debugging for the extension."
 msgstr ""
