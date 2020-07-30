@@ -56,9 +56,10 @@ overlays at the same time.  This is most useful:
 
 - If set to _Chain_, Soft Brightness will be used for the lowest
 part of the slider.  Then over a given percentage of the slider,
-back-light control will be used.  This is most useful:
-  - if the back-light control of your screen is working, but the
-  lowest setting is still too bright.
+back-light control will be used.  The keyboard brightness hotkeys will
+only be applied on the back-light part of the slider.  This is most
+useful if the back-light control of your screen is working, but the
+lowest setting is still too bright.
 
 #### _Monitor(s)_
 
@@ -113,7 +114,7 @@ Sets the minimum allowable brightness for the display where _0_ is
 completely dark and _1_ completely bright. Defaults to _0.1_ (10%).
 
 The minimum brightness will also be enforced for the panel back-light
-if _Backlight control mode_ is in blend mode.
+if _Backlight control mode_ is in _Blend_ or _Chain_ mode.
 
 When the brightness is set to 0%, the display will go completely dark,
 it may be hard to reset the brightness with the slider then.
@@ -199,6 +200,17 @@ For example an OLED panel or non-functional back-light.  Have
 Soft-Brightness control the brightness for all your monitors:
 
 - Set _Backlight control mode_ to _Blend_.
+
+- Set _Monitor(s)_ to _All_.
+
+#### You have a laptop computer with a back-light too bright
+
+You can control back-light of your built-in display when brightness
+is over a threshold value. Then under it, back-light will be at
+minimum and Soft Brightness will be applied to darken all your screen
+even more:
+
+- Set _Backlight control mode_ to _Chain_.
 
 - Set _Monitor(s)_ to _All_.
 
