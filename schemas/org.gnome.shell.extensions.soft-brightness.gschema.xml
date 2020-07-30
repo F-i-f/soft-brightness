@@ -20,11 +20,11 @@
       <summary>Backlight control mode.</summary>
       <description>If set to disabled, the Brightness slider will only
       control the Soft Brightness overlays.  If set to blend, Soft
-      Brightness will workntogether with your computer's back-light.
+      Brightness will work together with your computer's back-light.
       The brightness slider and keyboard brightness hotkeys will
       control both the back-light and the Soft Brightness overlays at
       the same time. If set to chain, Soft Brightness will be used
-      for the lowest part of the slider.  Then over a given
+      for the lowest part of the slider.  Then over a threshold
       percentage of the slider, back-light control will be used.
       </description>
     </key>
@@ -58,7 +58,7 @@
       <range min="0" max="1"/>
       <default>0.3</default>
       <summary>Chain mode threshold.</summary>
-      <description>Sets the brightness value between _0_ and _1_ at
+      <description>Sets the brightness value between 0 and 1 at
       which the switch is made between soft brightness and backlight
       control in chain mode.</description>
     </key>

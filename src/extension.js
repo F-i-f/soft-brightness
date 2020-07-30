@@ -477,8 +477,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		return brightness;
 	    } else {
 		const threshold = this._settings.get_double('chain-mode-threshold');
-		let convertedBrightness = brightness / 100.0 * (1.0 - threshold) + threshold
-		convertedBrightness = Math.min(1, Math.max(0, convertedBrightness))
+		let convertedBrightness = brightness / 100.0 * (1.0 - threshold) + threshold;
+		convertedBrightness = Math.min(1, Math.max(0, convertedBrightness));
 		this._logger.log_debug('_getBrightnessLevel() by chain mode proxy = '+convertedBrightness+' <- '+brightness);
 		return convertedBrightness;
 	    }
@@ -568,12 +568,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _on_backlight_mode_change() {
 	this._logger.log_debug('_on_backlight_mode_change()');
 	if (this._settings.get_string('backlight-mode') !== 'disabled') {
-		this._storeBrightnessLevel(this._settings.get_double('current-brightness'));
+	    this._storeBrightnessLevel(this._settings.get_double('current-brightness'));
 	} else if (this._brightnessIndicator._proxy.Brightness != null && this._brightnessIndicator._proxy.Brightness >= 0) {
 	    this._storeBrightnessLevel(this._brightnessIndicator._proxy.Brightness / 100.0);
 	}
     }
-	
+
     // Monitor change handling
     _enableMonitor2ing() {
 	this._logger.log_debug('_enableMonitor2ing()');
