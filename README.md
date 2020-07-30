@@ -118,10 +118,11 @@ if _Backlight control mode_ is in blend mode.
 When the brightness is set to 0%, the display will go completely dark,
 it may be hard to reset the brightness with the slider then.
 
-#### _Chain mode switching percentage_
+#### _Chain mode threshold_
 
-Sets the percentage at which the switch is made between soft
-brightness and backlight control in chain mode.
+Sets the brightness value between _0_ and _1_ at which the switch
+is made between soft brightness and backlight control in chain mode.
+Defaults to _0.3_ (30%).
 
 #### _Mouse cursor brightness control_
 

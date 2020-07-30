@@ -165,22 +165,22 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 
 	ypos += 1;
 
-	descr = _(this._settings.settings_schema.get_key('chain-mode-switch').get_description());
-	this.chain_percentage_label = new Gtk.Label({label: _("Chain mode switching percentage (1..99):"), halign: Gtk.Align.START});
+	descr = _(this._settings.settings_schema.get_key('chain-mode-threshold').get_description());
+	this.chain_percentage_label = new Gtk.Label({label: _("Chain mode threshold (0..1):"), halign: Gtk.Align.START});
 	this.chain_percentage_label.set_tooltip_text(descr);
 	this.chain_percentage_control = new Gtk.SpinButton({
 	    halign: Gtk.Align.END,
-	    digits: 0,
+	    digits: 2,
 	    adjustment: new Gtk.Adjustment({
-		lower: 1.0,
-		upper: 99.0,
-		step_increment: 1
+		lower: 0.0,
+		upper: 1.0,
+		step_increment: 0.01
 	    })
 	});
 	this.chain_percentage_control.set_tooltip_text(descr);
 	this.attach(this.chain_percentage_label,   1, ypos, 1, 1);
 	this.attach(this.chain_percentage_control, 2, ypos, 1, 1);
-	this._settings.bind('chain-mode-switch', this.chain_percentage_control, 'value', Gio.SettingsBindFlags.DEFAULT);
+	this._settings.bind('chain-mode-threshold', this.chain_percentage_control, 'value', Gio.SettingsBindFlags.DEFAULT);
 
 	ypos += 1;
 

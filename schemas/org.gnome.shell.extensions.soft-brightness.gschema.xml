@@ -54,13 +54,13 @@
       <summary>Minimum brightness.</summary>
       <description>Minimum brightness level.</description>
     </key>
-    <key name="chain-mode-switch" type="d">
-      <range min="1" max="99"/>
-      <default>10</default>
-      <summary>Chain mode switching percentage.</summary>
-      <description>Sets the percentage at which the switch is made
-      between soft brightness and backlight control in chain mode..
-      </description>
+    <key name="chain-mode-threshold" type="d">
+      <range min="0" max="1"/>
+      <default>0.3</default>
+      <summary>Chain mode threshold.</summary>
+      <description>Sets the brightness value between _0_ and _1_ at
+      which the switch is made between soft brightness and backlight
+      control in chain mode.</description>
     </key>
     <key name="current-brightness" type="d">
       <range min="0" max="1"/>
