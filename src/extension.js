@@ -441,10 +441,24 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     // Utility functions to manage the stored brightness value.
-    // If using the backlight, then we use the indicator as the brightness value store, which is linked to gsd.
+    // If in blend mode, then we use the indicator as the brightness value store, which is linked to gsd.
+    // If in chain mode, the brightness is stored in the extension setting if `brightness` < `chain-mode-switch`, but in the indicator if `brightness` > `chain-mode-switch`.
+    //     This allow sync with brightness key, while still being able to store the value somewhere when `brightness` < `chain-mode-switch`.
     // If not using the backlight, the brightness is stored in the extension setting.
     _storeBrightnessLevel(value) {
-	if (this._settings.get_string('backlight-mode') !== 'disabled' && this._brightnessIndicator._proxy.Brightness >= 0) {
+	if (this._settings.get_string('backlight-mode') === 'chain' && this._brightnessIndicator._proxy.Brightness >= 0) {
+	    if (value < this._settings.get_double('chain-mode-switch') / 100.0) {
+		this._logger.log_debug('_storeBrightnessLevel('+value+') by chain mode setting');
+		this._settings.set_double('current-brightness', value);
+		this._brightnessIndicator._proxy.Brightness = 0;
+	    } else {
+		const sw = this._settings.get_double('chain-mode-switch');
+		let convertedBrightness = (value * 100.0 - sw) / (100.0 - sw) * 100.0;
+		convertedBrightness = Math.min(100, Math.max(0, Math.round(convertedBrightness)));
+		this._logger.log_debug('_storeBrightnessLevel('+value+') by chain mode proxy -> '+convertedBrightness);
+		this._brightnessIndicator._proxy.Brightness = convertedBrightness;
+	    }
+	} else if (this._settings.get_string('backlight-mode') !== 'disabled' && this._brightnessIndicator._proxy.Brightness >= 0) {
 	    let convertedBrightness = Math.min(100, Math.round(value * 100.0));
 	    this._logger.log_debug('_storeBrightnessLevel('+value+') by proxy -> '+convertedBrightness);
 	    this._brightnessIndicator._proxy.Brightness = convertedBrightness;
@@ -456,7 +470,19 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _getBrightnessLevel() {
 	let brightness = this._brightnessIndicator._proxy.Brightness;
-	if (this._settings.get_string('backlight-mode') !== 'disabled' && brightness >= 0) {
+	if (this._settings.get_string('backlight-mode') === 'chain' && brightness >= 0) {
+	    if (brightness == 0) {
+		brightness = this._settings.get_double('current-brightness');
+		this._logger.log_debug('_getBrightnessLevel() by chain mode setting = '+brightness);
+		return brightness;
+	    } else {
+		const sw = this._settings.get_double('chain-mode-switch');
+		let convertedBrightness = (brightness / 100.0 * (100.0 - sw) + sw) / 100.0
+		convertedBrightness = Math.min(1, Math.max(0, convertedBrightness))
+		this._logger.log_debug('_getBrightnessLevel() by chain mode proxy = '+convertedBrightness+' <- '+brightness);
+		return convertedBrightness;
+	    }
+	} else if (this._settings.get_string('backlight-mode') !== 'disabled' && brightness >= 0) {
 	    let convertedBrightness = brightness / 100.0;
 	    this._logger.log_debug('_getBrightnessLevel() by proxy = '+convertedBrightness+' <- '+brightness);
 	    return convertedBrightness;
@@ -511,20 +537,28 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug("_on_brightness_change: current-brightness="+curBrightness+", min-brightness="+minBrightness);
 	if (curBrightness < minBrightness) {
 	    curBrightness = minBrightness;
-	    if (this._settings.get_string('backlight-mode') === 'disabled' ) {
+	    if (!this._settings.get_string('backlight-mode') !== 'disabled') {
 		this._brightnessIndicator.setSliderValue(curBrightness);
 	    }
 	    this._storeBrightnessLevel(minBrightness);
 	    return;
 	}
-	if (curBrightness >= 1) {
+
+	let overlayMaxBrightness = 1;
+	let overlayBrightness = curBrightness;
+	if (this._settings.get_string('backlight-mode') === 'chain') {
+	    overlayMaxBrightness = this._settings.get_double('chain-mode-switch') / 100.0;
+	    overlayBrightness = (curBrightness / this._settings.get_double('chain-mode-switch')) * 100.0;
+	}
+
+	if (curBrightness >= overlayMaxBrightness) {
 	    this._hideOverlays(false);
 	    this._stopCloningShowMouse();
 	} else {
 	    if (this._cursorWantedVisible) {
 		this._startCloningMouse(); // Must be called before _showOverlays so that the overlay is on top.
 	    }
-	    this._showOverlays(curBrightness, force);
+	    this._showOverlays(overlayBrightness, force);
 	    if (this._overlays.length == 0) {
 		this._stopCloningShowMouse();
 	    }
