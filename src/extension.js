@@ -53,7 +53,6 @@ const ModifiedBrightnessIndicator = (function() {
 	    this._softBrightnessExtension._logger.log_debug("_sync()");
 	    this._softBrightnessExtension._on_brightness_change(false);
 	    this.setSliderValue(this._softBrightnessExtension._getBrightnessLevel());
-	    this.setSliderVBar(this._softBrightnessExtension._getSliderVBar());
 	}
 
 	setSliderValue(value) {
@@ -65,18 +64,6 @@ const ModifiedBrightnessIndicator = (function() {
 		// Gnome-Shell 3.33.90+
 		this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
 		this._slider.value = value;
-	    }
-	}
-
-	setSliderVBar(percentage = null) {
-	    this._softBrightnessExtension._logger.log_debug("setSliderVBar("+percentage+") [GS 3.32-]");
-	    if (percentage !== null) {
-		// Slider vertical bar has been designed with "volume amplified"
-		// in mind. But it more logical for us to describe the position
-		// of the vertical bar in percentage, so we need to convert it.
-		this._slider.maximum_value = 100.0 / percentage;
-	    } else {
-		this._slider.maximum_value = null;
 	    }
 	}
     };
@@ -242,7 +229,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	if (! this._settings.get_string('backlight-mode') !== 'disabled' || this._brightnessIndicator._proxy.Brightness != null) {
 	    let curBrightness = this._getBrightnessLevel();
 	    this._brightnessIndicator.setSliderValue(curBrightness);
-	    this._brightnessIndicator.setSliderVBar(this._getSliderVBar());
 	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider);
 	}
 
@@ -481,13 +467,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	}
     }
 
-    _getSliderVBar() {
-	if (['chain', 'hybrid'].includes(this._settings.get_string('backlight-mode'))) {
-	    return this._settings.get_double('chain-mode-switch')
-	}
-	return null;
-    }
-
     // Settings monitoring
     _enableSettingsMonitoring() {
 	this._logger.log_debug('_enableSettingsMonitoring()');
@@ -554,8 +533,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _on_backlight_mode_change() {
 	this._logger.log_debug('_on_backlight_mode_change()');
-
-	this._brightnessIndicator.setSliderVBar(this._getSliderVBar())
 	if (this._settings.get_string('backlight-mode') !== 'disabled') {
 		this._storeBrightnessLevel(this._settings.get_double('current-brightness'));
 	} else if (this._brightnessIndicator._proxy.Brightness != null && this._brightnessIndicator._proxy.Brightness >= 0) {
