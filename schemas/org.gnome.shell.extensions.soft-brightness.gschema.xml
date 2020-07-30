@@ -13,7 +13,6 @@
     <value value="0" nick="disabled"/>
     <value value="1" nick="blend"/>
     <value value="2" nick="chain"/>
-    <value value="3" nick="hybrid"/>
   </enum>
   <schema id="org.gnome.shell.extensions.soft-brightness" path="/org/gnome/shell/extensions/soft-brightness/">
     <key name="backlight-mode" enum="org.gnome.shell.extensions.soft-brightness.backlight-modes">
@@ -26,9 +25,8 @@
       control both the back-light and the Soft Brightness overlays at
       the same time. If set to chain, Soft Brightness will be used
       for the lowest part of the slider.  Then over a given
-      percentage of the slider, back-light control will be used.  If
-      set to hybrid, blend mode will be used on external monitor and
-      chain mode will be used on built-in monitors.</description>
+      percentage of the slider, back-light control will be used.
+      </description>
     </key>
     <key name="monitors" enum="org.gnome.shell.extensions.soft-brightness.monitors">
       <default>"all"</default>

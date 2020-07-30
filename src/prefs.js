@@ -89,7 +89,6 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	this.backlight_control.append("disabled", _("Disabled"));
 	this.backlight_control.append("blend", _("Blend"));
 	this.backlight_control.append("chain", _("Chain"));
-	this.backlight_control.append("hybrid", _("Chain built-in, Blend external"));
 	this._settings.bind('backlight-mode', this.backlight_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
 	this.attach(this.backlight_label,   1, ypos, 1, 1);
 	this.attach(this.backlight_control, 2, ypos, 1, 1);

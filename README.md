@@ -60,10 +60,6 @@ back-light control will be used.  This is most useful:
   - if the back-light control of your screen is working, but the
   lowest setting is still too bright.
 
-- If set to _Chain built-in, Blend external_, Blend mode will be used
-on external monitor and Chain mode will be used on built-in
-monitors.
-
 #### _Monitor(s)_
 
 - If set to _All_, a brightness overlay will be added to all attached
