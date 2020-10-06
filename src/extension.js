@@ -21,6 +21,7 @@ const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 const Main = imports.ui.main;
+const MainLoop = imports.mainloop;
 const Magnifier = imports.ui.magnifier;
 const Meta = imports.gi.Meta;
 const PointerWatcher = imports.ui.pointerWatcher;
@@ -90,6 +91,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._actorGroup			 = null;
 	this._actorAddedConnection		 = null;
 	this._actorRemovedConnection		 = null;
+	this._delayedMouseCloning                = null;
 	this._cloneMouseOverride		 = null;
 	this._cloneMouseSetting			 = null;
 	this._cloneMouseSettingChangedConnection = null;
@@ -211,9 +213,15 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._actorAddedConnection   = global.stage.connect('actor-added',   this._restackOverlays.bind(this));
 	this._actorRemovedConnection = global.stage.connect('actor-removed', this._restackOverlays.bind(this));
 
-	this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
-	this._enableCloningMouse();
-	this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
+	// For some reason, starting the mouse cloning at this stage fails when gnome-shell is restarting on x11 and
+	// the mouse listener doesn't receive any events.  Adding a small delay before starting the whole mouse
+	// cloning business helps.
+	this._delayedMouseCloning = MainLoop.timeout_add(500, Lang.bind(this, function() {
+	    this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
+	    this._enableCloningMouse();
+	    this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
+	    this._delayedMouseCloning = null;
+	}));
 
 	this._brightnessIndicator = new ModifiedBrightnessIndicator();
 	this._brightnessIndicator._setExtension(this);
@@ -246,8 +254,14 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	this._hideOverlays(true);
 
-	this._settings.disconnect(this._cloneMouseSettingChangedConnection);
-	this._cloneMouseSettingChangedConnection = null;
+	if (this._delayedMouseCloning !== null) {
+	    MainLoop.source_remove(this._delayedMouseCloning);
+	    this._delayedMouseCloning = null;
+	}
+	if (this._cloneMouseSettingChangedConnection !== null) {
+	    this._settings.disconnect(this._cloneMouseSettingChangedConnection);
+	    this._cloneMouseSettingChangedConnection = null;
+	}
 	this._disableCloningMouse();
 	this._cloneMouseSetting = null;
 	this._cloneMouseOverride = null;
