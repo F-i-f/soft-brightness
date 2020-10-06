@@ -218,7 +218,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._brightnessIndicator = new ModifiedBrightnessIndicator();
 	this._brightnessIndicator._setExtension(this);
 	if (! this._swapMenu(AggregateMenu._brightness, this._brightnessIndicator)) {
-	    return;
+	    this._logger.log_debug('_enable(): couldn\'t swap brightness indicator in aggregate menu');
 	}
 
 	this._enableMonitor2ing();
