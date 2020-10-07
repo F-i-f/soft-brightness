@@ -202,6 +202,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		    this._cloneMouseOverride = false;
 		    this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
 		}
+
+		if ( major > 3 || (major == 3 && minor >= 38)) {
+		    this._cloneMouseOverride = false;
+		    this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion);
+		}
 	    }
 	}
 
