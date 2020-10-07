@@ -36,6 +36,16 @@ page](https://extensions.gnome.org/local/).
 
 ![Soft Brightness preference panel](docs/preferences.png)
 
+## Known Issues with Gnome-Shell 3.38:
+
+Gnome-Shell 3.38.0 and 3.38.1 have a broken cursor tracking
+implementation.  Soft Brightness version 20 and later detect this
+condition and disable cursor cloning.  On buggy gnome-shell versions,
+the cursor will not be affected by the brightness setting.
+
+This issue is tracked in the [Gnome Gitlab issue
+#3237](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3237).
+
 ### Configuration Settings
 
 #### _Use backlight control_
