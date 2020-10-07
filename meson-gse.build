@@ -16,7 +16,7 @@
 
 gse_project({soft-brightness},
 	    {fifi.org},
-	    {19},
+	    {20},
 {
 gse_sources	    += files('src/utils.js')
 gse_libs	    += [gse_lib_convenience, gse_lib_logger]

@@ -225,7 +225,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v19/soft-brightness@fifi.org.v19.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v20/soft-brightness@fifi.org.v20.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -249,6 +249,17 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 20
+#### October 6, 2020
+
+- Kludgy work-around a Gnome-Shell bug where mouse tracking doesn't
+  generate events by delaying the mouse tracking initialization after
+  the extension has loaded.
+- Disable mouse tracking on Gnome-Shell 3.38 until [Gnome-Shell Issue
+  #3237](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3237) is
+  fixed.
+- Support Gnome-Shell 3.38.
 
 ### Version 19
 #### April 24, 2020
@@ -430,5 +441,5 @@ First public release.
  -->
 <!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
  -->
-<!--  LocalWords:  bo
+<!--  LocalWords:  bo kludgy
  -->
