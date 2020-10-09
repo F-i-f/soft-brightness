@@ -230,7 +230,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v20/soft-brightness@fifi.org.v20.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v21/soft-brightness@fifi.org.v21.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -254,6 +254,13 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 21
+#### October 8, 2020
+
+- Only disable mouse tracking on Gnome-Shell 3.38 when gjs 1.65 up to
+  1.66.0 inclusive are detected.
+- Report gjs version in log.
 
 ### Version 20
 #### October 6, 2020
