@@ -1,5 +1,5 @@
 // meson-gse - Library for gnome-shell extensions
-// Copyright (C) 2019 Philippe Troin (F-i-f on Github)
+// Copyright (C) 2019, 2020 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,11 +37,21 @@ var Logger = class MesonGseLogger {
 	    let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
 	    if (gnomeShellVersion != undefined) {
 		msg += ' on Gnome-Shell ' + gnomeShellVersion;
-            }
+	    }
+	    let gjsVersion = imports.system.version;
+	    if (gjsVersion != undefined) {
+		let gjsVersionMajor = Math.floor(gjsVersion / 10000);
+		let gjsVersionMinor = Math.floor((gjsVersion % 10000) / 100);
+		let gjsVersionPatch = gjsVersion % 100;
+		msg +=( ' / gjs ' + gjsVersionMajor
+			+ '.' +gjsVersionMinor
+			+ '.' +gjsVersionPatch
+			+ ' ('+gjsVersion+')');
+	    }
 	    let sessionType = GLib.getenv('XDG_SESSION_TYPE');
-            if (sessionType != undefined) {
-                msg += ' / ' + sessionType;
-            }
+	    if (sessionType != undefined) {
+		msg += ' / ' + sessionType;
+	    }
 	    this.log(msg);
 	}
 	global.log(''+this._title+': '+text);
