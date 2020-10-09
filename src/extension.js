@@ -28,6 +28,7 @@ const PointerWatcher = imports.ui.pointerWatcher;
 const ScreenshotService = imports.ui.screenshot.ScreenshotService;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
+const System = imports.system;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -203,9 +204,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		    this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
 		}
 
-		if ( major > 3 || (major == 3 && minor >= 38)) {
+		if ( System.version >= 16500 && System.version < 16601) {
 		    this._cloneMouseOverride = false;
-		    this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion);
+		    this._logger.log('mouse cloning disabled on broken gjs '+System.version);
 		}
 	    }
 	}

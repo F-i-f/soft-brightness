@@ -30,13 +30,18 @@ Bonus features:
 
 ## Known Issues with Gnome-Shell 3.38:
 
-Gnome-Shell 3.38.0 and 3.38.1 have a broken cursor tracking
-implementation.  Soft Brightness version 20 and later detect this
-condition and disable cursor cloning.  On buggy gnome-shell versions,
-the cursor will not be affected by the brightness setting.
+Gjs 1.66.0 (and possibly earlier 1.65.x versions), shipped with Gnome
+3.38 has has a bug breaking cursor tracking.  Soft Brightness version
+20 and later detect this condition and disable cursor cloning.  On
+buggy systems, the cursor will not be affected by the brightness
+overlay, whatever the _Mouse cursor brightness control_ setting maybe.
 
-This issue is tracked in the [Gnome Gitlab issue
+The issue is fixed in gjs 1.66.1.
+
+- [Gnome Gitlab issue
 #3237](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3237).
+- [Gnome Gitlab gjs PR
+506](https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/506)
 
 ## Configuration
 
@@ -441,5 +446,5 @@ First public release.
  -->
 <!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
  -->
-<!--  LocalWords:  bo kludgy
+<!--  LocalWords:  bo kludgy gjs
  -->
