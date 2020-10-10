@@ -34,7 +34,8 @@ Gjs 1.66.0 (and possibly earlier 1.65.x versions), shipped with Gnome
 3.38 has has a bug breaking cursor tracking.  Soft Brightness version
 20 and later detect this condition and disable cursor cloning.  On
 buggy systems, the cursor will not be affected by the brightness
-overlay, whatever the _Mouse cursor brightness control_ setting maybe.
+overlay, whatever the _Mouse cursor brightness control_ setting may
+be.
 
 The issue is fixed in gjs 1.66.1.
 
