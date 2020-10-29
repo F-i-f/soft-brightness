@@ -791,8 +791,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	} else {
 	    Shell.util_cursor_tracker_to_clutter(this._cursorTracker, this._cursorSprite);
 	}
-	let [xHot, yHot] = this._cursorTracker.get_hot();
-	this._cursorSprite.set_anchor_point(xHot, yHot);
+	// set_anchor_point has disappeared in GS 3.38.
+	if (this._cursorSprite.set_anchor_point !== undefined) {
+	    let [xHot, yHot] = this._cursorTracker.get_hot();
+	    this._cursorSprite.set_anchor_point(xHot, yHot);
+	}
 	this._delayedSetPointerInvisible();
     }
 
