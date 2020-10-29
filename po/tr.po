@@ -1,0 +1,176 @@
+# Turkish translations for soft-brightness package.
+# Copyright (C) 2020 THE soft-brightness'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the soft-brightness package.
+# Muha Aliss, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: soft-brightness\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-24 18:28-0700\n"
+"PO-Revision-Date: 2020-10-29 16:05+0300\n"
+"Last-Translator: Muha Aliss <muhaaliss@pm.me>\n"
+"Language-Team: Turkish\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.1\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: src/prefs.js:53
+msgid "Soft Brightness"
+msgstr "Soft Brightness"
+
+#: src/prefs.js:63
+msgid "Version"
+msgstr "Sürüm"
+
+#: src/prefs.js:85
+msgid "Use backlight control:"
+msgstr "Arka ışık kontrolünü kullan:"
+
+#: src/prefs.js:96
+msgid "Monitor(s):"
+msgstr "Monitör(ler):"
+
+#: src/prefs.js:100
+msgid "All"
+msgstr "Tümü"
+
+#: src/prefs.js:101
+msgid "Built-in"
+msgstr "Yerleşik"
+
+#: src/prefs.js:102
+msgid "External"
+msgstr "Harici"
+
+#: src/prefs.js:110
+msgid "Built-in monitor:"
+msgstr "Yerleşik monitör:"
+
+#: src/prefs.js:133
+msgid "Full-screen behavior:"
+msgstr "Tam ekran davranışı:"
+
+#: src/prefs.js:137
+msgid "Do not enforce brightness in full-screen"
+msgstr "Tam ekranda parlaklığı zorunlu kılma"
+
+#: src/prefs.js:138
+msgid "Brightness enforced in full-screen"
+msgstr "Tam ekranda uygulanan parlaklık"
+
+#: src/prefs.js:139
+msgid "Brightness enforced in full-screen, always tear-free"
+msgstr "Tam ekranda uygulanan parlaklık, her zaman yırtılmaz"
+
+#: src/prefs.js:147
+msgid "Minimum brightness (0..1):"
+msgstr "Minimum parlaklık (0..1):"
+
+#: src/prefs.js:166
+msgid "Mouse cursor brightness control:"
+msgstr "Fare imleci parlaklık kontrolü:"
+
+#: src/prefs.js:177
+msgid "Debug:"
+msgstr "Hata ayıklama:"
+
+#: src/prefs.js:190
+msgid ""
+"Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f"
+"\">F-i-f</a> on GitHub)"
+msgstr ""
+"Telif hakkı © 2019, 2020 Philippe Troin (GitHub'da <a href=\"https://github."
+"com/F-i-f\">F-i-f</a>)"
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
+msgid "Use backlight control."
+msgstr "Arka ışık kontrolünü kullan."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:16
+msgid "Use the regular backlight control."
+msgstr "Normal arka ışık kontrolünü kullan."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:20
+msgid "Monitors."
+msgstr "Monitörler."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
+msgid "The monitors whose brightness should be adjusted."
+msgstr "Parlaklığı ayarlanması gereken monitörler."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:25
+msgid "Builtin monitor."
+msgstr "Dahili monitör."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:26
+msgid "The name of the built-in monitor."
+msgstr "Yerleşik monitörün adı."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:30
+msgid "Prevent window unredirecting behavior."
+msgstr "Pencere yeniden yönlendirme davranışını önle."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
+msgid ""
+"If set to never, unredirection is never prevented. If set to when-"
+"correcting, unredirection will be prevented when the brightness is not at "
+"the maximum setting (and an alpha layer is lowering the brightness). If set "
+"to always, window unredirection will always be prevented when this extension "
+"is active, allowing tear-free display."
+msgstr ""
+"Hiçbir zaman olarak ayarlanırsa, yeniden yönlendirme asla engellenmez. "
+"Düzeltme sırasında ayarlanırsa, parlaklık maksimum ayarda olmadığında (ve "
+"bir alfa katmanı parlaklığı düşürdüğünde) yeniden yönlendirme "
+"engellenecektir. Her zaman olarak ayarlanırsa, bu uzantı etkin olduğunda "
+"pencere yeniden yönlendirmesi her zaman engellenecek ve yırtılmasız görüntü "
+"sağlanacaktır."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:41
+msgid "Minimum brightness."
+msgstr "Minimum parlaklık."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:42
+msgid "Minimum brightness level."
+msgstr "Minimum parlaklık seviyesi."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:47
+msgid "Current brightness level."
+msgstr "Mevcut parlaklık seviyesi."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:48
+msgid "The current brightness level."
+msgstr "Mevcut parlaklık seviyesi."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
+msgid "Mouse cursor brightness control."
+msgstr "Fare imleci parlaklık kontrolü."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
+msgid ""
+"When enabled, the mouse cursor follows the brightness setting. When "
+"disabled, the mouse cursor always remains at full brightness. Controlling "
+"mouse cursor brightness can sometimes show the wrong cursor and introduce "
+"cursor lag. You may want to disable it if you encounter cursor issues. Note "
+"that if another Gnome Shell component clones the mouse (like the Zoom "
+"accessibility feature), the cursor will follow the screen brightness."
+msgstr ""
+"Etkinleştirildiğinde, fare imleci parlaklık ayarını takip eder. Devre dışı "
+"bırakıldığında, fare imleci her zaman tam parlaklıkta kalır. Fare imleci "
+"parlaklığını kontrol etmek bazen yanlış imleci gösterebilir ve imleç "
+"gecikmesine neden olabilir. İmleç sorunlarıyla karşılaşırsanız devre dışı "
+"bırakmak isteyebilirsiniz. Başka bir Gnome Shell bileşeni fareyi klonlarsa "
+"(Zoom erişilebilirlik özelliği gibi), imlecin ekran parlaklığını "
+"izleyeceğini unutmayın."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:65
+msgid "Debugging."
+msgstr "Hata ayıklama."
+
+#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:66
+msgid "Enable debugging for the extension."
+msgstr "Uzantı için hata ayıklamayı etkinleştir."
