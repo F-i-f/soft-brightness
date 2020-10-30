@@ -231,7 +231,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v23/soft-brightness@fifi.org.v23.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v24/soft-brightness@fifi.org.v24.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -256,7 +256,7 @@ directory (you may have to create the directory).
 
 ## Changelog
 
-### Version 23
+### Versions 23, 24
 #### October 29, 2020
 
 - Added Turkish translation.
@@ -264,7 +264,7 @@ directory (you may have to create the directory).
 ### Version 22
 #### October 28, 2020
 
-- GS 3.38 compatility: CursorSprite.set_anchor_point has been removed.
+- GS 3.38 compatibility: CursorSprite.set_anchor_point has been removed.
 
 ### Version 21
 #### October 8, 2020
@@ -464,5 +464,5 @@ First public release.
  -->
 <!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
  -->
-<!--  LocalWords:  bo kludgy gjs
+<!--  LocalWords:  bo kludgy gjs CursorSprite
  -->
