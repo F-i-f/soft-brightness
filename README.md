@@ -99,7 +99,7 @@ Choose one of:
 - _Do not enforce brightness in full-screen_: When an application
   enters full-screen mode, remove the brightness overlays.  You may
   want to try this setting if your applications' refresh rate is
-  lagging in full-screen.  The application will unredirect its window
+  lagging in full-screen.  The application will [unredirect](https://passthroughpo.st/linux-desktop-compositors-performance-functionality) its window
   and will bypass Gnome Shell's compositing (this is the default for
   full-screen applications in Gnome Shell unless changed by another
   extension).
