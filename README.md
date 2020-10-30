@@ -115,7 +115,7 @@ Choose one of:
   _Brightness enforced in full-screen_, but will still prevent
   full-screen applications from unredirecting their windows even if no
   brightness overlay is active (brightness is 100%).  Applications
-  will then always be rendered tear-free, whatever the brightness may
+  will then always be rendered [tear-free](https://en.wikipedia.org/wiki/Screen_tearing), whatever the brightness may
   be. In this mode, Soft Brightness can be used as a replacement for
   extensions like _Fix Fullscreen Tearing_.
 
