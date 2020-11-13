@@ -791,10 +791,18 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	} else {
 	    Shell.util_cursor_tracker_to_clutter(this._cursorTracker, this._cursorSprite);
 	}
-	// set_anchor_point has disappeared in GS 3.38.
+
+	let [xHot, yHot] = this._cursorTracker.get_hot();
 	if (this._cursorSprite.set_anchor_point !== undefined) {
-	    let [xHot, yHot] = this._cursorTracker.get_hot();
+	    // GS 3.36-
 	    this._cursorSprite.set_anchor_point(xHot, yHot);
+	} else {
+	    // GS 3.38+: set_anchor_point has disappeared in GS 3.38.
+	    // Apply transform directly
+	    this._cursorSprite.set({
+		translation_x: -xHot,
+		translation_y: -yHot,
+	    });
 	}
 	this._delayedSetPointerInvisible();
     }
