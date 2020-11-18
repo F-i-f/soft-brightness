@@ -306,7 +306,7 @@ cat <<-'EOD' > src/metadata.json.in
 EOD
 git add meson-gse.build src
 git commit -m "Initial checkin."
-git subtree add -P meson-gse -m "Pull from meson-gse as a subtree." --squash git@github.com:F-i-f/meson-gse.git master
+git subtree add -P meson-gse -m "Pull from meson-gse as a subtree." git@github.com:F-i-f/meson-gse.git master
 meson-gse/meson-gse
 meson build
 ninja -C build test install
