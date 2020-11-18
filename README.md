@@ -167,7 +167,7 @@ gse_project({extension name}, {extension uuid domain}, {extension version}, {gse
   gse_schemas += files('schemas/other-schema.xml')
   ```
 
-  The `gse_data` files are installed in the extension's `schemas`
+  The `gse_schemas` files are installed in the extension's `schemas`
   directory by the `install` or `extension.zip` `ninja` targets.
 
 - __gse_dbus_interfaces__
