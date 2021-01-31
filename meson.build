@@ -19,7 +19,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # meson-gse - Library for gnome-shell extensions
-# Copyright (C) 2019, 2020 Philippe Troin (F-i-f on Github)
+# Copyright (C) 2019-2021 Philippe Troin (F-i-f on Github)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,7 +69,10 @@ if gse_run_command_obj.returncode() == 0
   gse_schemas += files(gse_schema_main)
 endif
 
+gse_js78 = find_program('js78', required: false)
+gse_js68 = find_program('js68', required: false)
 gse_js60 = find_program('js60', required: false)
+gse_js52 = find_program('js52', required: false)
 
 # Include extension-specific settings
 
@@ -130,12 +133,42 @@ if gse_schemas != []
 	       install_dir: gse_target_dir_schemas)
 endif
 
-if (gse_js60.found())
+gse_js_found = 0
+
+if gse_js78.found() and gse_js_found == 0
+  foreach gse_source : gse_sources
+    test('Checking syntax of ' + '@0@'.format(gse_source),
+	 gse_js78,
+	 args: ['-w', '-c', gse_source])
+  endforeach
+  gse_js_found = 1
+endif
+
+if gse_js68.found() and gse_js_found == 0
+  foreach gse_source : gse_sources
+    test('Checking syntax of ' + '@0@'.format(gse_source),
+	 gse_js68,
+	 args: ['-w', '-c', gse_source])
+  endforeach
+  gse_js_found = 1
+endif
+
+if gse_js60.found() and gse_js_found == 0
   foreach gse_source : gse_sources
     test('Checking syntax of ' + '@0@'.format(gse_source),
 	 gse_js60,
-	 args: ['-s', '-c', gse_source])
+	 args: ['-w', '-c', gse_source])
   endforeach
+  gse_js_found = 1
+endif
+
+if gse_js52.found() and gse_js_found == 0
+  foreach gse_source : gse_sources
+    test('Checking syntax of ' + '@0@'.format(gse_source),
+	 gse_js52,
+	 args: ['-w', '-c', gse_source])
+  endforeach
+  gse_js_found = 1
 endif
 
 install_data(gse_sources + gse_data + gse_libs,
