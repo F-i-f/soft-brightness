@@ -238,7 +238,10 @@ function init() {
 function buildPrefsWidget() {
     let widget = new SoftBrightnessSettings();
     widget.setup();
-    widget.show_all();
+    // show_all() is only available/necessary on GTK < 4.0.
+    if (widget.show_all !== undefined) {
+	widget.show_all();
+    }
 
     return widget;
 }
