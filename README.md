@@ -28,21 +28,16 @@ Bonus features:
 
 - Disables itself temporarily when a screen shot is taken.
 
-## Known Issues with Gnome-Shell 3.38:
+## Known Issues with Gnome-Shell 40.0:
 
-Gjs 1.66.0 (and possibly earlier 1.65.x versions), shipped with Gnome
-3.38 has has a bug breaking cursor tracking.  Soft Brightness version
-20 and later detect this condition and disable cursor cloning.  On
-buggy systems, the cursor will not be affected by the brightness
-overlay, whatever the _Mouse cursor brightness control_ setting may
-be.
+Gnome Shell 40.0 has a bug in the cursor handling that prevents Soft
+Brightness from applying the brightness to the mouse cursor.
 
-The issue is fixed in gjs 1.66.1.
+On Gnome Shell 40.0, the cursor will always show up at full brightness
+until the issue is addressed (and the extension is updated).
 
 - [Gnome Gitlab issue
-#3237](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3237).
-- [Gnome Gitlab gjs PR
-506](https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/506)
+#3980](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3980).
 
 ## Configuration
 
@@ -233,7 +228,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v26/soft-brightness@fifi.org.v26.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v27/soft-brightness@fifi.org.v27.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -257,6 +252,18 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Versions 27
+#### March 25, 2021
+
+- Gnome-shell 40.0 compatibility.
+- Update preferences for Gnome-shell 40.0.
+- Disable mouse cloning on Gnome-shell 40 and later.
+- Update meson-gse to latest:
+  - Now prints the GJS version in the system log at start-up (if debug
+	is enabled).
+  - Support more mozjs version (78, 68, 52) for build-time syntax
+	checks (`ninja test`).
 
 ### Versions 26
 #### November 12, 2020
@@ -476,5 +483,5 @@ First public release.
  -->
 <!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
  -->
-<!--  LocalWords:  bo kludgy gjs CursorSprite
+<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs
  -->
