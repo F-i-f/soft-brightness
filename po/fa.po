@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-24 18:28-0700\n"
+"POT-Creation-Date: 2021-03-25 13:26-0700\n"
 "PO-Revision-Date: 2020-10-30 14:00+0330\n"
+"Last-Translator: Mahdi Hosseinzadeh\n"
 "Language-Team: \n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.1\n"
-"Last-Translator: Mahdi Hosseinzadeh\n"
 "Plural-Forms: nplurals=2; plural=(n==0 || n==1);\n"
-"Language: fa\n"
 
 #: src/prefs.js:53
 msgid "Soft Brightness"
@@ -80,8 +80,8 @@ msgstr "حالت اشکال‌زدایی:"
 
 #: src/prefs.js:190
 msgid ""
-"Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f"
-"\">F-i-f</a> on GitHub)"
+"Copyright © 2019-2021 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-"
+"i-f</a> on GitHub)"
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15

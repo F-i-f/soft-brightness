@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-24 18:28-0700\n"
+"POT-Creation-Date: 2021-03-25 13:26-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,8 +79,8 @@ msgstr ""
 
 #: src/prefs.js:190
 msgid ""
-"Copyright © 2019, 2020 Philippe Troin (<a href=\"https://github.com/F-i-f"
-"\">F-i-f</a> on GitHub)"
+"Copyright © 2019-2021 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-"
+"i-f</a> on GitHub)"
 msgstr ""
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
