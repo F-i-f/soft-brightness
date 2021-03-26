@@ -1,5 +1,5 @@
 // meson-gse - Library for gnome-shell extensions
-// Copyright (C) 2019, 2020 Philippe Troin (F-i-f on Github)
+// Copyright (C) 2019-2021 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ var Logger = class MesonGseLogger {
 	    }
 	    this.log(msg);
 	}
-	global.log(''+this._title+': '+text);
+	log(''+this._title+': '+text);
     }
 
     log_debug(text) {
