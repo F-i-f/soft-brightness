@@ -208,6 +208,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		    this._cloneMouseOverride = false;
 		    this._logger.log('mouse cloning disabled on broken gjs '+System.version);
 		}
+
+		if ( major >= 4 ) {
+		    this._cloneMouseOverride = false;
+		    this._logger.log('mouse cloning disabled on broken gnome-shell 40.0');
+		}
 	    }
 	}
 
