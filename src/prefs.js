@@ -81,14 +81,17 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 
 	ypos += 1;
 
-	descr = _(this._settings.settings_schema.get_key('use-backlight').get_description());
-	this.enabled_label = new Gtk.Label({label: _("Use backlight control:"), halign: Gtk.Align.START});
-	this.enabled_label.set_tooltip_text(descr);
-	this.enabled_control = new Gtk.Switch({halign: Gtk.Align.END});
-	this.enabled_control.set_tooltip_text(descr);
-	this.attach(this.enabled_label,   1, ypos, 1, 1);
-	this.attach(this.enabled_control, 2, ypos, 1, 1);
-	this._settings.bind('use-backlight', this.enabled_control, 'active', Gio.SettingsBindFlags.DEFAULT);
+	descr = _(this._settings.settings_schema.get_key('backlight-mode').get_description());
+	this.backlight_label = new Gtk.Label({label: _("Backlight control mode:"), halign: Gtk.Align.START});
+	this.backlight_label.set_tooltip_text(descr);
+	this.backlight_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
+	this.backlight_control.set_tooltip_text(descr);
+	this.backlight_control.append("disabled", _("Disabled"));
+	this.backlight_control.append("blend", _("Blend"));
+	this.backlight_control.append("chain", _("Chain"));
+	this._settings.bind('backlight-mode', this.backlight_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
+	this.attach(this.backlight_label,   1, ypos, 1, 1);
+	this.attach(this.backlight_control, 2, ypos, 1, 1);
 
 	ypos += 1;
 
@@ -159,6 +162,25 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	this.attach(this.min_brightness_label,   1, ypos, 1, 1);
 	this.attach(this.min_brightness_control, 2, ypos, 1, 1);
 	this._settings.bind('min-brightness', this.min_brightness_control, 'value', Gio.SettingsBindFlags.DEFAULT);
+
+	ypos += 1;
+
+	descr = _(this._settings.settings_schema.get_key('chain-mode-threshold').get_description());
+	this.chain_percentage_label = new Gtk.Label({label: _("Chain mode threshold (0..1):"), halign: Gtk.Align.START});
+	this.chain_percentage_label.set_tooltip_text(descr);
+	this.chain_percentage_control = new Gtk.SpinButton({
+	    halign: Gtk.Align.END,
+	    digits: 2,
+	    adjustment: new Gtk.Adjustment({
+		lower: 0.0,
+		upper: 1.0,
+		step_increment: 0.01
+	    })
+	});
+	this.chain_percentage_control.set_tooltip_text(descr);
+	this.attach(this.chain_percentage_label,   1, ypos, 1, 1);
+	this.attach(this.chain_percentage_control, 2, ypos, 1, 1);
+	this._settings.bind('chain-mode-threshold', this.chain_percentage_control, 'value', Gio.SettingsBindFlags.DEFAULT);
 
 	ypos += 1;
 

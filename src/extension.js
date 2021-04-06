@@ -103,12 +103,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._overlays            = null;
 
 	// Set/destroyed by _enableSettingsMonitoring/_disableSettingsMonitoring
-	this._minBrightnessSettingChangedConnection     = null;
-	this._currentBrightnessSettingChangedConnection = null;
-	this._monitorsSettingChangedConnection          = null;
-	this._builtinMonitorSettingChangedConnection    = null;
-	this._useBacklightSettingChangedConnection      = null;
-	this._preventUnredirectChangedConnection        = null;
+	this._minBrightnessSettingChangedConnection      = null;
+	this._currentBrightnessSettingChangedConnection  = null;
+	this._monitorsSettingChangedConnection           = null;
+	this._builtinMonitorSettingChangedConnection     = null;
+	this._backlightModeSettingChangedConnection      = null;
+	this._chainModeThresholdSettingChangedConnection = null;
+	this._preventUnredirectChangedConnection         = null;
 
 	// Set/destroyed by _enableMonitor2ing/_disableMonitor2ing
 	this._monitorManager            = null;
@@ -244,7 +245,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._enableSettingsMonitoring();
 
 	// If we use the backlight and the Brightness proxy is null, it's still connecting and we'll get a _sync later.
-	if (! this._settings.get_boolean('use-backlight') || this._brightnessIndicator._proxy.Brightness != null) {
+	if (! this._settings.get_string('backlight-mode') !== 'disabled' || this._brightnessIndicator._proxy.Brightness != null) {
 	    let curBrightness = this._getBrightnessLevel();
 	    this._brightnessIndicator.setSliderValue(curBrightness);
 	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider);
@@ -465,10 +466,24 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     // Utility functions to manage the stored brightness value.
-    // If using the backlight, then we use the indicator as the brightness value store, which is linked to gsd.
+    // If in blend mode, then we use the indicator as the brightness value store, which is linked to gsd.
+    // If in chain mode, the brightness is stored in the extension setting if `brightness` < `chain-mode-threshold`, but else in the indicator.
+    //     This allow sync with brightness key, while still being able to store the value somewhere when `brightness` < `chain-mode-threshold`.
     // If not using the backlight, the brightness is stored in the extension setting.
     _storeBrightnessLevel(value) {
-	if (this._settings.get_boolean('use-backlight') && this._brightnessIndicator._proxy.Brightness >= 0) {
+	if (this._settings.get_string('backlight-mode') === 'chain' && this._brightnessIndicator._proxy.Brightness >= 0) {
+	    if (value < this._settings.get_double('chain-mode-threshold')) {
+		this._logger.log_debug('_storeBrightnessLevel('+value+') by chain mode setting');
+		this._settings.set_double('current-brightness', value);
+		this._brightnessIndicator._proxy.Brightness = 0;
+	    } else {
+		const threshold = this._settings.get_double('chain-mode-threshold');
+		let convertedBrightness = (value - threshold) / (1.0 - threshold) * 100.0;
+		convertedBrightness = Math.min(100, Math.max(0, Math.round(convertedBrightness)));
+		this._logger.log_debug('_storeBrightnessLevel('+value+') by chain mode proxy -> '+convertedBrightness);
+		this._brightnessIndicator._proxy.Brightness = convertedBrightness;
+	    }
+	} else if (this._settings.get_string('backlight-mode') !== 'disabled' && this._brightnessIndicator._proxy.Brightness >= 0) {
 	    let convertedBrightness = Math.min(100, Math.round(value * 100.0));
 	    this._logger.log_debug('_storeBrightnessLevel('+value+') by proxy -> '+convertedBrightness);
 	    this._brightnessIndicator._proxy.Brightness = convertedBrightness;
@@ -480,7 +495,19 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _getBrightnessLevel() {
 	let brightness = this._brightnessIndicator._proxy.Brightness;
-	if (this._settings.get_boolean('use-backlight') && brightness >= 0) {
+	if (this._settings.get_string('backlight-mode') === 'chain' && brightness >= 0) {
+	    if (brightness == 0) {
+		brightness = this._settings.get_double('current-brightness');
+		this._logger.log_debug('_getBrightnessLevel() by chain mode setting = '+brightness);
+		return brightness;
+	    } else {
+		const threshold = this._settings.get_double('chain-mode-threshold');
+		let convertedBrightness = brightness / 100.0 * (1.0 - threshold) + threshold;
+		convertedBrightness = Math.min(1, Math.max(0, convertedBrightness));
+		this._logger.log_debug('_getBrightnessLevel() by chain mode proxy = '+convertedBrightness+' <- '+brightness);
+		return convertedBrightness;
+	    }
+	} else if (this._settings.get_string('backlight-mode') !== 'disabled' && brightness >= 0) {
 	    let convertedBrightness = brightness / 100.0;
 	    this._logger.log_debug('_getBrightnessLevel() by proxy = '+convertedBrightness+' <- '+brightness);
 	    return convertedBrightness;
@@ -497,13 +524,15 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	let brightnessChange       = Lang.bind(this, function() { this._on_brightness_change(false); });
 	let forcedBrightnessChange = Lang.bind(this, function() { this._on_brightness_change(true); });
+	let backlightModeChange    = this._on_backlight_mode_change.bind(this);
 
-	this._minBrightnessSettingChangedConnection     = this._settings.connect('changed::min-brightness',     brightnessChange);
-	this._currentBrightnessSettingChangedConnection = this._settings.connect('changed::current-brightness', brightnessChange);
-	this._monitorsSettingChangedConnection          = this._settings.connect('changed::monitors',           forcedBrightnessChange);
-	this._builtinMonitorSettingChangedConnection    = this._settings.connect('changed::builtin-monitor',    forcedBrightnessChange);
-	this._useBacklightSettingChangedConnection      = this._settings.connect('changed::use-backlight',      this._on_use_backlight_change.bind(this));
-	this._preventUnredirectChangedConnection        = this._settings.connect('changed::prevent-unredirect', forcedBrightnessChange);
+	this._minBrightnessSettingChangedConnection      = this._settings.connect('changed::min-brightness',     brightnessChange);
+	this._currentBrightnessSettingChangedConnection  = this._settings.connect('changed::current-brightness', brightnessChange);
+	this._monitorsSettingChangedConnection           = this._settings.connect('changed::monitors',           forcedBrightnessChange);
+	this._builtinMonitorSettingChangedConnection     = this._settings.connect('changed::builtin-monitor',    forcedBrightnessChange);
+	this._backlightModeSettingChangedConnection      = this._settings.connect('changed::backlight-mode',     backlightModeChange);
+	this._chainModeThresholdSettingChangedConnection = this._settings.connect('changed::chain-mode-threshold',  backlightModeChange);
+	this._preventUnredirectChangedConnection         = this._settings.connect('changed::prevent-unredirect', forcedBrightnessChange);
     }
 
     _disableSettingsMonitoring() {
@@ -513,15 +542,17 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._settings.disconnect(this._currentBrightnessSettingChangedConnection);
 	this._settings.disconnect(this._monitorsSettingChangedConnection);
 	this._settings.disconnect(this._builtinMonitorSettingChangedConnection);
-	this._settings.disconnect(this._useBacklightSettingChangedConnection);
+	this._settings.disconnect(this._backlightModeSettingChangedConnection);
+	this._settings.disconnect(this._chainModeThresholdSettingChangedConnection);
 	this._settings.disconnect(this._preventUnredirectChangedConnection);
 
-	this._minBrightnessSettingChangedConnection     = null;
-	this._currentBrightnessSettingChangedConnection = null;
-	this._monitorsSettingChangedConnection          = null;
-	this._builtinMonitorSettingChangedConnection    = null;
-	this._useBacklightSettingChangedConnection      = null;
-	this._preventUnredirectChangedConnection        = null;
+	this._minBrightnessSettingChangedConnection      = null;
+	this._currentBrightnessSettingChangedConnection  = null;
+	this._monitorsSettingChangedConnection           = null;
+	this._builtinMonitorSettingChangedConnection     = null;
+	this._backlightModeSettingChangedConnection      = null;
+	this._chainModeThresholdSettingChangedConnection = null;
+	this._preventUnredirectChangedConnection         = null;
     }
 
     _on_brightness_change(force) {
@@ -531,29 +562,37 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug("_on_brightness_change: current-brightness="+curBrightness+", min-brightness="+minBrightness);
 	if (curBrightness < minBrightness) {
 	    curBrightness = minBrightness;
-	    if (! this._settings.get_boolean('use-backlight')) {
+	    if (!this._settings.get_string('backlight-mode') !== 'disabled') {
 		this._brightnessIndicator.setSliderValue(curBrightness);
 	    }
 	    this._storeBrightnessLevel(minBrightness);
 	    return;
 	}
-	if (curBrightness >= 1) {
+
+	let overlayMaxBrightness = 1;
+	let overlayBrightness = curBrightness;
+	if (this._settings.get_string('backlight-mode') === 'chain') {
+	    overlayMaxBrightness = this._settings.get_double('chain-mode-threshold');
+	    overlayBrightness = curBrightness / this._settings.get_double('chain-mode-threshold');
+	}
+
+	if (curBrightness >= overlayMaxBrightness) {
 	    this._hideOverlays(false);
 	    this._stopCloningShowMouse();
 	} else {
 	    if (this._cursorWantedVisible) {
 		this._startCloningMouse(); // Must be called before _showOverlays so that the overlay is on top.
 	    }
-	    this._showOverlays(curBrightness, force);
+	    this._showOverlays(overlayBrightness, force);
 	    if (this._overlays.length == 0) {
 		this._stopCloningShowMouse();
 	    }
 	}
     }
 
-    _on_use_backlight_change() {
-	this._logger.log_debug('_on_use_backlight_change()');
-	if (this._settings.get_boolean('use-backlight')) {
+    _on_backlight_mode_change() {
+	this._logger.log_debug('_on_backlight_mode_change()');
+	if (this._settings.get_string('backlight-mode') !== 'disabled') {
 	    this._storeBrightnessLevel(this._settings.get_double('current-brightness'));
 	} else if (this._brightnessIndicator._proxy.Brightness != null && this._brightnessIndicator._proxy.Brightness >= 0) {
 	    this._storeBrightnessLevel(this._brightnessIndicator._proxy.Brightness / 100.0);

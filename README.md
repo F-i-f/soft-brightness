@@ -49,23 +49,28 @@ page](https://extensions.gnome.org/local/).
 
 ### Configuration Settings
 
-#### _Use backlight control_
+#### _Backlight control mode_
 
-When enabled, Soft Brightness will work together with your computer's
-back-light.  The brightness slider and keyboard brightness hotkeys
-will control both the back-light and the Soft Brightness overlays.
-This is most useful:
+- If set to _Disabled_, the Brightness slider will only control the
+Soft Brightness overlays.  The keyboard brightness hotkeys will keep
+their default bindings.
 
-- if you have a back-light and  _Monitors_ is set to _External_, or
-
-- if a back-light is detected by Gnome but is not working (like some
+- If set to _Blend_, Soft Brightness will work together with your
+computer's back-light.  The brightness slider and keyboard brightness
+hotkeys will control both the back-light and the Soft Brightness
+overlays at the same time.  This is most useful:
+  - if you have a back-light and  _Monitors_ is set to _External_, or
+  - if a back-light is detected by Gnome but is not working (like some
   OLED panel laptops which report having a back-light brightness which
   doesn't exist).  In that latter case _Monitors_ should be set to
   _All_.
 
-If _Use backlight control_ is disabled, the Brightness slider will
-only control the Soft Brightness overlays.  The keyboard brightness
-hotkeys will keep their default bindings.
+- If set to _Chain_, Soft Brightness will be used for the lowest
+part of the slider.  Then over a given percentage of the slider,
+back-light control will be used.  The keyboard brightness hotkeys will
+only be applied on the back-light part of the slider.  This is most
+useful if the back-light control of your screen is working, but the
+lowest setting is still too bright.
 
 #### _Monitor(s)_
 
@@ -122,10 +127,16 @@ Sets the minimum allowable brightness for the display where _0_ is
 completely dark and _1_ completely bright. Defaults to _0.1_ (10%).
 
 The minimum brightness will also be enforced for the panel back-light
-if _Use backlight control_ is on.
+if _Backlight control mode_ is in _Blend_ or _Chain_ mode.
 
 When the brightness is set to 0%, the display will go completely dark,
 it may be hard to reset the brightness with the slider then.
+
+#### _Chain mode threshold_
+
+Sets the brightness value between _0_ and _1_ at which the switch
+is made between soft brightness and backlight control in chain mode.
+Defaults to _0.3_ (30%).
 
 #### _Mouse cursor brightness control_
 
@@ -180,7 +191,7 @@ power usage.
 Soft Brightness can be used to control the brightness of all your
 attached monitors:
 
-- Set _Use backlight control_ to _Off_.
+- Set _Backlight control mode_ to _Disabled_.
 
 - Set _Monitor(s)_ to _All_.
 
@@ -190,7 +201,7 @@ You can leave the control of your attached display to the back-light
 and use Soft Brightness to control the brightness of external
 displays:
 
-- Set _Use backlight control_ to _On_.
+- Set _Backlight control mode_ to _Blend_.
 
 - Set _Monitor(s)_ to _External_.
 
@@ -201,7 +212,18 @@ displays:
 For example an OLED panel or non-functional back-light.  Have
 Soft-Brightness control the brightness for all your monitors:
 
-- Set _Use backlight control_ to _On_.
+- Set _Backlight control mode_ to _Blend_.
+
+- Set _Monitor(s)_ to _All_.
+
+#### You have a laptop computer with a back-light too bright
+
+You can control back-light of your built-in display when brightness
+is over a threshold value. Then under it, back-light will be at
+minimum and Soft Brightness will be applied to darken all your screen
+even more:
+
+- Set _Backlight control mode_ to _Chain_.
 
 - Set _Monitor(s)_ to _All_.
 
