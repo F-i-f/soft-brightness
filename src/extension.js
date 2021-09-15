@@ -29,6 +29,7 @@ const ScreenshotService = imports.ui.screenshot.ScreenshotService;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const System = imports.system;
+const Tweener = imports.ui.tweener;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -38,6 +39,9 @@ const Utils = Me.imports.utils;
 const Logger = Me.imports.logger;
 
 var softBrightnessExtension = null;
+var button; 
+var text;
+var indicatorValue=1;
 
 const ModifiedBrightnessIndicator = (function() {
     let cls = class ModifiedBrightnessIndicator extends Indicator {
@@ -177,6 +181,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     // Main enable / disable switch
     _enable() {
+	Main.panel._rightBox.insert_child_at_index(button, 0);
 	this._logger.log_debug('_enable()');
 
 	this._cloneMouseOverride = true;
@@ -254,6 +259,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _disable() {
+	Main.panel._rightBox.remove_child(button);
 	this._logger.log_debug('_disable()');
 
 	let standardIndicator = new imports.ui.status.brightness.Indicator();
@@ -885,9 +891,86 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
     }
 
+	_clickOpacity(){
+		let curBrightness = this._getBrightnessLevel();
+		let minBrightness = this._settings.get_double('min-brightness');
+		
+		if(curBrightness!=minBrightness)
+			curBrightness=minBrightness;
+		else
+			curBrightness=1;
+
+		this._brightnessIndicator.setSliderValue(curBrightness);
+    }
+
+    _scrollOpacity(action, event){	//dont delete action
+		let curBrightness = this._getBrightnessLevel();
+		let minBrightness = this._settings.get_double('min-brightness');
+		
+		//direction 1=scrooldown 0=scrollup
+		let direction = event.get_scroll_direction();
+		
+		if(direction == 0 && curBrightness != 1)//maxBrightness
+			curBrightness+= 0.1;//gapValue
+		else if(direction == 1 && curBrightness != minBrightness)
+			curBrightness-= 0.1;
+			
+		this._brightnessIndicator.setSliderValue(curBrightness);
+		indicatorValue = curBrightness;
+    }
+	//https://github.com/julio641742/gnome-shell-extension-reference/blob/master/tutorials/FIRST-EXTENSION.md    
+	_hideOsd() {
+		Main.uiGroup.remove_actor(text);
+		text = null;
+	}
+	
+	_showOsd() {
+		let iValuePercent=(100*indicatorValue).toFixed(0);
+		let myText = iValuePercent.toString(10);
+		if (!text) {
+			//it would be great to have ui slider instead of this as popup
+			text = new St.Label({ style_class: 'brightness-label', 
+								  text: "Brightness: " + myText + "%"});
+			Main.uiGroup.add_actor(text);
+		}
+	
+		text.opacity = 255;
+	
+		let monitor = Main.layoutManager.primaryMonitor;
+		text.set_position(monitor.x + Math.floor(monitor.width / 2 - text.width / 2),
+						  monitor.y + Math.floor(monitor.height / 2 - text.height / 2));
+		
+		Tweener.addTween(text, {opacity: 0,
+								time: 0.2,
+								transition: 'easeOutQuad',
+								onComplete: softBrightnessExtension._hideOsd });
+	}
 };
 
 function init() {
-    softBrightnessExtension = new SoftBrightnessExtension();
+	softBrightnessExtension = new SoftBrightnessExtension();
+
+	button = new St.Bin({style_class:'brightness-icon',
+						reactive: true,
+						can_focus: true,
+						x_fill: true,
+						y_fill: false,
+						track_hover: true});
+	let icon = new St.Icon({icon_name:'display-brightness-symbolic',
+	  						style_class:'brightness-icon'});
+
+    button.set_child(icon);
+
+	button.connect('button-press-event', () => 
+		softBrightnessExtension._clickOpacity()
+	);
+	
+	button.connect('scroll-event', (action, event) => 
+		softBrightnessExtension._scrollOpacity(action, event)
+	);
+	button.connect('scroll-event', () => 
+		softBrightnessExtension._showOsd()	
+	);
+	
     return softBrightnessExtension;
 }

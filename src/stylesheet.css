@@ -1,0 +1,11 @@
+.brightness-label{
+    background: black;
+    font-weight: bold;
+    font-size: 20px;
+    padding: 30px 50px 30px 50px;
+    border-radius: 30px;
+}
+.brightness-icon{
+    width: 18px;
+    margin: 2px 10px 2px 10px;
+}
