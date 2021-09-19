@@ -1,0 +1,15 @@
+.brightness-osd{
+    background: black;    
+    padding: 30px 60px 60px 50px;
+    border-radius: 30px;
+}
+.brightness-label{
+    margin-top: 90px;
+    margin-left: 55px;
+    font-weight: bold;
+    font-size: 20px;
+}
+.brightness-icon{
+    width: 18px;
+    margin: 2px 10px 2px 10px;
+}
