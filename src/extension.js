@@ -974,7 +974,8 @@ function init() {
 						y_fill: false,
 						track_hover: true});
 	let icon = new St.Icon({icon_name:'display-brightness-symbolic',
-	  						style_class:'brightness-icon'});
+	  			style_class:'brightness-icon',
+			        icon_size: 18});
 
     button.set_child(icon);
 
