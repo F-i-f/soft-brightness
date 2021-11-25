@@ -17,6 +17,7 @@
 const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 const Clutter = imports.gi.Clutter;
 const Indicator = imports.ui.status.brightness.Indicator;
+const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Lang = imports.lang;
@@ -29,7 +30,6 @@ const ScreenshotService = imports.ui.screenshot.ScreenshotService;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const System = imports.system;
-const Tweener = imports.ui.tweener;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -38,11 +38,10 @@ const Convenience = Me.imports.convenience;
 const Utils = Me.imports.utils;
 const Logger = Me.imports.logger;
 
-var softBrightnessExtension = null;
-var button; 
-var text;
-var osdIcon;
-var indicatorValue=1;
+const MessageTray = imports.ui.messageTray;
+const Gtk = imports.gi.Gtk;
+const Panel = imports.ui.panel;
+const PanelMenu = imports.ui.panelMenu;
 
 const ModifiedBrightnessIndicator = (function() {
     let cls = class ModifiedBrightnessIndicator extends Indicator {
@@ -182,7 +181,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     // Main enable / disable switch
     _enable() {
-	Main.panel._rightBox.insert_child_at_index(button, 0);
 	this._logger.log_debug('_enable()');
 
 	this._cloneMouseOverride = true;
@@ -260,7 +258,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _disable() {
-	Main.panel._rightBox.remove_child(button);
 	this._logger.log_debug('_disable()');
 
 	let standardIndicator = new imports.ui.status.brightness.Indicator();
@@ -891,6 +888,55 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._on_brightness_change(false);
 	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
     }
+};
+
+
+
+var softBrightnessExtension = null;
+
+class PanelButton extends SoftBrightnessExtension{
+	constructor(){
+		super();
+		this.button = null;
+		this.text = null;
+		this.osdWidget =	null;
+		this.indicatorValue	=	1;
+	}
+	
+	/**
+	 * main enable/disable - inherited
+	 */
+	_enable(){
+		this.button = new PanelMenu.Button(0.0, null, false);
+        		
+		let icon = new St.Icon({
+			icon_name:'display-brightness-symbolic',
+			style_class:'bicon',
+			icon_size: 18
+		});
+
+		this.button.add_actor(icon);
+
+		this.button.connect('button-press-event', () => 
+		softBrightnessExtension._clickOpacity()
+		);
+
+		this.button.connect('scroll-event', (action, event) => 
+		softBrightnessExtension._scrollOpacity(action, event)
+		);
+
+		this.button.connect('scroll-event', () => 
+		softBrightnessExtension._showOsd()	
+		);
+
+		Main.panel.addToStatusArea('soft-brightness', this.button);
+		super._enable();
+	}
+
+	_disable(){
+		this.button.destroy();
+		super._disable();
+	}
 
 	_clickOpacity(){
 		let curBrightness = this._getBrightnessLevel();
@@ -917,78 +963,37 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 			curBrightness-= 0.1;
 			
 		this._brightnessIndicator.setSliderValue(curBrightness);
-		indicatorValue = curBrightness;
-    }
-	//https://github.com/julio641742/gnome-shell-extension-reference/blob/master/tutorials/FIRST-EXTENSION.md	
-	_hideOsd() {
-		Main.uiGroup.remove_actor(text);
-		Main.uiGroup.remove_actor(osdIcon);
-		text = null;
-		osdIcon = null;
-	}
+		this.indicatorValue = curBrightness;
+    }	
 	
-	_showOsd() {
-		if(text){
-			text=null;
-			osdIcon = null;}
-
-		let iValuePercent=(100*indicatorValue).toFixed(0);
+	_showOsd(actor, event) {
+		//It would be great to have Gjs_ui_barlevel/whatever slider instead of text
+		let iValuePercent=(100*this.indicatorValue).toFixed(0);
 		let myText = iValuePercent.toString(10);
-		if (!text) {
-			//it would be great to have ui slider instead of this as popup
-			osdIcon = new St.Icon({ style_class: 'brightness-osd',
-									icon_name: 'display-brightness-symbolic'});
-
-			text = new St.Label({ style_class: 'brightness-label', 					
-								  text: myText + "%"});
-
-			Main.uiGroup.add_actor(osdIcon);
-			Main.uiGroup.add_actor(text);
-		}
-	
-		//text.opacity = 255;
-	
-		let monitor = Main.layoutManager.primaryMonitor;
-		osdIcon.set_position(monitor.x + Math.floor(monitor.width / 2 - osdIcon.width / 2),
-						  monitor.y + Math.floor(monitor.height / 2- osdIcon.width / 2 ));
-		text.set_position(monitor.x + Math.floor(monitor.width / 2 - osdIcon.width / 2),
-						  monitor.y + Math.floor(monitor.height / 2 - osdIcon.width / 2));
-
-		//http://hosted.zeh.com.br/tweener/docs/en-us/				  
-		Tweener.addTween(osdIcon, {opacity:0,
-								delay: 1.5,
-								onComplete: softBrightnessExtension._hideOsd});		
-		Tweener.addTween(text, {opacity:0,
-								delay: 1.5,								
-								onComplete: softBrightnessExtension._hideOsd});
+		let notification_text = myText + "%";           
+		//
+		Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), notification_text);
 	}
+
+	/**
+	 *	function copied from lockkeys@vaina.lt 
+	 */
+	getCustIcon(icon_name) {
+		let icon_path = Me.dir.get_child(icon_name + ".svg").get_path();
+		let theme = Gtk.IconTheme.get_default();
+		if (theme) {
+			let theme_icon = theme.lookup_icon(icon_name, -1, 2);
+			if (theme_icon) {
+				icon_path = theme_icon.get_filename();
+			}
+		}
+		return Gio.FileIcon.new(Gio.File.new_for_path(icon_path));
+	}
+
 };
 
+
 function init() {
-	softBrightnessExtension = new SoftBrightnessExtension();
-
-	button = new St.Bin({style_class:'brightness-icon',
-						reactive: true,
-						can_focus: true,
-						x_fill: true,
-						y_fill: false,
-						track_hover: true});
-	let icon = new St.Icon({icon_name:'display-brightness-symbolic',
-	  			style_class:'brightness-icon',
-			        icon_size: 18});
-
-    button.set_child(icon);
-
-	button.connect('button-press-event', () => 
-		softBrightnessExtension._clickOpacity()
-	);
-	
-	button.connect('scroll-event', (action, event) => 
-		softBrightnessExtension._scrollOpacity(action, event)
-	);
-	button.connect('scroll-event', () => 
-		softBrightnessExtension._showOsd()	
-	);
-	
+	softBrightnessExtension = new PanelButton();
     return softBrightnessExtension;
 }
