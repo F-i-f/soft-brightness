@@ -911,8 +911,10 @@ class PanelButton extends SoftBrightnessExtension{
         		
 		let icon = new St.Icon({
 			icon_name:'display-brightness-symbolic',
-			style_class:'bicon',
-			icon_size: 18
+			style_class:'system-status-icon',
+//			^^^ automatic formating ^^^
+//			vvv manual vvv
+//			icon_size: 18
 		});
 
 		this.button.add_actor(icon);
