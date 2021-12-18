@@ -969,12 +969,14 @@ class PanelButton extends SoftBrightnessExtension{
     }	
 	
 	_showOsd(actor, event) {
-		//It would be great to have Gjs_ui_barlevel/whatever slider instead of text
-		let iValuePercent=(100*this.indicatorValue).toFixed(0);
-		let myText = iValuePercent.toString(10);
-		let notification_text = myText + "%";           
-		//
-		Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), notification_text);
+	    //text
+	    //let iValuePercent=(100*this.indicatorValue).toFixed(0);
+	    //let myText = iValuePercent.toString(10);
+	    //let notification_text = myText + "%";
+	    //Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), notification_text);
+
+	    //slider
+	    Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), "", this.indicatorValue);
 	}
 
 	/**
