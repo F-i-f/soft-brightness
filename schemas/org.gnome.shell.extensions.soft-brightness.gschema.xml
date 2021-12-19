@@ -9,11 +9,24 @@
     <value value="1" nick="when-correcting"/>
     <value value="2" nick="always"/>
   </enum>
+  <enum id="org.gnome.shell.extensions.soft-brightness.backlight-modes">
+    <value value="0" nick="disabled"/>
+    <value value="1" nick="blend"/>
+    <value value="2" nick="chain"/>
+  </enum>
   <schema id="org.gnome.shell.extensions.soft-brightness" path="/org/gnome/shell/extensions/soft-brightness/">
-    <key name="use-backlight" type="b">
-      <default>false</default>
-      <summary>Use backlight control.</summary>
-      <description>Use the regular backlight control.</description>
+    <key name="backlight-mode" enum="org.gnome.shell.extensions.soft-brightness.backlight-modes">
+      <default>"disabled"</default>
+      <summary>Backlight control mode.</summary>
+      <description>If set to disabled, the Brightness slider will only
+      control the Soft Brightness overlays.  If set to blend, Soft
+      Brightness will work together with your computer's back-light.
+      The brightness slider and keyboard brightness hotkeys will
+      control both the back-light and the Soft Brightness overlays at
+      the same time. If set to chain, Soft Brightness will be used
+      for the lowest part of the slider.  Then over a threshold
+      percentage of the slider, back-light control will be used.
+      </description>
     </key>
     <key name="monitors" enum="org.gnome.shell.extensions.soft-brightness.monitors">
       <default>"all"</default>
@@ -40,6 +53,14 @@
       <default>0.1</default>
       <summary>Minimum brightness.</summary>
       <description>Minimum brightness level.</description>
+    </key>
+    <key name="chain-mode-threshold" type="d">
+      <range min="0" max="1"/>
+      <default>0.3</default>
+      <summary>Chain mode threshold.</summary>
+      <description>Sets the brightness value between 0 and 1 at
+      which the switch is made between soft brightness and backlight
+      control in chain mode.</description>
     </key>
     <key name="current-brightness" type="d">
       <range min="0" max="1"/>
