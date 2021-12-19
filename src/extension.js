@@ -19,7 +19,6 @@ const Clutter = imports.gi.Clutter;
 const Indicator = imports.ui.status.brightness.Indicator;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
-const Lang = imports.lang;
 const Main = imports.ui.main;
 const MainLoop = imports.mainloop;
 const Magnifier = imports.ui.magnifier;
@@ -227,12 +226,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// For some reason, starting the mouse cloning at this stage fails when gnome-shell is restarting on x11 and
 	// the mouse listener doesn't receive any events.  Adding a small delay before starting the whole mouse
 	// cloning business helps.
-	this._delayedMouseCloning = MainLoop.timeout_add(500, Lang.bind(this, function() {
+	this._delayedMouseCloning = MainLoop.timeout_add(500, (function() {
 	    this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
 	    this._enableCloningMouse();
 	    this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
 	    this._delayedMouseCloning = null;
-	}));
+	}).bind(this));
 
 	this._brightnessIndicator = new ModifiedBrightnessIndicator();
 	this._brightnessIndicator._setExtension(this);
@@ -495,8 +494,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _enableSettingsMonitoring() {
 	this._logger.log_debug('_enableSettingsMonitoring()');
 
-	let brightnessChange       = Lang.bind(this, function() { this._on_brightness_change(false); });
-	let forcedBrightnessChange = Lang.bind(this, function() { this._on_brightness_change(true); });
+	let brightnessChange       = (function() { this._on_brightness_change(false); }).bind(this);
+	let forcedBrightnessChange = (function() { this._on_brightness_change(true); }).bind(this);
 
 	this._minBrightnessSettingChangedConnection     = this._settings.connect('changed::min-brightness',     brightnessChange);
 	this._currentBrightnessSettingChangedConnection = this._settings.connect('changed::current-brightness', brightnessChange);
@@ -565,7 +564,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_enableMonitor2ing()');
 
 	this._monitorManager = Meta.MonitorManager.get();
-	Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
+	Utils.newDisplayConfig((function(proxy, error) {
 	    if (error) {
 		this._logger.log("newDisplayConfig() callback: Cannot get Display Config: " + error);
 		return;
@@ -573,7 +572,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._logger.log_debug('newDisplayConfig() callback');
 	    this._displayConfigProxy = proxy;
 	    this._on_monitors_change();
-	}));
+	}).bind(this));
 
 	this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
     }
@@ -595,7 +594,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    return;
 	}
 	this._logger.log_debug("_on_monitors_change()");
-	Utils.getMonitorConfig(this._displayConfigProxy, Lang.bind(this, function(result, error) {
+	Utils.getMonitorConfig(this._displayConfigProxy, (function(result, error) {
 	    if (error) {
 		this._logger.log("_on_monitors_change(): cannot get Monitor Config: "+error);
 		return;
@@ -612,7 +611,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._monitorNames = monitorNames;
 	    this._actorGroup.set_size(global.screen_width, global.screen_height);
 	    this._on_brightness_change(true);
-	}));
+	}).bind(this));
     }
 
     // Cursor handling

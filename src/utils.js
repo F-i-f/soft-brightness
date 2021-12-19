@@ -1,5 +1,5 @@
 // Soft-brightness - Control the display's brightness via an alpha channel.
-// Copyright (C) 2019 Philippe Troin (F-i-f on Github)
+// Copyright (C) 2019, 2021 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const ByteArray = imports.byteArray;
-const Lang = imports.lang;
 const Gio = imports.gi.Gio;
 
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -65,7 +64,7 @@ function newDisplayConfig(callback) {
 }
 
 function getMonitorConfig(displayConfigProxy, callback) {
-    displayConfigProxy.GetResourcesRemote(Lang.bind(this, function(result) {
+    displayConfigProxy.GetResourcesRemote((function(result) {
 	if (result.length <= 2) {
 	    callback(null, "Cannot get DisplayConfig: No outputs in GetResources()");
 	} else {
@@ -86,5 +85,5 @@ function getMonitorConfig(displayConfigProxy, callback) {
 	    }
 	    callback(monitors, null);
 	}
-    }));
+    }).bind(this));
 }

@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const Lang = imports.lang;
 const Gio = imports.gi.Gio;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
@@ -115,14 +114,14 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	if (builtin_monitor_name != "") {
 	    this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
 	}
-	this.displayConfigProxy = Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
+	this.displayConfigProxy = Utils.newDisplayConfig((function(proxy, error) {
 	    if (error) {
 		log("Cannot get DisplayConfig: "+error);
 		return;
 	    }
 	    this.displayConfigProxy.connectSignal('MonitorsChanged', this._refreshMonitors.bind(this));
 	    this._refreshMonitors();
-	}));
+	}).bind(this));
 	this._bindBuiltinMonitorControl();
 	this.attach(this.builtin_monitor_label,   1, ypos, 1, 1);
 	this.attach(this.builtin_monitor_control, 2, ypos, 1, 1);
@@ -207,7 +206,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
     }
 
     _refreshMonitors() {
-	Utils.getMonitorConfig(this.displayConfigProxy, Lang.bind(this, function(result, error) {
+	Utils.getMonitorConfig(this.displayConfigProxy, (function(result, error) {
 	    if (error) {
 		log("Cannot get DisplayConfig: "+error);
 		return;
@@ -227,7 +226,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 		this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
 	    }
 	    this._bindBuiltinMonitorControl();
-	}));
+	}).bind(this));
     }
 });
 
