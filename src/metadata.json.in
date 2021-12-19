@@ -4,8 +4,6 @@
   "name": "Soft brightness",
   "settings-schema": "org.gnome.shell.extensions.soft-brightness",
   "shell-version": [
-    "3.28",
-    "3.30",
     "3.32",
     "3.33.90",
     "3.34",

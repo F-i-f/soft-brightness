@@ -20,7 +20,6 @@ const Gtk = imports.gi.Gtk;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
 const Utils = Me.imports.utils;
 
 const Gettext = imports.gettext.domain(Me.metadata['gettext-domain']);
@@ -39,7 +38,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	this.column_spacing = this.row_spacing;
 	this.orientation = Gtk.Orientation.VERTICAL;
 
-	this._settings = Convenience.getSettings();
+	this._settings = ExtensionUtils.getSettings();
 	this._logger = new Logger.Logger('Soft-Brightness/prefs');
 	this._logger.set_debug(this._settings.get_boolean('debug'));
 
@@ -231,7 +230,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 });
 
 function init() {
-    Convenience.initTranslations();
+    ExtensionUtils.initTranslations();
 }
 
 function buildPrefsWidget() {
