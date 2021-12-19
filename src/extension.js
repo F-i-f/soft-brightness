@@ -635,13 +635,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_enableCloningMouse()');
 
 	this._cursorWantedVisible = true;
-	if (Meta.CursorTracker.get_for_display) {
-	    // Shell 3.30+
-	    this._cursorTracker = Meta.CursorTracker.get_for_display(global.display);
-	} else {
-	    // Shell 3.28
-	    this._cursorTracker = Meta.CursorTracker.get_for_screen(global.screen);
-	}
+	this._cursorTracker = Meta.CursorTracker.get_for_display(global.display);
 	this._cursorTrackerSetPointerVisible = Meta.CursorTracker.prototype.set_pointer_visible;
 	this._cursorTrackerSetPointerVisibleBound = this._cursorTrackerSetPointerVisible.bind(this._cursorTracker);
 	Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisibleReplacement.bind(this);
