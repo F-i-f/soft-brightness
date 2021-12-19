@@ -437,13 +437,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _preventUnredirect() {
 	if (! this._unredirectPrevented) {
 	    this._logger.log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
-	    if (Meta.disable_unredirect_for_display) {
-		// Shell 3.30+
-		Meta.disable_unredirect_for_display(global.display);
-	    } else {
-		// Shell 3.28-
-		Meta.disable_unredirect_for_screen(global.screen);
-	    }
+	    Meta.disable_unredirect_for_display(global.display);
 	    this._unredirectPrevented = true;
 	}
     }
@@ -451,13 +445,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _allowUnredirect() {
 	if (this._unredirectPrevented) {
 	    this._logger.log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
-	    if (Meta.enable_unredirect_for_display) {
-		// Shell 3.30+
-		Meta.enable_unredirect_for_display(global.display);
-	    } else {
-		// Shell 3.28-
-		Meta.enable_unredirect_for_screen(global.screen);
-	    }
+	    Meta.enable_unredirect_for_display(global.display);
 	    this._unredirectPrevented = false;
 	}
     }
