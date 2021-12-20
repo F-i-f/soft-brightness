@@ -57,7 +57,7 @@ m4_define({gse_project},
 # Boilerplate
 project('$1',
 	version: '$3',
-	meson_version: '>= 0.44.0',
+	meson_version: '>= 0.50.0',
 	license: 'GPL3' )
 
 gnome = import('gnome')
