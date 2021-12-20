@@ -37,7 +37,7 @@
 # Boilerplate
 project('soft-brightness',
 	version: '28',
-	meson_version: '>= 0.44.0',
+	meson_version: '>= 0.50.0',
 	license: 'GPL3' )
 
 gnome = import('gnome')
