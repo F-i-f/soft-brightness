@@ -320,9 +320,17 @@ Refer to the [projects using meson-gse](#gnome-shell-extensions-using-meson-gse)
 
 ## Requirements
 
+- [Meson](https://mesonbuild.com/) 0.50.0 or later.
 - [GNU M4](https://www.gnu.org/software/m4/m4.html)
 
   M4 is needed to generate `meson.build` from `meson-gse.build`.
+
+## Recent changes
+
+### 2021-12-20
+
+- Fix compatibility issue with meson 0.60.
+- Require meson 0.50.0 or later for builds.
 
 ## Credits
 
