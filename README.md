@@ -237,7 +237,7 @@ directory (you may have to create the directory).
 
 ### Requirements
 
-- [meson](http://mesonbuild.com/) v0.44.0 or later.
+- [meson](http://mesonbuild.com/) v0.50.0 or later.
 
 ### Running the build
 
@@ -258,7 +258,7 @@ directory (you may have to create the directory).
 
 - Gnome Shell 41 compatibility.
 - Update meson-gse to latest:
-  - Bugfix for preferences logging.
+  - Bug fix for preferences logging.
 - Add Dutch translation (courtesy of @Vistaus).
 
 ### Version 27
@@ -491,5 +491,5 @@ First public release.
  -->
 <!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
  -->
-<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs
+<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs Vistaus
  -->
