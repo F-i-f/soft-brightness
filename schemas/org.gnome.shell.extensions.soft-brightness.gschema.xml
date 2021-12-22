@@ -60,6 +60,14 @@
       brightness.
       </description>
     </key>
+    <key name="brightness-button" type="b">
+      <default>false</default>
+      <summary>Enables brightness button in panel</summary>
+      <description>Enable brightness button with ability to scroll and change
+      brightness while focused on it with mouse cursor. Click on it and imediatelly
+      change brightness to Minimum brightness.
+      </description>
+    </key>
     <key name="debug" type="b">
       <default>false</default>
       <summary>Debugging.</summary>

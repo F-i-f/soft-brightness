@@ -171,6 +171,17 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 
 	ypos += 1;
 
+	descr = _(this._settings.settings_schema.get_key('brightness-button').get_description());
+        this.debug_label = new Gtk.Label({label: _("Brightness button in panel"), halign: Gtk.Align.START});
+        this.debug_label.set_tooltip_text(descr);
+        this.debug_control = new Gtk.Switch({halign: Gtk.Align.END});
+        this.debug_control.set_tooltip_text(descr);
+        this.attach(this.debug_label,   1, ypos, 1, 1);
+        this.attach(this.debug_control, 2, ypos, 1, 1);
+	this._settings.bind('brightness-button', this.debug_control, 'active', Gio.SettingsBindFlags.DEFAULT);
+
+        ypos += 1;
+
 	descr = _(this._settings.settings_schema.get_key('debug').get_description());
 	this.debug_label = new Gtk.Label({label: _("Debug:"), halign: Gtk.Align.START});
 	this.debug_label.set_tooltip_text(descr);

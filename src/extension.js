@@ -17,7 +17,6 @@
 const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 const Clutter = imports.gi.Clutter;
 const Indicator = imports.ui.status.brightness.Indicator;
-const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Main = imports.ui.main;
@@ -36,10 +35,13 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 const Logger = Me.imports.logger;
 
-const MessageTray = imports.ui.messageTray;
 const Gtk = imports.gi.Gtk;
+const Gio = imports.gi.Gio;
 const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
+const MessageTray = imports.ui.messageTray;
+
+var softBrightnessExtension = null;
 
 const ModifiedBrightnessIndicator = (function() {
     let cls = class ModifiedBrightnessIndicator extends Indicator {
@@ -99,6 +101,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cloneMouseSetting			 = null;
 	this._cloneMouseSettingChangedConnection = null;
 	this._brightnessIndicator                = null;
+	this._brightnessButtonSettingChangedConnection = null;
 
 	// Set/destroyed by _showOverlays/_hideOverlays
 	this._unredirectPrevented = false;
@@ -137,6 +140,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotServiceScreenshotAsync       = null;
 	this._screenshotServiceScreenshotAreaAsync   = null;
 	this._screenshotService_onScreenShotComplete = null;
+
+	//	Set/destroyed by _enableBrightnessButton/_disableBrightnessButton
+	this.button = null;
+	this.osdWidget = null;
+	this.indicatorValue	= 1;
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
@@ -253,6 +261,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	}
 
 	this._enableScreenshotPatch();
+
+	if (this._settings.get_boolean('brightness-button'))
+		this._enableBrightnessButton();
+	else
+		this._disableBrightnessButton();
+
+	this._brightnessButtonSettingChangedConnection = this._settings.connect('changed::brightness-button', this._on_brightness_button_change.bind(this));
     }
 
     _disable() {
@@ -261,6 +276,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	let standardIndicator = new imports.ui.status.brightness.Indicator();
 	this._swapMenu(this._brightnessIndicator, standardIndicator);
 	this._brightnessIndicator = null;
+
+	if (this._brightnessButtonSettingChangedConnection !== null) {
+		this._settings.disconnect(this._brightnessButtonSettingChangedConnection);
+		this._brightnessButtonSettingChangedConnection = null;
+	}
+	this._disableBrightnessButton();
 
 	this._disableMonitor2ing();
 	this._disableSettingsMonitoring();
@@ -868,116 +889,98 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._on_brightness_change(false);
 	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
     }
-};
 
+	_enableBrightnessButton(){
+	this.button = new PanelMenu.Button(0.0, null, false);
+			
+	let icon = new St.Icon({
+		icon_name:'display-brightness-symbolic',
+		style_class:'system-status-icon',
+	});
 
+	this.button.add_actor(icon);
 
-var softBrightnessExtension = null;
+	this.button.connect('button-press-event', () => 
+	softBrightnessExtension._clickOpacity()
+	);
 
-class PanelButton extends SoftBrightnessExtension{
-	constructor(){
-		super();
-		this.button = null;
-		this.text = null;
-		this.osdWidget =	null;
-		this.indicatorValue	=	1;
-	}
-	
-	/**
-	 * main enable/disable - inherited
-	 */
-	_enable(){
-		this.button = new PanelMenu.Button(0.0, null, false);
-        		
-		let icon = new St.Icon({
-			icon_name:'display-brightness-symbolic',
-			style_class:'system-status-icon',
-//			^^^ automatic formating ^^^
-//			vvv manual vvv
-//			icon_size: 18
-		});
+	this.button.connect('scroll-event', (action, event) => 
+	softBrightnessExtension._scrollOpacity(action, event)
+	);
 
-		this.button.add_actor(icon);
+	this.button.connect('scroll-event', () => 
+	softBrightnessExtension._showOsd()	
+	);
 
-		this.button.connect('button-press-event', () => 
-		softBrightnessExtension._clickOpacity()
-		);
-
-		this.button.connect('scroll-event', (action, event) => 
-		softBrightnessExtension._scrollOpacity(action, event)
-		);
-
-		this.button.connect('scroll-event', () => 
-		softBrightnessExtension._showOsd()	
-		);
-
-		Main.panel.addToStatusArea('soft-brightness', this.button);
-		super._enable();
+	Main.panel.addToStatusArea('soft-brightness', this.button);
 	}
 
-	_disable(){
-		this.button.destroy();
-		super._disable();
+	_disableBrightnessButton(){
+	this.button.destroy();
+	//this.button = null;
+	//this.osdWidget = null;
+	}
+
+	_on_brightness_button_change() {
+	if (this._settings.get_boolean('brightness-button')) {
+		//this._logger.log_debug("some usefull tip");
+		this._enableBrightnessButton();
+	} else {
+		//this._logger.log_debug("some usefull tip");
+		this._disableBrightnessButton();
+	}
 	}
 
 	_clickOpacity(){
-		let curBrightness = this._getBrightnessLevel();
-		let minBrightness = this._settings.get_double('min-brightness');
-		
-		if(curBrightness!=minBrightness)
-			curBrightness=minBrightness;
-		else
-			curBrightness=1;
+	let curBrightness = this._getBrightnessLevel();
+	let minBrightness = this._settings.get_double('min-brightness');
+	
+	if(curBrightness!=minBrightness)
+		curBrightness=minBrightness;
+	else
+		curBrightness=1;
 
-		this._brightnessIndicator.setSliderValue(curBrightness);
+	this._brightnessIndicator.setSliderValue(curBrightness);
     }
 
     _scrollOpacity(action, event){	//dont delete action
-		let curBrightness = this._getBrightnessLevel();
-		let minBrightness = this._settings.get_double('min-brightness');
+	let curBrightness = this._getBrightnessLevel();
+	let minBrightness = this._settings.get_double('min-brightness');
+	
+	//direction 1=scrooldown 0=scrollup
+	let direction = event.get_scroll_direction();
+	
+	if(direction == 0 && curBrightness != 1)//maxBrightness
+		curBrightness+= 0.1;//gapValue
+	else if(direction == 1 && curBrightness != minBrightness)
+		curBrightness-= 0.1;
 		
-		//direction 1=scrooldown 0=scrollup
-		let direction = event.get_scroll_direction();
-		
-		if(direction == 0 && curBrightness != 1)//maxBrightness
-			curBrightness+= 0.1;//gapValue
-		else if(direction == 1 && curBrightness != minBrightness)
-			curBrightness-= 0.1;
-			
-		this._brightnessIndicator.setSliderValue(curBrightness);
-		this.indicatorValue = curBrightness;
+	this._brightnessIndicator.setSliderValue(curBrightness);
+	this.indicatorValue = curBrightness;
     }	
 	
 	_showOsd(actor, event) {
-	    //text
-	    //let iValuePercent=(100*this.indicatorValue).toFixed(0);
-	    //let myText = iValuePercent.toString(10);
-	    //let notification_text = myText + "%";
-	    //Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), notification_text);
-
-	    //slider
-	    Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), "", this.indicatorValue);
+	//slider
+	Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), " ", this.indicatorValue);
 	}
 
 	/**
 	 *	function copied from lockkeys@vaina.lt 
 	 */
 	getCustIcon(icon_name) {
-		let icon_path = Me.dir.get_child(icon_name + ".svg").get_path();
-		let theme = Gtk.IconTheme.get_default();
-		if (theme) {
-			let theme_icon = theme.lookup_icon(icon_name, -1, 2);
-			if (theme_icon) {
-				icon_path = theme_icon.get_filename();
-			}
+	let icon_path = Me.dir.get_child(icon_name + ".svg").get_path();
+	let theme = Gtk.IconTheme.get_default();
+	if (theme) {
+		let theme_icon = theme.lookup_icon(icon_name, -1, 2);
+		if (theme_icon) {
+			icon_path = theme_icon.get_filename();
 		}
-		return Gio.FileIcon.new(Gio.File.new_for_path(icon_path));
 	}
-
+	return Gio.FileIcon.new(Gio.File.new_for_path(icon_path));
+	}
 };
 
-
 function init() {
-	softBrightnessExtension = new PanelButton();
+	softBrightnessExtension = new SoftBrightnessExtension();
     return softBrightnessExtension;
 }
