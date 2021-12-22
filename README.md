@@ -228,7 +228,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v27/soft-brightness@fifi.org.v27.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v28/soft-brightness@fifi.org.v28.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -237,7 +237,7 @@ directory (you may have to create the directory).
 
 ### Requirements
 
-- [meson](http://mesonbuild.com/) v0.44.0 or later.
+- [meson](http://mesonbuild.com/) v0.50.0 or later.
 
 ### Running the build
 
@@ -253,7 +253,15 @@ directory (you may have to create the directory).
 
 ## Changelog
 
-### Versions 27
+### Version 28
+#### December 18, 2021
+
+- Gnome Shell 41 compatibility.
+- Update meson-gse to latest:
+  - Bug fix for preferences logging.
+- Add Dutch translation (courtesy of @Vistaus).
+
+### Version 27
 #### March 25, 2021
 
 - Gnome-shell 40.0 compatibility.
@@ -265,17 +273,17 @@ directory (you may have to create the directory).
   - Support more mozjs version (78, 68, 52) for build-time syntax
 	checks (`ninja test`).
 
-### Versions 26
+### Version 26
 #### November 12, 2020
 
 - Fix mouse cursor offset bug on GS 3.38.
 
-### Versions 25
+### Version 25
 #### October 30, 2020
 
 - Added Persian translation.
 
-### Versions 23, 24
+### Version 23, 24
 #### October 29, 2020
 
 - Added Turkish translation.
@@ -483,5 +491,5 @@ First public release.
  -->
 <!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
  -->
-<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs
+<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs Vistaus
  -->

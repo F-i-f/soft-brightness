@@ -1,5 +1,5 @@
 # meson-gse - Library for gnome-shell extensions
-# Copyright (C) 2019 Philippe Troin (F-i-f on Github)
+# Copyright (C) 2019, 2021 Philippe Troin (F-i-f on Github)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-i18n.gettext(gse_gettext_domain, preset: 'glib', install: false)
-meson.add_install_script(join_paths(meson.source_root(), meson_extra_scripts, 'install-po'),
-			 gse_gettext_domain, gse_target_locale_dir)
+i18n.gettext(gse_gettext_domain, preset: 'glib', install: true, install_dir: gse_target_locale_dir)

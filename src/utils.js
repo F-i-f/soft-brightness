@@ -1,5 +1,5 @@
 // Soft-brightness - Control the display's brightness via an alpha channel.
-// Copyright (C) 2019 Philippe Troin (F-i-f on Github)
+// Copyright (C) 2019, 2021 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,27 +15,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const ByteArray = imports.byteArray;
-const Lang = imports.lang;
 const Gio = imports.gi.Gio;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 let cachedDisplayConfigProxy = null;
-
-// ByteArray.toString() doesn't work as expected in Gnome-Shell 3.28-
-// Test & provide a wrapper
-var ByteArray_toString;
-
-if (ByteArray.toString(ByteArray.fromString('X')) == 'X') {
-    ByteArray_toString = function(x) {
-	return ByteArray.toString(x);
-    }
-} else {
-    ByteArray_toString = function(x) {
-	return String(x);
-    }
-}
 
 function getDisplayConfigProxy() {
     if (cachedDisplayConfigProxy == null) {
@@ -44,7 +29,7 @@ function getDisplayConfigProxy() {
 	try {
 	    let [ok, bytes] = file.load_contents(null);
 	    if (ok) {
-		xml = ByteArray_toString(bytes);
+		xml = ByteArray.toString(bytes);
 	    }
 	} catch(e) {
 	    log('failed to load DisplayConfig interface XML');
@@ -65,7 +50,7 @@ function newDisplayConfig(callback) {
 }
 
 function getMonitorConfig(displayConfigProxy, callback) {
-    displayConfigProxy.GetResourcesRemote(Lang.bind(this, function(result) {
+    displayConfigProxy.GetResourcesRemote((function(result) {
 	if (result.length <= 2) {
 	    callback(null, "Cannot get DisplayConfig: No outputs in GetResources()");
 	} else {
@@ -86,5 +71,5 @@ function getMonitorConfig(displayConfigProxy, callback) {
 	    }
 	    callback(monitors, null);
 	}
-    }));
+    }).bind(this));
 }

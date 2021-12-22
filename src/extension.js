@@ -20,7 +20,6 @@ const Indicator = imports.ui.status.brightness.Indicator;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
-const Lang = imports.lang;
 const Main = imports.ui.main;
 const MainLoop = imports.mainloop;
 const Magnifier = imports.ui.magnifier;
@@ -34,7 +33,6 @@ const System = imports.system;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
-const Convenience = Me.imports.convenience;
 const Utils = Me.imports.utils;
 const Logger = Me.imports.logger;
 
@@ -147,7 +145,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
 	} else {
 	    this._logger = new Logger.Logger('Soft-Brightness');
-	    this._settings = Convenience.getSettings();
+	    this._settings = ExtensionUtils.getSettings();
 	    this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
 	    this._logger.set_debug(this._settings.get_boolean('debug'));
 	    this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
@@ -213,7 +211,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		    this._logger.log('mouse cloning disabled on broken gjs '+System.version);
 		}
 
-		if ( major >= 4 ) {
+		if ( major >= 40 ) {
 		    this._cloneMouseOverride = false;
 		    this._logger.log('mouse cloning disabled on broken gnome-shell 40.0');
 		}
@@ -231,12 +229,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// For some reason, starting the mouse cloning at this stage fails when gnome-shell is restarting on x11 and
 	// the mouse listener doesn't receive any events.  Adding a small delay before starting the whole mouse
 	// cloning business helps.
-	this._delayedMouseCloning = MainLoop.timeout_add(500, Lang.bind(this, function() {
+	this._delayedMouseCloning = MainLoop.timeout_add(500, (function() {
 	    this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
 	    this._enableCloningMouse();
 	    this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
 	    this._delayedMouseCloning = null;
-	}));
+	}).bind(this));
 
 	this._brightnessIndicator = new ModifiedBrightnessIndicator();
 	this._brightnessIndicator._setExtension(this);
@@ -443,13 +441,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _preventUnredirect() {
 	if (! this._unredirectPrevented) {
 	    this._logger.log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
-	    if (Meta.disable_unredirect_for_display) {
-		// Shell 3.30+
-		Meta.disable_unredirect_for_display(global.display);
-	    } else {
-		// Shell 3.28-
-		Meta.disable_unredirect_for_screen(global.screen);
-	    }
+	    Meta.disable_unredirect_for_display(global.display);
 	    this._unredirectPrevented = true;
 	}
     }
@@ -457,13 +449,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _allowUnredirect() {
 	if (this._unredirectPrevented) {
 	    this._logger.log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
-	    if (Meta.enable_unredirect_for_display) {
-		// Shell 3.30+
-		Meta.enable_unredirect_for_display(global.display);
-	    } else {
-		// Shell 3.28-
-		Meta.enable_unredirect_for_screen(global.screen);
-	    }
+	    Meta.enable_unredirect_for_display(global.display);
 	    this._unredirectPrevented = false;
 	}
     }
@@ -499,8 +485,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _enableSettingsMonitoring() {
 	this._logger.log_debug('_enableSettingsMonitoring()');
 
-	let brightnessChange       = Lang.bind(this, function() { this._on_brightness_change(false); });
-	let forcedBrightnessChange = Lang.bind(this, function() { this._on_brightness_change(true); });
+	let brightnessChange       = (function() { this._on_brightness_change(false); }).bind(this);
+	let forcedBrightnessChange = (function() { this._on_brightness_change(true); }).bind(this);
 
 	this._minBrightnessSettingChangedConnection     = this._settings.connect('changed::min-brightness',     brightnessChange);
 	this._currentBrightnessSettingChangedConnection = this._settings.connect('changed::current-brightness', brightnessChange);
@@ -569,7 +555,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_enableMonitor2ing()');
 
 	this._monitorManager = Meta.MonitorManager.get();
-	Utils.newDisplayConfig(Lang.bind(this, function(proxy, error) {
+	Utils.newDisplayConfig((function(proxy, error) {
 	    if (error) {
 		this._logger.log("newDisplayConfig() callback: Cannot get Display Config: " + error);
 		return;
@@ -577,7 +563,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._logger.log_debug('newDisplayConfig() callback');
 	    this._displayConfigProxy = proxy;
 	    this._on_monitors_change();
-	}));
+	}).bind(this));
 
 	this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
     }
@@ -599,7 +585,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    return;
 	}
 	this._logger.log_debug("_on_monitors_change()");
-	Utils.getMonitorConfig(this._displayConfigProxy, Lang.bind(this, function(result, error) {
+	Utils.getMonitorConfig(this._displayConfigProxy, (function(result, error) {
 	    if (error) {
 		this._logger.log("_on_monitors_change(): cannot get Monitor Config: "+error);
 		return;
@@ -616,7 +602,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._monitorNames = monitorNames;
 	    this._actorGroup.set_size(global.screen_width, global.screen_height);
 	    this._on_brightness_change(true);
-	}));
+	}).bind(this));
     }
 
     // Cursor handling
@@ -653,13 +639,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_enableCloningMouse()');
 
 	this._cursorWantedVisible = true;
-	if (Meta.CursorTracker.get_for_display) {
-	    // Shell 3.30+
-	    this._cursorTracker = Meta.CursorTracker.get_for_display(global.display);
-	} else {
-	    // Shell 3.28
-	    this._cursorTracker = Meta.CursorTracker.get_for_screen(global.screen);
-	}
+	this._cursorTracker = Meta.CursorTracker.get_for_display(global.display);
 	this._cursorTrackerSetPointerVisible = Meta.CursorTracker.prototype.set_pointer_visible;
 	this._cursorTrackerSetPointerVisibleBound = this._cursorTrackerSetPointerVisible.bind(this._cursorTracker);
 	Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisibleReplacement.bind(this);
