@@ -28,17 +28,6 @@ Bonus features:
 
 - Disables itself temporarily when a screen shot is taken.
 
-## Known Issues with Gnome-Shell 40.0:
-
-Gnome Shell 40.0 has a bug in the cursor handling that prevents Soft
-Brightness from applying the brightness to the mouse cursor.
-
-On Gnome Shell 40.0, the cursor will always show up at full brightness
-until the issue is addressed (and the extension is updated).
-
-- [Gnome Gitlab issue
-#3980](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3980).
-
 ## Configuration
 
 Soft Brightness comes with a configuration panel, which can be
@@ -228,7 +217,7 @@ site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 Or download the zip file from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and unzip
 [the
-file](https://github.com/F-i-f/soft-brightness/releases/download/v28/soft-brightness@fifi.org.v28.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v29/soft-brightness@fifi.org.v29.shell-extension.zip)
 in the
 `~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
 directory (you may have to create the directory).
@@ -252,6 +241,25 @@ directory (you may have to create the directory).
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 29
+#### December 22, 2021
+
+- Fixed long standing issue with _Mouse cursor brightness control_ not
+  working on Gnome 40 and later.
+- Declare compatibility with version 40 and 41 of Gnome Shell instead
+  of using minor versions (40.0 and 41.1).  This should clear reports
+  of the extension being incompatible with well-supported versions.
+- Drop compatibility with Gnome Shell 3.28 and 3.30 (which do not have
+  getSettings/initTranslations in ExtensionUtils).
+- Update meson-gse:
+  - Fix build issues with meson 0.60.0.
+  - Bump minimum meson version to 0.50.0.
+- Clean up code:
+  - Remove Lang imports.
+  - Use ExtensionUtils for getSettings/initTranslations instead of
+	using meson-gse's convenience.js.
+  - Drop old Gnome Shell 3.28 compatibility code.
 
 ### Version 28
 #### December 18, 2021
@@ -491,5 +499,7 @@ First public release.
  -->
 <!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
  -->
-<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs Vistaus
+<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs Vistaus gse's
+ -->
+<!--  LocalWords:  getSettings initTranslations ExtensionUtils
  -->
