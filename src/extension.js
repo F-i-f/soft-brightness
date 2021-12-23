@@ -101,8 +101,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cloneMouseSetting			 = null;
 	this._cloneMouseSettingChangedConnection = null;
 	this._brightnessIndicator                = null;
-  this._delaySetPointerInvisible           = null; // Used by mouse cloning but set by _enable/_disable.
-  this._brightnessButtonSettingChangedConnection = null; 
+  	this._delaySetPointerInvisible           = null; // Used by mouse cloning but set by _enable/_disable.
+  	this._panelBrightnessButtonSettingChangedConnection = null; 
 
 	// Set/destroyed by _showOverlays/_hideOverlays
 	this._unredirectPrevented = false;
@@ -143,9 +143,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotService_onScreenShotComplete = null;
 
 	//	Set/destroyed by _enableBrightnessButton/_disableBrightnessButton
-	this.button = null;
-	this.osdWidget = null;
-	this.indicatorValue	= 1;
+	this._panelBrightnessButton = null;
+	this._panelBrightnessButton_osdWidget = null;
+	this._panelBrightnessButton_indicatorValue	= 1;
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
@@ -269,11 +269,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._enableScreenshotPatch();
 
 	if (this._settings.get_boolean('brightness-button'))
-		this._enableBrightnessButton();
+		this._enablePanelBrightnessButton();
 	else
-		this._disableBrightnessButton();
+		this._disablePanelBrightnessButton();
 
-	this._brightnessButtonSettingChangedConnection = this._settings.connect('changed::brightness-button', this._on_brightness_button_change.bind(this));
+	this._panelBrightnessButtonSettingChangedConnection = this._settings.connect('changed::brightness-button', this._on_panel_brightness_button_change.bind(this));
     }
 
     _disable() {
@@ -283,11 +283,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._swapMenu(this._brightnessIndicator, standardIndicator);
 	this._brightnessIndicator = null;
 
-	if (this._brightnessButtonSettingChangedConnection !== null) {
-		this._settings.disconnect(this._brightnessButtonSettingChangedConnection);
-		this._brightnessButtonSettingChangedConnection = null;
+	if (this._panelBrightnessButtonSettingChangedConnection !== null) {
+		this._settings.disconnect(this._panelBrightnessButtonSettingChangedConnection);
+		this._panelBrightnessButtonSettingChangedConnection = null;
 	}
-	this._disableBrightnessButton();
+	this._disablePanelBrightnessButton();
 
 	this._disableMonitor2ing();
 	this._disableSettingsMonitoring();
@@ -896,48 +896,50 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
     }
 
-	_enableBrightnessButton(){
-	this.button = new PanelMenu.Button(0.0, null, false);
+	_enablePanelBrightnessButton(){
+	this._panelBrightnessButton = new PanelMenu.Button(0.0, null, false);
 			
 	let icon = new St.Icon({
 		icon_name:'display-brightness-symbolic',
 		style_class:'system-status-icon',
 	});
 
-	this.button.add_actor(icon);
+	this._panelBrightnessButton.add_actor(icon);
 
-	this.button.connect('button-press-event', () => 
+	this._panelBrightnessButton.connect('button-press-event', () => 
 	softBrightnessExtension._clickOpacity()
 	);
 
-	this.button.connect('scroll-event', (action, event) => 
+	this._panelBrightnessButton.connect('scroll-event', (action, event) => 
 	softBrightnessExtension._scrollOpacity(action, event)
 	);
 
-	this.button.connect('scroll-event', () => 
+	this._panelBrightnessButton.connect('scroll-event', () => 
 	softBrightnessExtension._showOsd()	
 	);
 
-	Main.panel.addToStatusArea('soft-brightness', this.button);
+	Main.panel.addToStatusArea('soft-brightness', this._panelBrightnessButton);
 	}
 
-	_disableBrightnessButton(){
-	this.button.destroy();  
-	//this.button = null;
-	//this.osdWidget = null;
+	_disablePanelBrightnessButton(){
+	if(this._panelBrightnessButton !== null)
+		this._panelBrightnessButton.destroy();
+		
+	this._panelBrightnessButton = null;
+	this._panelBrightnessButton_osdWidget = null;
 	}
 
-	_on_brightness_button_change() {
+	_on_panel_brightness_button_change() {
 	if (this._settings.get_boolean('brightness-button')) {
 		//this._logger.log_debug("some usefull tip");
-		this._enableBrightnessButton();
+		this._enablePanelBrightnessButton();
 	} else {
 		//this._logger.log_debug("some usefull tip");
-		this._disableBrightnessButton();
+		this._disablePanelBrightnessButton();
 	}
 	}
 
-	_clickOpacity(){
+	_panelBrightnessButton_clickOpacity(){
 	let curBrightness = this._getBrightnessLevel();
 	let minBrightness = this._settings.get_double('min-brightness');
 	
@@ -949,7 +951,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._brightnessIndicator.setSliderValue(curBrightness);
     }
 
-    _scrollOpacity(action, event){	//dont delete action
+    _panelBrightnessButton_scrollOpacity(action, event){	//dont delete action
 	let curBrightness = this._getBrightnessLevel();
 	let minBrightness = this._settings.get_double('min-brightness');
 	
@@ -962,16 +964,17 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		curBrightness-= 0.1;
 		
 	this._brightnessIndicator.setSliderValue(curBrightness);
-	this.indicatorValue = curBrightness;
+	this._panelBrightnessButton_indicatorValue = curBrightness;
     }	
 	
-	_showOsd(actor, event) {
+	_panelBrightnessButton_showOsd(actor, event) {
 	//slider
-	Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), " ", this.indicatorValue);
+	Main.osdWindowManager.show(-1, this.getCustIcon('display-brightness-symbolic'), " ", this._panelBrightnessButton_indicatorValue);
 	}
 
 	/**
 	 *	function copied from lockkeys@vaina.lt 
+	 *	this function can be used globally
 	 */
 	getCustIcon(icon_name) {
 	let icon_path = Me.dir.get_child(icon_name + ".svg").get_path();
