@@ -95,6 +95,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cloneMouseSetting			 = null;
 	this._cloneMouseSettingChangedConnection = null;
 	this._brightnessIndicator                = null;
+	this._delaySetPointerInvisible           = null; // Used by mouse cloning but set by _enable/_disable.
 
 	// Set/destroyed by _showOverlays/_hideOverlays
 	this._unredirectPrevented = false;
@@ -177,7 +178,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _enable() {
 	this._logger.log_debug('_enable()');
 
-	this._cloneMouseOverride = true;
+	this._cloneMouseOverride       = true;
+	this._delaySetPointerInvisible = true;
 	let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
 	if (gnomeShellVersion != undefined) {
 	    let matchGroups = /^([0-9]+)\.([0-9]+)(\.([0-9]+)(\..*)?)?$/.exec(gnomeShellVersion);
@@ -208,8 +210,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		}
 
 		if ( major >= 40 ) {
-		    this._cloneMouseOverride = false;
-		    this._logger.log('mouse cloning disabled on broken gnome-shell 40.0');
+		    // GS40+
+		    this._logger.log('no delays for setting pointer invisible');
+		    this._delaySetPointerInvisible = false;
+		} else {
+		    // GS3.38-
+		    this._logger.log('delaying setting pointer invisible');
 		}
 	    }
 	}
@@ -796,7 +802,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// this._logger.log('_delayedSetPointerInvisible()');
 	this._setPointerVisible(false);
 
-	if (this._redrawConnection == null) {
+	if (this._delaySetPointerInvisible && this._redrawConnection == null) {
 	    this._redrawConnection = this._actorGroup.connect('paint', () => {
 		// this._logger.log('_delayedSetPointerInvisible::paint()');
 		this._clearRedrawConnection();
