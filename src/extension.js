@@ -907,15 +907,15 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._panelBrightnessButton.add_actor(icon);
 
 	this._panelBrightnessButton.connect('button-press-event', () => 
-	softBrightnessExtension._clickOpacity()
+	softBrightnessExtension._panelBrightnessButton_clickOpacity()
 	);
 
 	this._panelBrightnessButton.connect('scroll-event', (action, event) => 
-	softBrightnessExtension._scrollOpacity(action, event)
+	softBrightnessExtension._panelBrightnessButton_scrollOpacity(action, event)
 	);
 
 	this._panelBrightnessButton.connect('scroll-event', () => 
-	softBrightnessExtension._showOsd()	
+	softBrightnessExtension._panelBrightnessButton_showOsd()	
 	);
 
 	Main.panel.addToStatusArea('soft-brightness', this._panelBrightnessButton);
