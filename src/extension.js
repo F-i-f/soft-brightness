@@ -182,41 +182,46 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._delaySetPointerInvisible = true;
 	let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
 	if (gnomeShellVersion != undefined) {
-	    let matchGroups = /^([0-9]+)\.([0-9]+)(\.([0-9]+)(\..*)?)?$/.exec(gnomeShellVersion);
-	    if (matchGroups != null) {
-		let major = Number(matchGroups[1]);
-		let minor = Number(matchGroups[2]);
-		let patch = (matchGroups[4] == undefined || matchGroups[4] == '') ? 0 : Number(matchGroups[4]);
-		let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
-		let onWayland = xdgSessionType == 'wayland';
-		let isPotentiallyBroken = ( major > 3
-					    || (major == 3 && (   (minor == 33 && patch > 90)
-								  || minor > 33 )));
-		let hasSetKeepFocusWhileHidden = Meta.CursorTracker.prototype.set_keep_focus_while_hidden != undefined;
-		let hasDefaultSeat = Clutter.get_default_backend != undefined && Clutter.get_default_backend().get_default_seat != undefined;
-		this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', XDG_SESSION_TYPE='+xdgSessionType);
-		this._logger.log_debug('_enable(): onWayland='+onWayland
-				       +', isPotentiallyBroken='+isPotentiallyBroken
-				       +', hasSetKeepFocusWhileHidden='+hasSetKeepFocusWhileHidden
-				       +', hasDefaultSeat='+hasDefaultSeat);
-		if ( onWayland && isPotentiallyBroken && !hasSetKeepFocusWhileHidden && !hasDefaultSeat) {
-		    this._cloneMouseOverride = false;
-		    this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
-		}
-
-		if ( System.version >= 16500 && System.version < 16601) {
-		    this._cloneMouseOverride = false;
-		    this._logger.log('mouse cloning disabled on broken gjs '+System.version);
-		}
-
-		if ( major >= 40 ) {
-		    // GS40+
-		    this._logger.log('no delays for setting pointer invisible');
-		    this._delaySetPointerInvisible = false;
+	    let splitVersion = gnomeShellVersion.split('.').map((x) => {
+		x = Number(x);
+		if (Number.isNaN(x)) {
+		    return 0;
 		} else {
-		    // GS3.38-
-		    this._logger.log('delaying setting pointer invisible');
+		    return x;
 		}
+	    });
+	    let major = splitVersion[0];
+	    let minor = splitVersion.length >= 2 ? splitVersion[1] : 0;
+	    let patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
+	    let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
+	    let onWayland = xdgSessionType == 'wayland';
+	    let isPotentiallyBroken = ( major > 3
+					|| (major == 3 && (   (minor == 33 && patch > 90)
+							      || minor > 33 )));
+	    let hasSetKeepFocusWhileHidden = Meta.CursorTracker.prototype.set_keep_focus_while_hidden != undefined;
+	    let hasDefaultSeat = Clutter.get_default_backend != undefined && Clutter.get_default_backend().get_default_seat != undefined;
+	    this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', XDG_SESSION_TYPE='+xdgSessionType);
+	    this._logger.log_debug('_enable(): onWayland='+onWayland
+				   +', isPotentiallyBroken='+isPotentiallyBroken
+				   +', hasSetKeepFocusWhileHidden='+hasSetKeepFocusWhileHidden
+				   +', hasDefaultSeat='+hasDefaultSeat);
+	    if ( onWayland && isPotentiallyBroken && !hasSetKeepFocusWhileHidden && !hasDefaultSeat) {
+		this._cloneMouseOverride = false;
+		this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
+	    }
+
+	    if ( System.version >= 16500 && System.version < 16601) {
+		this._cloneMouseOverride = false;
+		this._logger.log('mouse cloning disabled on broken gjs '+System.version);
+	    }
+
+	    if ( major >= 40 ) {
+		// GS40+
+		this._logger.log('no delays for setting pointer invisible');
+		this._delaySetPointerInvisible = false;
+	    } else {
+		// GS3.38-
+		this._logger.log('delaying setting pointer invisible');
 	    }
 	}
 
