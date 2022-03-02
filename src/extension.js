@@ -717,7 +717,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	    this._actorGroup.add_actor(this._cursorActor);
 	    this._cursorChangedConnection = this._cursorTracker.connect('cursor-changed', this._updateMouseSprite.bind(this));
-	    let interval = 1000 / Clutter.get_default_frame_rate();
+	    let frame_rate = 60;
+	    if ( Clutter.get_default_frame_rate !== undefined ) {
+		// GS 41-
+		frame_rate = Clutter.get_default_frame_rate();
+	    }
+	    let interval = 1000 / frame_rate;
 	    this._logger.log_debug('_startCloningMouse(): watch interval = '+interval+' ms');
 	    this._cursorWatch = this._cursorWatcher.addWatch(interval, this._updateMousePosition.bind(this));
 
