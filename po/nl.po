@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 08:06-0800\n"
-"PO-Revision-Date: 2021-07-12 18:24+0200\n"
+"PO-Revision-Date: 2022-03-02 08:07-0800\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -79,13 +79,10 @@ msgid "Debug:"
 msgstr "Foutopsporing:"
 
 #: src/prefs.js:188
-#, fuzzy
 msgid ""
 "Copyright © 2019-2022 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-"
 "i-f</a> on GitHub)"
-msgstr ""
-"Copyright © 2019-2021 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-"
-"i-f</a> op GitHub)"
+msgstr "Copyright © 2019-2022 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</a> op GitHub)"
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
 msgid "Use backlight control."
