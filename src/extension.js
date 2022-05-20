@@ -166,6 +166,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// Set/destroyed by _startCloningMouse / _stopCloningMouse
 	this._cursorWatch			  = null;
 	this._cursorChangedConnection		  = null;
+	this._cursorVisibilityChangedConnection	  = null;
 	// Set/destroyed by _delayedSetPointerInvisible/_clearRedrawConnection
 	this._redrawConnection                    = null;
 
@@ -760,6 +761,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	    this._actorGroup.add_actor(this._cursorActor);
 	    this._cursorChangedConnection = this._cursorTracker.connect('cursor-changed', this._updateMouseSprite.bind(this));
+	    this._cursorVisibilityChangedConnection = this._cursorTracker.connect('visibility-changed', this._updateMouseSprite.bind(this));
 	    let frame_rate = 60;
 	    if ( Clutter.get_default_frame_rate !== undefined ) {
 		// GS 41-
@@ -809,6 +811,9 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._cursorTracker.disconnect(this._cursorChangedConnection);
 	    this._cursorChangedConnection = null;
 
+	    this._cursorTracker.disconnect(this._cursorVisibilityChangedConnection);
+	    this._cursorVisibilityChangedConnection = null;
+
 	    this._actorGroup.remove_actor(this._cursorActor);
 	}
 
@@ -850,6 +855,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _delayedSetPointerInvisible() {
 	// this._logger.log('_delayedSetPointerInvisible()');
 	this._setPointerVisible(false);
+	MainLoop.idle_add(() => {
+	    this._setPointerVisible(false);
+	    return false;
+	});
 
 	if (this._delaySetPointerInvisible && this._redrawConnection == null) {
 	    this._redrawConnection = this._actorGroup.connect('paint', () => {
