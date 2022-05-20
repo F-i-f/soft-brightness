@@ -78,6 +78,45 @@ const ModifiedBrightnessIndicator = (function() {
     return cls;
 })();
 
+var ScreenshotClass;
+if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
+    // GS 42+
+    ScreenshotClass = GObject.registerClass(
+	// Wrap around the Shell.Screenshot's C extension in GS 42.
+	class Screenshot extends Shell.Screenshot {
+	    _softBrightnessStartScreenshot(funcname) {
+		softBrightnessExtension._logger.log_debug('ScreenshotClass.'+funcname+'(): start screenshot')
+		softBrightnessExtension._screenshotStart();
+	    }
+
+	    _softBrightnessStopScreenshot(res) {
+		softBrightnessExtension._logger.log_debug('ScreenshotClass: stop screenshot')
+		softBrightnessExtension._on_brightness_change(false);
+		return res;
+	    }
+
+	    screenshot(...args) {
+		this._softBrightnessStartScreenshot('screenshot');
+		return super.screenshot.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+
+	    screenshot_area(...args) {
+		this._softBrightnessStartScreenshot('screenshot_area');
+		return super.screenshot_area.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+
+	    screenshot_stage_to_content(...args) {
+		this._softBrightnessStartScreenshot('screenshot_stage_to_content');
+		return super.screenshot_stage_to_content.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+
+	    screenshot_window(...args) {
+		this._softBrightnessStartScreenshot('screenshot_window');
+		return super.screenshot_window.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+	});
+}
+
 const SoftBrightnessExtension = class SoftBrightnessExtension {
     constructor() {
 	// Set/destroyed by enable/disable
@@ -134,6 +173,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotServiceScreenshotAsync       = null;
 	this._screenshotServiceScreenshotAreaAsync   = null;
 	this._screenshotService_onScreenShotComplete = null;
+	this._screenshotClass                        = null;
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
@@ -839,32 +879,53 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     // Monkey-patched ScreenshotService methods
     _enableScreenshotPatch() {
-	this._logger.log_debug('_enableScreenshotPatch()');
-
 	// Monkey patch some screenshot functions to remove the
 	// overlay during area and desktop screenshots (unnecessary for window screenshots).
-	this._screenshotServiceScreenshotAsync       = ScreenshotService.prototype.ScreenshotAsync;
-	this._screenshotServiceScreenshotAreaAsync   = ScreenshotService.prototype.ScreenshotAreaAsync;
-	this._screenshotService_onScreenShotComplete = ScreenshotService.prototype._onScreenshotComplete;
+	if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
+	    // GS 42+
+	    this._logger.log_debug('_enableScreenshotPatch(): GS 42+ method');
+	    this._screenshotClass = Shell.Screenshot;
+	    Shell.Screenshot      = ScreenshotClass;
+	} else {
+	    // GS 41-
+	    this._logger.log_debug('_enableScreenshotPatch(): GS 41- method');
+	    this._screenshotServiceScreenshotAsync       = ScreenshotService.prototype.ScreenshotAsync;
+	    this._screenshotServiceScreenshotAreaAsync   = ScreenshotService.prototype.ScreenshotAreaAsync;
+	    this._screenshotService_onScreenShotComplete = ScreenshotService.prototype._onScreenshotComplete;
 
-	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotAsyncWrapper.bind(this);
-	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotAreaAsyncWrapper.bind(this);
-	ScreenshotService.prototype._onScreenshotComplete = this._onScreenshotCompleteWrapper.bind(this);
+	    ScreenshotService.prototype.ScreenshotAsync       = this._screenshotAsyncWrapper.bind(this);
+	    ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotAreaAsyncWrapper.bind(this);
+	    ScreenshotService.prototype._onScreenshotComplete = this._onScreenshotCompleteWrapper.bind(this);
+	}
     }
 
     _disableScreenshotPatch() {
-	this._logger.log_debug('_disableScreenshotPatch()');
-
 	// Undo monkey patching of screenshot functions
-	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
-	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
-	ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenShotComplete;
+	if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
+	    // GS 42+
+	    this._logger.log_debug('_disableScreenshotPatch(): GS 42+ method');
+	    Shell.Screenshot      = this._screenshotClass
+	    this._screenshotClass = null;
+	} else {
+	    // GS 41-
+	    this._logger.log_debug('_disableScreenshotPatch(): GS 41- method');
+	    ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
+	    ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
+	    ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenShotComplete;
 
-	this._screenshotServiceScreenshotAsync       = null;
-	this._screenshotServiceScreenshotAreaAsync   = null;
-	this._screenshotService_onScreenShotComplete = null;
+	    this._screenshotServiceScreenshotAsync       = null;
+	    this._screenshotServiceScreenshotAreaAsync   = null;
+	    this._screenshotService_onScreenShotComplete = null;
+	}
     }
 
+    _screenshotStart() {
+	this._hideOverlays(false);
+	this._stopCloningMouse();
+	this._setPointerVisible(false);
+    }
+
+    // GS 41- methods
     _screenshotAsyncWrapper(...args) {
 	this._logger.log_debug('_screenshotAsyncWrapper()');
 	this._screenshotStart();
@@ -875,12 +936,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_screenshotAreaAsyncWrapper()');
 	this._screenshotStart();
 	this._screenshotServiceScreenshotAreaAsync.apply(Main.shellDBusService._screenshotService, args);
-    }
-
-    _screenshotStart() {
-	this._hideOverlays(false);
-	this._stopCloningMouse();
-	this._setPointerVisible(false);
     }
 
     _onScreenshotCompleteWrapper(...args) {
