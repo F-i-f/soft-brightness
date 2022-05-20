@@ -19,7 +19,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # meson-gse - Library for gnome-shell extensions
-# Copyright (C) 2019-2021 Philippe Troin (F-i-f on Github)
+# Copyright (C) 2019-2022 Philippe Troin (F-i-f on Github)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ if gse_run_command_obj.returncode() == 0
   gse_schemas += files(gse_schema_main)
 endif
 
+gse_js91 = find_program('js91', required: false)
 gse_js78 = find_program('js78', required: false)
 gse_js68 = find_program('js68', required: false)
 gse_js60 = find_program('js60', required: false)
@@ -134,6 +135,15 @@ if gse_schemas != []
 endif
 
 gse_js_found = 0
+
+if gse_js91.found() and gse_js_found == 0
+  foreach gse_source : gse_sources
+    test('Checking syntax of ' + '@0@'.format(gse_source),
+	 gse_js91,
+	 args: ['-w', '-c', gse_source])
+  endforeach
+  gse_js_found = 1
+endif
 
 if gse_js78.found() and gse_js_found == 0
   foreach gse_source : gse_sources
