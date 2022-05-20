@@ -700,14 +700,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorTrackerSetPointerVisibleBound = this._cursorTrackerSetPointerVisible.bind(this._cursorTracker);
 	Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisibleReplacement.bind(this);
 
-	if (Magnifier.MouseSpriteContent) {
-	    this._logger.log_debug('_enableCloningMouse(): using Gnome Shell 3.32 method');
-	    this._cursorSprite = new Clutter.Actor({ request_mode: Clutter.RequestMode.CONTENT_SIZE });
-	    this._cursorSprite.content = new Magnifier.MouseSpriteContent();
-	} else {
-	    this._logger.log_debug('_enableCloningMouse(): using Gnome Shell 3.30 method');
-	    this._cursorSprite = new Clutter.Texture();
-	}
+	this._cursorSprite = new Clutter.Actor({ request_mode: Clutter.RequestMode.CONTENT_SIZE });
+	this._cursorSprite.content = new Magnifier.MouseSpriteContent();
 
 	this._cursorActor = new Clutter.Actor();
 	this._cursorActor.add_actor(this._cursorSprite);
@@ -830,16 +824,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _updateMouseSprite() {
 	// this._logger.log_debug('_updateMouseSprite()');
-	if (Magnifier.MouseSpriteContent) {
-	    let sprite = this._cursorTracker.get_sprite();
-	    if (sprite) {
-		this._cursorSprite.content.texture = sprite;
-		this._cursorSprite.show();
-	    } else {
-		this._cursorSprite.hide();
-	    }
+	let sprite = this._cursorTracker.get_sprite();
+	if (sprite) {
+	    this._cursorSprite.content.texture = sprite;
+	    this._cursorSprite.show();
 	} else {
-	    Shell.util_cursor_tracker_to_clutter(this._cursorTracker, this._cursorSprite);
+	    this._cursorSprite.hide();
 	}
 
 	let [xHot, yHot] = this._cursorTracker.get_hot();
