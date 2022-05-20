@@ -330,6 +330,7 @@ Refer to the [projects using meson-gse](#gnome-shell-extensions-using-meson-gse)
 ### 2022-05-20
 
 - Support js91 for javascript validation.
+- Fix issue in git-subtree-push.
 
 ### 2021-12-20
 
