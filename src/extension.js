@@ -172,7 +172,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
 	this._screenshotServiceScreenshotAsync       = null;
 	this._screenshotServiceScreenshotAreaAsync   = null;
-	this._screenshotService_onScreenShotComplete = null;
+	this._screenshotService_onScreenshotComplete = null;
 	this._screenshotClass                        = null;
     }
 
@@ -882,7 +882,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._logger.log_debug('_enableScreenshotPatch(): GS 41- method');
 	    this._screenshotServiceScreenshotAsync       = ScreenshotService.prototype.ScreenshotAsync;
 	    this._screenshotServiceScreenshotAreaAsync   = ScreenshotService.prototype.ScreenshotAreaAsync;
-	    this._screenshotService_onScreenShotComplete = ScreenshotService.prototype._onScreenshotComplete;
+	    this._screenshotService_onScreenshotComplete = ScreenshotService.prototype._onScreenshotComplete;
 
 	    ScreenshotService.prototype.ScreenshotAsync       = this._screenshotAsyncWrapper.bind(this);
 	    ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotAreaAsyncWrapper.bind(this);
@@ -902,11 +902,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._logger.log_debug('_disableScreenshotPatch(): GS 41- method');
 	    ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
 	    ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
-	    ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenShotComplete;
+	    ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenshotComplete;
 
 	    this._screenshotServiceScreenshotAsync       = null;
 	    this._screenshotServiceScreenshotAreaAsync   = null;
-	    this._screenshotService_onScreenShotComplete = null;
+	    this._screenshotService_onScreenshotComplete = null;
 	}
     }
 
@@ -932,7 +932,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _onScreenshotCompleteWrapper(...args) {
 	this._logger.log_debug('_onScreenshotCompleteWrapper()');
 	this._on_brightness_change(false);
-	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
+	this._screenshotService_onScreenshotComplete.apply(Main.shellDBusService._screenshotService, args);
     }
 
 };
