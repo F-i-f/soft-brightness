@@ -148,20 +148,20 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._monitorNames              = null;
 
 	// Set/destroyed by _enableCloningMouse/_disableCloningMouse
-	this._cursorWantedVisible                 = null;
-	this._cursorTracker			  = null;
-	this._cursorTrackerSetPointerVisible	  = null;
-	this._cursorTrackerSetPointerVisibleBound = null;
-	this._cursorSprite			  = null;
-	this._cursorActor			  = null;
-	this._cursorWatcher			  = null;
-	this._cursorSeat                          = null;
+	this._cursorWantedVisible			 = null;
+	this._cursorTracker				 = null;
+	this._cursorTrackerSetPointerVisible		 = null;
+	this._cursorTrackerSetPointerVisibleBound	 = null;
+	this._cursorSprite				 = null;
+	this._cursorActor				 = null;
+	this._cursorWatcher				 = null;
+	this._cursorSeat				 = null;
 	// Set/destroyed by _startCloningMouse / _stopCloningMouse
-	this._cursorWatch			  = null;
-	this._cursorChangedConnection		  = null;
-	this._cursorVisibilityChangedConnection	  = null;
+	this._cursorWatch				 = null;
+	this._cursorChangedConnection			 = null;
+	this._cursorVisibilityChangedConnection		 = null;
 	// Set/destroyed by _delayedSetPointerInvisible/_clearDelayedSetPointerInvibleCallbacks
-	this._redrawConnection                    = null;
+	this._delayedSetPointerInvisibleRedrawConnection = null;
 
 	// Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
 	this._screenshotServiceScreenshotAsync       = null;
@@ -853,8 +853,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    return false;
 	});
 
-	if (this._delaySetPointerInvisible && this._redrawConnection == null) {
-	    this._redrawConnection = this._actorGroup.connect('paint', () => {
+	if (this._delaySetPointerInvisible && this._delayedSetPointerInvisibleRedrawConnection == null) {
+	    this._delayedSetPointerInvisibleRedrawConnection = this._actorGroup.connect('paint', () => {
 		// this._logger.log('_delayedSetPointerInvisible::paint()');
 		this._clearDelayedSetPointerInvibleCallbacks();
 		this._setPointerVisible(false);
@@ -863,10 +863,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _clearDelayedSetPointerInvibleCallbacks() {
-	if (this._redrawConnection != null) {
+	if (this._delayedSetPointerInvisibleRedrawConnection != null) {
 	    // this._logger.log_debug('_clearDelayedSetPointerInvibleCallbacks()');
-	    this._actorGroup.disconnect(this._redrawConnection);
-	    this._redrawConnection = null;
+	    this._actorGroup.disconnect(this._delayedSetPointerInvisibleRedrawConnection);
+	    this._delayedSetPointerInvisibleRedrawConnection = null;
 	}
     }
 
