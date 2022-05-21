@@ -215,12 +215,12 @@ Install directly from the [Gnome Shell Extensions
 site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 
 Or download the [zip
-file](https://github.com/F-i-f/soft-brightness/releases/download/v29/soft-brightness@fifi.org.v29.shell-extension.zip)
+file](https://github.com/F-i-f/soft-brightness/releases/download/v30/soft-brightness@fifi.org.v30.shell-extension.zip)
 from the GitHub [releases
 page](https://github.com/F-i-f/soft-brightness/releases) and run:
 
 ``` shell
-gnome-extensions install soft-brightness@fifi.org.v29.shell-extension.zip
+gnome-extensions install soft-brightness@fifi.org.v30.shell-extension.zip
 ```
 
 ## Building from source
@@ -242,6 +242,18 @@ gnome-extensions install soft-brightness@fifi.org.v29.shell-extension.zip
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 30
+#### May 20, 2022
+
+- Support Gnome Shell 42.
+- Drop compatibility with Gnome Shell 3.32. The earliest supported
+  version is now 3.33.90.
+- Fix version detection code to handle non-numeric versions
+  (eg. 42.beta).
+- Fix error at startup ("TypeError: this._overlays is null").
+- Meson-gse update: Support js91, meson 0.61.
+- Cleanups.
 
 ### Version 29
 #### December 22, 2021
