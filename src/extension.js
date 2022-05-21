@@ -56,15 +56,8 @@ const ModifiedBrightnessIndicator = (function() {
 	}
 
 	setSliderValue(value) {
-	    if (this._slider.setValue !== undefined) {
-		// Gnome-Shell 3.32-
-		this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.32-]");
-		this._slider.setValue(value);
-	    } else {
-		// Gnome-Shell 3.33.90+
-		this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
-		this._slider.value = value;
-	    }
+	    this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
+	    this._slider.value = value;
 	}
     };
 
