@@ -171,6 +171,20 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 
 	ypos += 1;
 
+	descr = _(this._settings.settings_schema.get_key('brightness-scroll').get_description());
+	this.brightness_scroll_label = new Gtk.Label({label: _("Brightness Scroller"), halign: Gtk.Align.START});
+	this.brightness_scroll_label.set_tooltip_text(descr);
+	this.brightness_scroll_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
+	this.brightness_scroll_control.set_tooltip_text(descr);
+	this.brightness_scroll_control.append("none-scroll",   _("None"));
+	this.brightness_scroll_control.append("button-scroll", _("Button"));
+	this.brightness_scroll_control.append("panel-scroll",  _("Panel"));
+	this._settings.bind('brightness-scroll', this.brightness_scroll_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
+	this.attach(this.brightness_scroll_label,   1, ypos, 1, 1);
+	this.attach(this.brightness_scroll_control, 2, ypos, 1, 1);
+
+    ypos += 1;
+
 	descr = _(this._settings.settings_schema.get_key('debug').get_description());
 	this.debug_label = new Gtk.Label({label: _("Debug:"), halign: Gtk.Align.START});
 	this.debug_label.set_tooltip_text(descr);

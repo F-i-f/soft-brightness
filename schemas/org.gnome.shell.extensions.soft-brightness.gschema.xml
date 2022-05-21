@@ -9,6 +9,11 @@
     <value value="1" nick="when-correcting"/>
     <value value="2" nick="always"/>
   </enum>
+  <enum id="org.gnome.shell.extensions.soft-brightness.brightness-scroll">
+    <value value="0" nick="none-scroll"/>
+    <value value="1" nick="button-scroll"/>
+    <value value="2" nick="panel-scroll"/>
+  </enum>
   <schema id="org.gnome.shell.extensions.soft-brightness" path="/org/gnome/shell/extensions/soft-brightness/">
     <key name="use-backlight" type="b">
       <default>false</default>
@@ -58,6 +63,16 @@
       that if another Gnome Shell component clones the mouse (like the
       Zoom accessibility feature), the cursor will follow the screen
       brightness.
+      </description>
+    </key>
+    <key name="brightness-scroll" enum="org.gnome.shell.extensions.soft-brightness.brightness-scroll">
+      <default>"none-scroll"</default>
+      <summary>Change brightness by scrolling with mouse wheel</summary>
+      <description>If chosen Button than point with mouse cursor on sun/brightness icon and scroll.
+      
+      If chosen Panel than point with mouse cursor (almost) anywhere on panel and scroll. 
+
+      WARNING! Panel can get in conflict with other extensions that supports scrolling on panel.
       </description>
     </key>
     <key name="debug" type="b">
