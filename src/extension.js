@@ -161,6 +161,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorChangedConnection			 = null;
 	this._cursorVisibilityChangedConnection		 = null;
 	// Set/destroyed by _delayedSetPointerInvisible/_clearDelayedSetPointerInvibleCallbacks
+	this._delayedSetPointerInvisibleIdleSource       = null;
 	this._delayedSetPointerInvisibleRedrawConnection = null;
 
 	// Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
@@ -848,17 +849,25 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _delayedSetPointerInvisible() {
 	// this._logger.log('_delayedSetPointerInvisible()');
 	this._setPointerVisible(false);
-	MainLoop.idle_add(() => {
-	    this._setPointerVisible(false);
-	    return false;
-	});
 
-	if (this._delayedSetPointerInvisibleWithPaintSignal && this._delayedSetPointerInvisibleRedrawConnection == null) {
-	    this._delayedSetPointerInvisibleRedrawConnection = this._actorGroup.connect('paint', () => {
-		// this._logger.log('_delayedSetPointerInvisible::paint()');
-		this._clearDelayedSetPointerInvibleCallbacks();
-		this._setPointerVisible(false);
-	    });
+	if (this._delayedSetPointerInvisibleWithPaintSignal) {
+	    // GS 3.38-: make the pointer invisible after every paint event.
+	    if (this._delayedSetPointerInvisibleRedrawConnection == null) {
+		this._delayedSetPointerInvisibleRedrawConnection = this._actorGroup.connect('paint', () => {
+		    // this._logger.log('_delayedSetPointerInvisible::paint()');
+		    this._clearDelayedSetPointerInvibleCallbacks();
+		    this._setPointerVisible(false);
+		});
+	    }
+	} else {
+	    // GS40: clear the pointer upon entering idle loop
+	    if (this._delayedSetPointerInvisibleIdleSource == null) {
+		this._delayedSetPointerInvisibleIdleSource = MainLoop.idle_add((function() {
+		    this._setPointerVisible(false);
+		    this._delayedSetPointerInvisibleIdleSource = null;
+		    return false;
+		}).bind(this));
+	    }
 	}
     }
 
@@ -867,6 +876,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    // this._logger.log_debug('_clearDelayedSetPointerInvibleCallbacks()');
 	    this._actorGroup.disconnect(this._delayedSetPointerInvisibleRedrawConnection);
 	    this._delayedSetPointerInvisibleRedrawConnection = null;
+	}
+
+	if (this._delayedSetPointerInvisibleIdleSource != null) {
+	    MainLoop.source_remove(this._delayedSetPointerInvisibleIdleSource);
+	    this._delayedSetPointerInvisibleIdleSource = null;
 	}
     }
 
