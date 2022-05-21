@@ -113,39 +113,39 @@ if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
 const SoftBrightnessExtension = class SoftBrightnessExtension {
     constructor() {
 	// Set/destroyed by enable/disable
-	this._enabled			    = false;
-	this._logger			    = null;
-	this._settings			    = null;
-	this._debugSettingChangedConnection = null;
+	this._enabled					 = false;
+	this._logger					 = null;
+	this._settings					 = null;
+	this._debugSettingChangedConnection              = null;
 
 	// Set/destroyed by _enable/_disable
-	this._actorGroup			 = null;
-	this._actorAddedConnection		 = null;
-	this._actorRemovedConnection		 = null;
-	this._delayedMouseCloning                = null;
-	this._cloneMouseOverride		 = null;
-	this._cloneMouseSetting			 = null;
-	this._cloneMouseSettingChangedConnection = null;
-	this._brightnessIndicator                = null;
-	this._delaySetPointerInvisible           = null; // Used by mouse cloning but set by _enable/_disable.
+	this._actorGroup				 = null;
+	this._actorAddedConnection			 = null;
+	this._actorRemovedConnection			 = null;
+	this._delayedMouseCloning			 = null;
+	this._cloneMouseOverride			 = null;
+	this._cloneMouseSetting				 = null;
+	this._cloneMouseSettingChangedConnection	 = null;
+	this._brightnessIndicator			 = null;
+	this._delayedSetPointerInvisibleWithPaintSignal  = null; // Used by mouse cloning but set by _enable/_disable.
 
 	// Set/destroyed by _showOverlays/_hideOverlays
-	this._unredirectPrevented = false;
-	this._overlays            = null;
+	this._unredirectPrevented                        = false;
+	this._overlays                                   = null;
 
 	// Set/destroyed by _enableSettingsMonitoring/_disableSettingsMonitoring
-	this._minBrightnessSettingChangedConnection     = null;
-	this._currentBrightnessSettingChangedConnection = null;
-	this._monitorsSettingChangedConnection          = null;
-	this._builtinMonitorSettingChangedConnection    = null;
-	this._useBacklightSettingChangedConnection      = null;
-	this._preventUnredirectChangedConnection        = null;
+	this._minBrightnessSettingChangedConnection      = null;
+	this._currentBrightnessSettingChangedConnection  = null;
+	this._monitorsSettingChangedConnection           = null;
+	this._builtinMonitorSettingChangedConnection     = null;
+	this._useBacklightSettingChangedConnection       = null;
+	this._preventUnredirectChangedConnection         = null;
 
 	// Set/destroyed by _enableMonitor2ing/_disableMonitor2ing
-	this._monitorManager            = null;
-	this._displayConfigProxy        = null;
-	this._monitorsChangedConnection = null;
-	this._monitorNames              = null;
+	this._monitorManager                             = null;
+	this._displayConfigProxy                         = null;
+	this._monitorsChangedConnection                  = null;
+	this._monitorNames                               = null;
 
 	// Set/destroyed by _enableCloningMouse/_disableCloningMouse
 	this._cursorWantedVisible			 = null;
@@ -164,10 +164,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._delayedSetPointerInvisibleRedrawConnection = null;
 
 	// Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
-	this._screenshotServiceScreenshotAsync       = null;
-	this._screenshotServiceScreenshotAreaAsync   = null;
-	this._screenshotService_onScreenshotComplete = null;
-	this._screenshotClass                        = null;
+	this._screenshotServiceScreenshotAsync           = null;
+	this._screenshotServiceScreenshotAreaAsync       = null;
+	this._screenshotService_onScreenshotComplete     = null;
+	this._screenshotClass                            = null;
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
@@ -213,7 +213,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_enable()');
 
 	this._cloneMouseOverride       = true;
-	this._delaySetPointerInvisible = true;
+	this._delayedSetPointerInvisibleWithPaintSignal = true;
 	let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
 	if (gnomeShellVersion != undefined) {
 	    let splitVersion = gnomeShellVersion.split('.').map((x) => {
@@ -252,7 +252,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    if ( major >= 40 ) {
 		// GS40+
 		this._logger.log('no delays for setting pointer invisible');
-		this._delaySetPointerInvisible = false;
+		this._delayedSetPointerInvisibleWithPaintSignal = false;
 	    } else {
 		// GS3.38-
 		this._logger.log('delaying setting pointer invisible');
@@ -853,7 +853,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    return false;
 	});
 
-	if (this._delaySetPointerInvisible && this._delayedSetPointerInvisibleRedrawConnection == null) {
+	if (this._delayedSetPointerInvisibleWithPaintSignal && this._delayedSetPointerInvisibleRedrawConnection == null) {
 	    this._delayedSetPointerInvisibleRedrawConnection = this._actorGroup.connect('paint', () => {
 		// this._logger.log('_delayedSetPointerInvisible::paint()');
 		this._clearDelayedSetPointerInvibleCallbacks();
