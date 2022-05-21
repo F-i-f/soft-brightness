@@ -327,6 +327,12 @@ Refer to the [projects using meson-gse](#gnome-shell-extensions-using-meson-gse)
 
 ## Recent changes
 
+### 2022-05-20
+
+- Support js91 for javascript validation.
+- Support Meson 0.61 and later.
+- Fix issue in git-subtree-push.
+
 ### 2021-12-20
 
 - Fix compatibility issue with meson 0.60.

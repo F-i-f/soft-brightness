@@ -4,7 +4,6 @@
   "name": "Soft brightness",
   "settings-schema": "org.gnome.shell.extensions.soft-brightness",
   "shell-version": [
-    "3.32",
     "3.33.90",
     "3.34",
     "3.35.1",
@@ -12,7 +11,8 @@
     "3.36",
     "3.38",
     "40",
-    "41"
+    "41",
+    "42"
   ],
   "url": "https://github.com/F-i-f/soft-brightness",
   "uuid": "@uuid@",

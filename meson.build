@@ -3,7 +3,7 @@
 # This file has been generated from meson-gse/meson.build.m4 and meson-gse.build
 
 # Soft-brightness - Control the display's brightness via an alpha channel.
-# Copyright (C) 2019-2021 Philippe Troin (F-i-f on Github)
+# Copyright (C) 2019-2022 Philippe Troin (F-i-f on Github)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # meson-gse - Library for gnome-shell extensions
-# Copyright (C) 2019-2021 Philippe Troin (F-i-f on Github)
+# Copyright (C) 2019-2022 Philippe Troin (F-i-f on Github)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 
 # Boilerplate
 project('soft-brightness',
-	version: '29',
+	version: '30',
 	meson_version: '>= 0.50.0',
 	license: 'GPL3' )
 
@@ -53,22 +53,23 @@ gse_data	    = []
 gse_schemas	    = []
 gse_dbus_interfaces = []
 
-gse_run_command_obj = run_command('test', '-f', 'src/prefs.js')
+gse_run_command_obj = run_command('test', '-f', 'src/prefs.js', check : false)
 if gse_run_command_obj.returncode() == 0
   gse_sources += files('src/prefs.js')
 endif
 
-gse_run_command_obj = run_command('test', '-f', 'src/stylesheet.css')
+gse_run_command_obj = run_command('test', '-f', 'src/stylesheet.css', check : false)
 if gse_run_command_obj.returncode() == 0
   gse_data += files('src/stylesheet.css')
 endif
 
 gse_schema_main = 'schemas/org.gnome.shell.extensions.'+ meson.project_name() + '.gschema.xml'
-gse_run_command_obj = run_command('test', '-f', gse_schema_main)
+gse_run_command_obj = run_command('test', '-f', gse_schema_main, check : false)
 if gse_run_command_obj.returncode() == 0
   gse_schemas += files(gse_schema_main)
 endif
 
+gse_js91 = find_program('js91', required: false)
 gse_js78 = find_program('js78', required: false)
 gse_js68 = find_program('js68', required: false)
 gse_js60 = find_program('js60', required: false)
@@ -84,7 +85,7 @@ gse_dbus_interfaces += [files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xm
 # End of extension-specific settings
 
 # Boilerplate
-gse_run_command_obj = run_command('sh', '-c', 'echo $HOME')
+gse_run_command_obj = run_command('sh', '-c', 'echo $HOME', check : false)
 if gse_run_command_obj.returncode() != 0
   error('HOME not found, exit=@0@'.format(gse_run_command_obj.returncode()))
 endif
@@ -99,7 +100,7 @@ gse_target_dir_dbus_intf = join_paths(gse_target_dir, 'dbus-interfaces')
 meson_extra_scripts      = 'meson-gse/meson-scripts'
 
 gse_metadata_conf = configuration_data()
-git_rev_cmd = run_command('git', 'describe', '--tags', '--long', '--always')
+git_rev_cmd = run_command('git', 'describe', '--tags', '--long', '--always', check : false)
 if git_rev_cmd.returncode() != 0
   warning('git rev-parse exit=@0@'.format(git_rev_cmd.returncode()))
   gse_metadata_conf.set('VCS_TAG', 'unknown')
@@ -134,6 +135,15 @@ if gse_schemas != []
 endif
 
 gse_js_found = 0
+
+if gse_js91.found() and gse_js_found == 0
+  foreach gse_source : gse_sources
+    test('Checking syntax of ' + '@0@'.format(gse_source),
+	 gse_js91,
+	 args: ['-w', '-c', gse_source])
+  endforeach
+  gse_js_found = 1
+endif
 
 if gse_js78.found() and gse_js_found == 0
   foreach gse_source : gse_sources
@@ -183,7 +193,7 @@ custom_target('gse-extension.zip',
 	      command: [files(join_paths(meson_extra_scripts, 'make-extension')), gse_target_dir, '@OUTDIR@', '@OUTPUT@'],
 	      output:  'extension.zip')
 
-gse_run_command_obj = run_command('test', '-d', 'po')
+gse_run_command_obj = run_command('test', '-d', 'po', check : false)
 if gse_run_command_obj.returncode() == 0
   subdir('po')
 endif

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: soft-brightness\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 13:26-0700\n"
-"PO-Revision-Date: 2021-03-25 13:28-0700\n"
+"POT-Creation-Date: 2022-03-02 08:06-0800\n"
+"PO-Revision-Date: 2022-03-02 08:07-0800\n"
 "Last-Translator: Muha Aliss <muhaaliss@pm.me>\n"
 "Language-Team: Turkish\n"
 "Language: tr\n"
@@ -19,71 +19,71 @@ msgstr ""
 "X-Generator: Poedit 2.4.1\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: src/prefs.js:53
+#: src/prefs.js:51
 msgid "Soft Brightness"
 msgstr "Soft Brightness"
 
-#: src/prefs.js:63
+#: src/prefs.js:61
 msgid "Version"
 msgstr "Sürüm"
 
-#: src/prefs.js:85
+#: src/prefs.js:83
 msgid "Use backlight control:"
 msgstr "Arka ışık kontrolünü kullan:"
 
-#: src/prefs.js:96
+#: src/prefs.js:94
 msgid "Monitor(s):"
 msgstr "Monitör(ler):"
 
-#: src/prefs.js:100
+#: src/prefs.js:98
 msgid "All"
 msgstr "Tümü"
 
-#: src/prefs.js:101
+#: src/prefs.js:99
 msgid "Built-in"
 msgstr "Yerleşik"
 
-#: src/prefs.js:102
+#: src/prefs.js:100
 msgid "External"
 msgstr "Harici"
 
-#: src/prefs.js:110
+#: src/prefs.js:108
 msgid "Built-in monitor:"
 msgstr "Yerleşik monitör:"
 
-#: src/prefs.js:133
+#: src/prefs.js:131
 msgid "Full-screen behavior:"
 msgstr "Tam ekran davranışı:"
 
-#: src/prefs.js:137
+#: src/prefs.js:135
 msgid "Do not enforce brightness in full-screen"
 msgstr "Tam ekranda parlaklığı zorunlu kılma"
 
-#: src/prefs.js:138
+#: src/prefs.js:136
 msgid "Brightness enforced in full-screen"
 msgstr "Tam ekranda uygulanan parlaklık"
 
-#: src/prefs.js:139
+#: src/prefs.js:137
 msgid "Brightness enforced in full-screen, always tear-free"
 msgstr "Tam ekranda uygulanan parlaklık, her zaman yırtılmaz"
 
-#: src/prefs.js:147
+#: src/prefs.js:145
 msgid "Minimum brightness (0..1):"
 msgstr "Minimum parlaklık (0..1):"
 
-#: src/prefs.js:166
+#: src/prefs.js:164
 msgid "Mouse cursor brightness control:"
 msgstr "Fare imleci parlaklık kontrolü:"
 
-#: src/prefs.js:177
+#: src/prefs.js:175
 msgid "Debug:"
 msgstr "Hata ayıklama:"
 
-#: src/prefs.js:190
+#: src/prefs.js:188
 msgid ""
-"Copyright © 2019-2021 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-"
+"Copyright © 2019-2022 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-"
 "i-f</a> on GitHub)"
-msgstr "Telif hakkı © 2019-2021 Philippe Troin (GitHub'da <a href=\"https://github.com/F-i-f\">F-i-f</a>)"
+msgstr "Telif hakkı © 2019-2022 Philippe Troin (GitHub'da <a href=\"https://github.com/F-i-f\">F-i-f</a>)"
 
 #: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
 msgid "Use backlight control."

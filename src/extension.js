@@ -1,5 +1,5 @@
 // Soft-brightness - Control the display's brightness via an alpha channel.
-// Copyright (C) 2019-2021 Philippe Troin (F-i-f on Github)
+// Copyright (C) 2019-2022 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -64,15 +64,8 @@ const ModifiedBrightnessIndicator = (function() {
 	}
 
 	setSliderValue(value) {
-	    if (this._slider.setValue !== undefined) {
-		// Gnome-Shell 3.32-
-		this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.32-]");
-		this._slider.setValue(value);
-	    } else {
-		// Gnome-Shell 3.33.90+
-		this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
-		this._slider.value = value;
-	    }
+	    this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
+	    this._slider.value = value;
 	}
     };
 
@@ -189,29 +182,68 @@ const BrightnessScroll = GObject.registerClass({
 	}
 })
 
+var ScreenshotClass;
+if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
+    // GS 42+
+    ScreenshotClass = GObject.registerClass(
+	// Wrap around the Shell.Screenshot's C extension in GS 42.
+	class Screenshot extends Shell.Screenshot {
+	    _softBrightnessStartScreenshot(funcname) {
+		softBrightnessExtension._logger.log_debug('ScreenshotClass.'+funcname+'(): start screenshot')
+		softBrightnessExtension._screenshotStart();
+	    }
+
+	    _softBrightnessStopScreenshot(res) {
+		softBrightnessExtension._logger.log_debug('ScreenshotClass: stop screenshot')
+		softBrightnessExtension._on_brightness_change(false);
+		return res;
+	    }
+
+	    screenshot(...args) {
+		this._softBrightnessStartScreenshot('screenshot');
+		return super.screenshot.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+
+	    screenshot_area(...args) {
+		this._softBrightnessStartScreenshot('screenshot_area');
+		return super.screenshot_area.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+
+	    screenshot_stage_to_content(...args) {
+		this._softBrightnessStartScreenshot('screenshot_stage_to_content');
+		return super.screenshot_stage_to_content.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+
+	    screenshot_window(...args) {
+		this._softBrightnessStartScreenshot('screenshot_window');
+		return super.screenshot_window.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+	});
+}
+
 const SoftBrightnessExtension = class SoftBrightnessExtension {
     constructor() {
 	// Set/destroyed by enable/disable
-	this._enabled			    = false;
-	this._logger			    = null;
-	this._settings			    = null;
-	this._debugSettingChangedConnection = null;
+	this._enabled					 = false;
+	this._logger					 = null;
+	this._settings					 = null;
+	this._debugSettingChangedConnection              = null;
 
 	// Set/destroyed by _enable/_disable
-	this._actorGroup			 = null;
-	this._actorAddedConnection		 = null;
-	this._actorRemovedConnection		 = null;
-	this._delayedMouseCloning                = null;
-	this._cloneMouseOverride		 = null;
-	this._cloneMouseSetting			 = null;
-	this._cloneMouseSettingChangedConnection = null;
-	this._brightnessIndicator                = null;
-  	this._delaySetPointerInvisible           = null; // Used by mouse cloning but set by _enable/_disable.
+	this._actorGroup				 = null;
+	this._actorAddedConnection			 = null;
+	this._actorRemovedConnection			 = null;
+	this._delayedMouseCloning			 = null;
+	this._cloneMouseOverride			 = null;
+	this._cloneMouseSetting				 = null;
+	this._cloneMouseSettingChangedConnection	 = null;
+	this._brightnessIndicator			 = null;
+	this._delayedSetPointerInvisibleWithPaintSignal  = null; // Used by mouse cloning but set by _enable/_disable.
 	this._brightnessScroll = null;
 
 	// Set/destroyed by _showOverlays/_hideOverlays
-	this._unredirectPrevented = false;
-	this._overlays            = null;
+	this._unredirectPrevented                        = false;
+	this._overlays                                   = null;
 
 	// Set/destroyed by _enableSettingsMonitoring/_disableSettingsMonitoring
 	this._minBrightnessSettingChangedConnection     = null;
@@ -223,31 +255,33 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._brightnessScrollSettingChangedConnection	= null; 
 
 	// Set/destroyed by _enableMonitor2ing/_disableMonitor2ing
-	this._monitorManager            = null;
-	this._displayConfigProxy        = null;
-	this._monitorsChangedConnection = null;
-	this._monitorNames              = null;
+	this._monitorManager                             = null;
+	this._displayConfigProxy                         = null;
+	this._monitorsChangedConnection                  = null;
+	this._monitorNames                               = null;
 
 	// Set/destroyed by _enableCloningMouse/_disableCloningMouse
-	this._cursorWantedVisible                 = null;
-	this._cursorTracker			  = null;
-	this._cursorTrackerSetPointerVisible	  = null;
-	this._cursorTrackerSetPointerVisibleBound = null;
-	this._cursorSprite			  = null;
-	this._cursorActor			  = null;
-	this._cursorWatcher			  = null;
-	this._cursorSeat                          = null;
+	this._cursorWantedVisible			 = null;
+	this._cursorTracker				 = null;
+	this._cursorTrackerSetPointerVisible		 = null;
+	this._cursorTrackerSetPointerVisibleBound	 = null;
+	this._cursorSprite				 = null;
+	this._cursorActor				 = null;
+	this._cursorWatcher				 = null;
+	this._cursorSeat				 = null;
 	// Set/destroyed by _startCloningMouse / _stopCloningMouse
-	this._cursorWatch			  = null;
-	this._cursorChangedConnection		  = null;
-	// Set/destroyed by _delayedSetPointerInvisible/_clearRedrawConnection
-	this._redrawConnection                    = null;
+	this._cursorWatch				 = null;
+	this._cursorChangedConnection			 = null;
+	this._cursorVisibilityChangedConnection		 = null;
+	// Set/destroyed by _delayedSetPointerInvisible/_clearDelayedSetPointerInvibleCallbacks
+	this._delayedSetPointerInvisibleIdleSource       = null;
+	this._delayedSetPointerInvisibleRedrawConnection = null;
 
 	// Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
-	this._screenshotServiceScreenshotAsync       = null;
-	this._screenshotServiceScreenshotAreaAsync   = null;
-	this._screenshotService_onScreenShotComplete = null;
-	
+	this._screenshotServiceScreenshotAsync           = null;
+	this._screenshotServiceScreenshotAreaAsync       = null;
+	this._screenshotService_onScreenshotComplete     = null;
+	this._screenshotClass                            = null;
     }
 
 	getBrightnessIndicator() {
@@ -323,44 +357,49 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._logger.log_debug('_enable()');
 
 	this._cloneMouseOverride       = true;
-	this._delaySetPointerInvisible = true;
+	this._delayedSetPointerInvisibleWithPaintSignal = true;
 	let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
 	if (gnomeShellVersion != undefined) {
-	    let matchGroups = /^([0-9]+)\.([0-9]+)(\.([0-9]+)(\..*)?)?$/.exec(gnomeShellVersion);
-	    if (matchGroups != null) {
-		let major = Number(matchGroups[1]);
-		let minor = Number(matchGroups[2]);
-		let patch = (matchGroups[4] == undefined || matchGroups[4] == '') ? 0 : Number(matchGroups[4]);
-		let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
-		let onWayland = xdgSessionType == 'wayland';
-		let isPotentiallyBroken = ( major > 3
-					    || (major == 3 && (   (minor == 33 && patch > 90)
-								  || minor > 33 )));
-		let hasSetKeepFocusWhileHidden = Meta.CursorTracker.prototype.set_keep_focus_while_hidden != undefined;
-		let hasDefaultSeat = Clutter.get_default_backend != undefined && Clutter.get_default_backend().get_default_seat != undefined;
-		this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', XDG_SESSION_TYPE='+xdgSessionType);
-		this._logger.log_debug('_enable(): onWayland='+onWayland
-				       +', isPotentiallyBroken='+isPotentiallyBroken
-				       +', hasSetKeepFocusWhileHidden='+hasSetKeepFocusWhileHidden
-				       +', hasDefaultSeat='+hasDefaultSeat);
-		if ( onWayland && isPotentiallyBroken && !hasSetKeepFocusWhileHidden && !hasDefaultSeat) {
-		    this._cloneMouseOverride = false;
-		    this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
-		}
-
-		if ( System.version >= 16500 && System.version < 16601) {
-		    this._cloneMouseOverride = false;
-		    this._logger.log('mouse cloning disabled on broken gjs '+System.version);
-		}
-
-		if ( major >= 40 ) {
-		    // GS40+
-		    this._logger.log('no delays for setting pointer invisible');
-		    this._delaySetPointerInvisible = false;
+	    let splitVersion = gnomeShellVersion.split('.').map((x) => {
+		x = Number(x);
+		if (Number.isNaN(x)) {
+		    return 0;
 		} else {
-		    // GS3.38-
-		    this._logger.log('delaying setting pointer invisible');
+		    return x;
 		}
+	    });
+	    let major = splitVersion[0];
+	    let minor = splitVersion.length >= 2 ? splitVersion[1] : 0;
+	    let patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
+	    let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
+	    let onWayland = xdgSessionType == 'wayland';
+	    let isPotentiallyBroken = ( major > 3
+					|| (major == 3 && (   (minor == 33 && patch > 90)
+							      || minor > 33 )));
+	    let hasSetKeepFocusWhileHidden = Meta.CursorTracker.prototype.set_keep_focus_while_hidden != undefined;
+	    let hasDefaultSeat = Clutter.get_default_backend != undefined && Clutter.get_default_backend().get_default_seat != undefined;
+	    this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', XDG_SESSION_TYPE='+xdgSessionType);
+	    this._logger.log_debug('_enable(): onWayland='+onWayland
+				   +', isPotentiallyBroken='+isPotentiallyBroken
+				   +', hasSetKeepFocusWhileHidden='+hasSetKeepFocusWhileHidden
+				   +', hasDefaultSeat='+hasDefaultSeat);
+	    if ( onWayland && isPotentiallyBroken && !hasSetKeepFocusWhileHidden && !hasDefaultSeat) {
+		this._cloneMouseOverride = false;
+		this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
+	    }
+
+	    if ( System.version >= 16500 && System.version < 16601) {
+		this._cloneMouseOverride = false;
+		this._logger.log('mouse cloning disabled on broken gjs '+System.version);
+	    }
+
+	    if ( major >= 40 ) {
+		// GS40+
+		this._logger.log('no delays for setting pointer invisible');
+		this._delayedSetPointerInvisibleWithPaintSignal = false;
+	    } else {
+		// GS3.38-
+		this._logger.log('delaying setting pointer invisible');
 	    }
 	}
 
@@ -475,7 +514,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
     _restackOverlays() {
-	if (this._actorGroup.raise_top != undefined) {
+	if (this._actorGroup.raise_top !== undefined) {
 	    this._logger.log_debug('_restackOverlays() (GS 3.34- method)');
 	    this._actorGroup.raise_top();
 	    if (this._overlays != null) {
@@ -483,12 +522,20 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		    this._overlays[i].raise_top();
 		}
 	    }
-	} else {
-	    this._logger.log_debug('_restackOverlays() (GS 3.35+ method)');
+	} else if (this._actorGroup.raise_child !== undefined) {
+	    this._logger.log_debug('_restackOverlays() (GS 3.35-41 method)');
 	    this._actorGroup.get_parent().raise_child(this._actorGroup, null);
 	    if (this._overlays != null) {
 		for (let i=0; i < this._overlays.length; ++i) {
 		    this._actorGroup.raise_child(this._overlays[i], null);
+		}
+	    }
+	} else {
+	    this._logger.log_debug('_restackOverlays() (GS 42+ method)');
+	    this._actorGroup.get_parent().set_child_above_sibling(this._actorGroup, null);
+	    if (this._overlays != null) {
+		for (let i=0; i < this._overlays.length; ++i) {
+		    this._actorGroup.set_child_above_sibling(this._overlays[i], null);
 		}
 	    }
 	}
@@ -695,7 +742,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 		this._startCloningMouse(); // Must be called before _showOverlays so that the overlay is on top.
 	    }
 	    this._showOverlays(curBrightness, force);
-	    if (this._overlays.length == 0) {
+	    // _showOverlays may not populate _overlays during initializations if we're waiting from the monitor list callback
+	    if (this._overlays === null || this._overlays.length == 0) {
 		this._stopCloningShowMouse();
 	    }
 	}
@@ -804,14 +852,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._cursorTrackerSetPointerVisibleBound = this._cursorTrackerSetPointerVisible.bind(this._cursorTracker);
 	Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisibleReplacement.bind(this);
 
-	if (Magnifier.MouseSpriteContent) {
-	    this._logger.log_debug('_enableCloningMouse(): using Gnome Shell 3.32 method');
-	    this._cursorSprite = new Clutter.Actor({ request_mode: Clutter.RequestMode.CONTENT_SIZE });
-	    this._cursorSprite.content = new Magnifier.MouseSpriteContent();
-	} else {
-	    this._logger.log_debug('_enableCloningMouse(): using Gnome Shell 3.30 method');
-	    this._cursorSprite = new Clutter.Texture();
-	}
+	this._cursorSprite = new Clutter.Actor({ request_mode: Clutter.RequestMode.CONTENT_SIZE });
+	this._cursorSprite.content = new Magnifier.MouseSpriteContent();
 
 	this._cursorActor = new Clutter.Actor();
 	this._cursorActor.add_actor(this._cursorSprite);
@@ -870,7 +912,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
 	    this._actorGroup.add_actor(this._cursorActor);
 	    this._cursorChangedConnection = this._cursorTracker.connect('cursor-changed', this._updateMouseSprite.bind(this));
-	    let interval = 1000 / Clutter.get_default_frame_rate();
+	    this._cursorVisibilityChangedConnection = this._cursorTracker.connect('visibility-changed', this._updateMouseSprite.bind(this));
+	    let frame_rate = 60;
+	    if ( Clutter.get_default_frame_rate !== undefined ) {
+		// GS 41-
+		frame_rate = Clutter.get_default_frame_rate();
+	    }
+	    let interval = 1000 / frame_rate;
 	    this._logger.log_debug('_startCloningMouse(): watch interval = '+interval+' ms');
 	    this._cursorWatch = this._cursorWatcher.addWatch(interval, this._updateMousePosition.bind(this));
 
@@ -914,10 +962,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._cursorTracker.disconnect(this._cursorChangedConnection);
 	    this._cursorChangedConnection = null;
 
+	    this._cursorTracker.disconnect(this._cursorVisibilityChangedConnection);
+	    this._cursorVisibilityChangedConnection = null;
+
 	    this._actorGroup.remove_actor(this._cursorActor);
 	}
 
-	this._clearRedrawConnection();
+	this._clearDelayedSetPointerInvibleCallbacks();
     }
 
     _updateMousePosition(actor, event) {
@@ -929,16 +980,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _updateMouseSprite() {
 	// this._logger.log_debug('_updateMouseSprite()');
-	if (Magnifier.MouseSpriteContent) {
-	    let sprite = this._cursorTracker.get_sprite();
-	    if (sprite) {
-		this._cursorSprite.content.texture = sprite;
-		this._cursorSprite.show();
-	    } else {
-		this._cursorSprite.hide();
-	    }
+	let sprite = this._cursorTracker.get_sprite();
+	if (sprite) {
+	    this._cursorSprite.content.texture = sprite;
+	    this._cursorSprite.show();
 	} else {
-	    Shell.util_cursor_tracker_to_clutter(this._cursorTracker, this._cursorSprite);
+	    this._cursorSprite.hide();
 	}
 
 	let [xHot, yHot] = this._cursorTracker.get_hot();
@@ -960,51 +1007,89 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	// this._logger.log('_delayedSetPointerInvisible()');
 	this._setPointerVisible(false);
 
-	if (this._delaySetPointerInvisible && this._redrawConnection == null) {
-	    this._redrawConnection = this._actorGroup.connect('paint', () => {
-		// this._logger.log('_delayedSetPointerInvisible::paint()');
-		this._clearRedrawConnection();
-		this._setPointerVisible(false);
-	    });
+	if (this._delayedSetPointerInvisibleWithPaintSignal) {
+	    // GS 3.38-: make the pointer invisible after every paint event.
+	    if (this._delayedSetPointerInvisibleRedrawConnection == null) {
+		this._delayedSetPointerInvisibleRedrawConnection = this._actorGroup.connect('paint', () => {
+		    // this._logger.log('_delayedSetPointerInvisible::paint()');
+		    this._clearDelayedSetPointerInvibleCallbacks();
+		    this._setPointerVisible(false);
+		});
+	    }
+	} else {
+	    // GS40: clear the pointer upon entering idle loop
+	    if (this._delayedSetPointerInvisibleIdleSource == null) {
+		this._delayedSetPointerInvisibleIdleSource = MainLoop.idle_add((function() {
+		    this._setPointerVisible(false);
+		    this._delayedSetPointerInvisibleIdleSource = null;
+		    return false;
+		}).bind(this));
+	    }
 	}
     }
 
-    _clearRedrawConnection() {
-	if (this._redrawConnection != null) {
-	    // this._logger.log_debug('_clearRedrawConnection()');
-	    this._actorGroup.disconnect(this._redrawConnection);
-	    this._redrawConnection = null;
+    _clearDelayedSetPointerInvibleCallbacks() {
+	if (this._delayedSetPointerInvisibleRedrawConnection != null) {
+	    // this._logger.log_debug('_clearDelayedSetPointerInvibleCallbacks()');
+	    this._actorGroup.disconnect(this._delayedSetPointerInvisibleRedrawConnection);
+	    this._delayedSetPointerInvisibleRedrawConnection = null;
+	}
+
+	if (this._delayedSetPointerInvisibleIdleSource != null) {
+	    MainLoop.source_remove(this._delayedSetPointerInvisibleIdleSource);
+	    this._delayedSetPointerInvisibleIdleSource = null;
 	}
     }
 
     // Monkey-patched ScreenshotService methods
     _enableScreenshotPatch() {
-	this._logger.log_debug('_enableScreenshotPatch()');
-
 	// Monkey patch some screenshot functions to remove the
 	// overlay during area and desktop screenshots (unnecessary for window screenshots).
-	this._screenshotServiceScreenshotAsync       = ScreenshotService.prototype.ScreenshotAsync;
-	this._screenshotServiceScreenshotAreaAsync   = ScreenshotService.prototype.ScreenshotAreaAsync;
-	this._screenshotService_onScreenShotComplete = ScreenshotService.prototype._onScreenshotComplete;
+	if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
+	    // GS 42+
+	    this._logger.log_debug('_enableScreenshotPatch(): GS 42+ method');
+	    this._screenshotClass = Shell.Screenshot;
+	    Shell.Screenshot      = ScreenshotClass;
+	} else {
+	    // GS 41-
+	    this._logger.log_debug('_enableScreenshotPatch(): GS 41- method');
+	    this._screenshotServiceScreenshotAsync       = ScreenshotService.prototype.ScreenshotAsync;
+	    this._screenshotServiceScreenshotAreaAsync   = ScreenshotService.prototype.ScreenshotAreaAsync;
+	    this._screenshotService_onScreenshotComplete = ScreenshotService.prototype._onScreenshotComplete;
 
-	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotAsyncWrapper.bind(this);
-	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotAreaAsyncWrapper.bind(this);
-	ScreenshotService.prototype._onScreenshotComplete = this._onScreenshotCompleteWrapper.bind(this);
+	    ScreenshotService.prototype.ScreenshotAsync       = this._screenshotAsyncWrapper.bind(this);
+	    ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotAreaAsyncWrapper.bind(this);
+	    ScreenshotService.prototype._onScreenshotComplete = this._onScreenshotCompleteWrapper.bind(this);
+	}
     }
 
     _disableScreenshotPatch() {
-	this._logger.log_debug('_disableScreenshotPatch()');
-
 	// Undo monkey patching of screenshot functions
-	ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
-	ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
-	ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenShotComplete;
+	if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
+	    // GS 42+
+	    this._logger.log_debug('_disableScreenshotPatch(): GS 42+ method');
+	    Shell.Screenshot      = this._screenshotClass
+	    this._screenshotClass = null;
+	} else {
+	    // GS 41-
+	    this._logger.log_debug('_disableScreenshotPatch(): GS 41- method');
+	    ScreenshotService.prototype.ScreenshotAsync       = this._screenshotServiceScreenshotAsync;
+	    ScreenshotService.prototype.ScreenshotAreaAsync   = this._screenshotServiceScreenshotAreaAsync;
+	    ScreenshotService.prototype._onScreenshotComplete = this._screenshotService_onScreenshotComplete;
 
-	this._screenshotServiceScreenshotAsync       = null;
-	this._screenshotServiceScreenshotAreaAsync   = null;
-	this._screenshotService_onScreenShotComplete = null;
+	    this._screenshotServiceScreenshotAsync       = null;
+	    this._screenshotServiceScreenshotAreaAsync   = null;
+	    this._screenshotService_onScreenshotComplete = null;
+	}
     }
 
+    _screenshotStart() {
+	this._hideOverlays(false);
+	this._stopCloningMouse();
+	this._setPointerVisible(false);
+    }
+
+    // GS 41- methods
     _screenshotAsyncWrapper(...args) {
 	this._logger.log_debug('_screenshotAsyncWrapper()');
 	this._screenshotStart();
@@ -1017,16 +1102,10 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	this._screenshotServiceScreenshotAreaAsync.apply(Main.shellDBusService._screenshotService, args);
     }
 
-    _screenshotStart() {
-	this._hideOverlays(false);
-	this._stopCloningMouse();
-	this._setPointerVisible(false);
-    }
-
     _onScreenshotCompleteWrapper(...args) {
 	this._logger.log_debug('_onScreenshotCompleteWrapper()');
 	this._on_brightness_change(false);
-	this._screenshotService_onScreenShotComplete.apply(Main.shellDBusService._screenshotService, args);
+	this._screenshotService_onScreenshotComplete.apply(Main.shellDBusService._screenshotService, args);
     }
 
 	
