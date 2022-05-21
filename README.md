@@ -214,13 +214,14 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 Install directly from the [Gnome Shell Extensions
 site](https://extensions.gnome.org/extension/1625/soft-brightness/).
 
-Or download the zip file from the GitHub [releases
-page](https://github.com/F-i-f/soft-brightness/releases) and unzip
-[the
+Or download the [zip
 file](https://github.com/F-i-f/soft-brightness/releases/download/v29/soft-brightness@fifi.org.v29.shell-extension.zip)
-in the
-`~/.local/share/gnome-shell/extensions/soft-brightness@fifi.org`
-directory (you may have to create the directory).
+from the GitHub [releases
+page](https://github.com/F-i-f/soft-brightness/releases) and run:
+
+``` shell
+gnome-extensions install soft-brightness@fifi.org.v29.shell-extension.zip
+```
 
 ## Building from source
 
