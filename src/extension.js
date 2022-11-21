@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const AggregateMenu = imports.ui.main.panel.statusArea.aggregateMenu;
 const Clutter = imports.gi.Clutter;
-const Indicator = imports.ui.status.brightness.Indicator;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
+const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 const MainLoop = imports.mainloop;
 const Magnifier = imports.ui.magnifier;
@@ -27,7 +26,9 @@ const PointerWatcher = imports.ui.pointerWatcher;
 const ScreenshotService = imports.ui.screenshot.ScreenshotService;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
+const StatusArea = imports.ui.main.panel.statusArea;
 const System = imports.system;
+const { loadInterfaceXML } = imports.misc.fileUtils;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -35,41 +36,11 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 const Logger = Me.imports.logger;
 
-var softBrightnessExtension = null;
+const BrightnessInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Power.Screen');
+const BrightnessProxy = Gio.DBusProxy.makeProxyWrapper(BrightnessInterface);
 
-const ModifiedBrightnessIndicator = (function() {
-    let cls = class ModifiedBrightnessIndicator extends Indicator {
-	_setExtension(ext) {
-	    this._softBrightnessExtension = ext;
-	}
-
-	_sliderChanged(slider) {
-	    let value = this._slider.value;
-	    this._softBrightnessExtension._logger.log_debug("_sliderChanged(slide, "+value+")");
-	    this._softBrightnessExtension._storeBrightnessLevel(value);
-	}
-
-	_sync() {
-	    this._softBrightnessExtension._logger.log_debug("_sync()");
-	    this._softBrightnessExtension._on_brightness_change(false);
-	    this.setSliderValue(this._softBrightnessExtension._getBrightnessLevel());
-	}
-
-	setSliderValue(value) {
-	    this._softBrightnessExtension._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
-	    this._slider.value = value;
-	}
-    };
-
-    // In GS 3.35.92, Indicator becomes a GObject, and derived classes
-    // must be registered with GObject.  Detect if Indicator is a GObject
-    // by looking at the get_property method.
-    if (Indicator.prototype.get_property) {
-	cls = GObject.registerClass(cls);
-    }
-
-    return cls;
-})();
+const BUS_NAME = 'org.gnome.SettingsDaemon.Power';
+const OBJECT_PATH = '/org/gnome/SettingsDaemon/Power';
 
 var ScreenshotClass;
 if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
@@ -278,21 +249,18 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    this._delayedMouseCloning = null;
 	}).bind(this));
 
-	this._brightnessIndicator = new ModifiedBrightnessIndicator();
-	this._brightnessIndicator._setExtension(this);
-	if (! this._swapMenu(AggregateMenu._brightness, this._brightnessIndicator)) {
-	    this._logger.log_debug('_enable(): couldn\'t swap brightness indicator in aggregate menu');
+	if (StatusArea.hasOwnProperty('aggregateMenu')) {
+	    // GS 42-
+	    this._brightnessIndicator = StatusArea.aggregateMenu._brightness;
+	    this._brightnessSlider = this._brightnessIndicator._slider;
+	} else {
+	    // GS 43+
+	    this._brightnessIndicator = StatusArea.quickSettings._brightness.quickSettingsItems[0];
+	    this._brightnessSlider = this._brightnessIndicator.slider;
 	}
-
+	this._enableBrightnessIndicatorPatch();
 	this._enableMonitor2ing();
 	this._enableSettingsMonitoring();
-
-	// If we use the backlight and the Brightness proxy is null, it's still connecting and we'll get a _sync later.
-	if (! this._settings.get_boolean('use-backlight') || this._brightnessIndicator._proxy.Brightness != null) {
-	    let curBrightness = this._getBrightnessLevel();
-	    this._brightnessIndicator.setSliderValue(curBrightness);
-	    this._brightnessIndicator._sliderChanged(this._brightnessIndicator._slider);
-	}
 
 	this._enableScreenshotPatch();
     }
@@ -300,10 +268,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _disable() {
 	this._logger.log_debug('_disable()');
 
-	let standardIndicator = new imports.ui.status.brightness.Indicator();
-	this._swapMenu(this._brightnessIndicator, standardIndicator);
-	this._brightnessIndicator = null;
-
+	this._disableBrightnessIndicatorPatch();
 	this._disableMonitor2ing();
 	this._disableSettingsMonitoring();
 
@@ -332,28 +297,6 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	global.stage.remove_actor(this._actorGroup);
 	this._actorGroup.destroy();
 	this._actorGroup = null;
-    }
-
-    _swapMenu(oldIndicator, newIndicator) {
-	let menuItems = AggregateMenu.menu._getMenuItems();
-	let menuIndex = null;
-	for (let i = 0; i < menuItems.length; i++) {
-	    if (oldIndicator.menu == menuItems[i]) {
-		menuIndex = i;
-		break;
-	    }
-	}
-	if (menuIndex == null) {
-	    this._logger.log('_swapMenu(): Cannot find brightness indicator');
-	    return false;
-	}
-	this._logger.log_debug('_swapMenu(): Replacing brightness menu item at index '+menuIndex);
-	menuItems.splice(menuIndex, 1);
-	oldIndicator._proxy.run_dispose();
-	oldIndicator.menu.destroy();
-	AggregateMenu.menu.addMenuItem(newIndicator.menu, menuIndex);
-	AggregateMenu._brightness = newIndicator;
-	return true;
     }
 
     _restackOverlays() {
@@ -882,6 +825,85 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    MainLoop.source_remove(this._delayedSetPointerInvisibleIdleSource);
 	    this._delayedSetPointerInvisibleIdleSource = null;
 	}
+    }
+
+    // Monkey-patched brightness indicator methods
+    _enableBrightnessIndicatorPatch() {
+	const indicator = this._brightnessIndicator;
+	const slider = this._brightnessSlider;
+	const ext = this;
+
+	// In GS 42-, despite swapping out the _sync function, the Brightness proxy
+	// still calls the old function. GS42 and GS43 proxy initialization code is
+	// identical. Perhaps there was a bug in how GS42- SpiderMonkey handles the
+	// "this" keyword w.r.t. arrow functions? As a workaround, destroy and
+	// re-create the proxy. The new proxy will always call the correct _sync
+	// function by name, regardless of which is being used. NOTE: We leave this
+	// new Brightness proxy as-is when disabling the extension.
+	indicator._proxy.run_dispose();
+	indicator._proxy = new BrightnessProxy(
+	    Gio.DBus.session, BUS_NAME, OBJECT_PATH, (function (proxy, error) {
+	        if (error)
+	            console.error(error.message);
+	        else
+	            this._proxy.connect('g-properties-changed', () => this._sync());
+	    }).bind(indicator));
+
+	indicator.__orig__sliderChanged = indicator._sliderChanged;
+	indicator._sliderChanged = (function() {
+	    const value = slider.value;
+	    ext._logger.log_debug("_sliderChanged(slide, "+value+")");
+	    ext._storeBrightnessLevel(value);
+	}).bind(indicator);
+	slider.disconnect(indicator._sliderChangedId);
+	indicator._sliderChangedId = slider.connect(
+	  'notify::value', indicator._sliderChanged.bind(indicator));
+
+	indicator.__orig__sync = indicator._sync;
+	indicator._sync = (function() {
+	    ext._logger.log_debug("_sync()");
+	    ext._on_brightness_change(false);
+	    this.setSliderValue(ext._getBrightnessLevel());
+	}).bind(indicator);
+
+	indicator.__orig_setSliderValue = indicator.setSliderValue;
+	indicator.setSliderValue = (function(value) {
+	    ext._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
+	    slider.value = value;
+	}).bind(indicator);
+
+	// If brightness indicator was previously hidden (i.e. backlight adjustment
+	// not available on this device), brightness indicator needs to be manually
+	// set to visible for our own use.
+	// (e.g. if backlight control not available).
+	indicator.visible = true;
+	// If "use-backlight" is false when enabling the extention, slider will
+	// now be used for adjusting gamma instead of backlight. Run _sync() to
+	// update slider to its new value.
+	indicator._sync();
+    }
+
+    _disableBrightnessIndicatorPatch() {
+	const indicator = this._brightnessIndicator;
+	const slider = this._brightnessSlider;
+
+	indicator._sliderChanged = indicator.__orig__sliderChanged;
+	slider.disconnect(indicator._sliderChangedId);
+	indicator._sliderChangedId = slider.connect(
+	  'notify::value', indicator._sliderChanged.bind(indicator));
+	delete indicator.__orig__sliderChanged;
+
+	indicator._sync = indicator.__orig__sync;
+	delete indicator.__orig__sync;
+
+	indicator.setSliderValue = indicator.__orig_setSliderValue;
+	delete indicator.__orig_setSliderValue;
+
+	// If "use-backlight" is false and slider was being used for adjusting gamma,
+	// slider will now revert to its previous use of backlight adjustment. Run
+	// _sync() to update its value, and maybe also hide the slider if backlight
+	// adjustment is unavailable on this machine.
+	indicator._sync();
     }
 
     // Monkey-patched ScreenshotService methods
