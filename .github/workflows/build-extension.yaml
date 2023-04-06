@@ -23,7 +23,7 @@ jobs:
           ninja -C build extension.zip
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build.zip
           path: build/
