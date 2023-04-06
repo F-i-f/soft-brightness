@@ -15,8 +15,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 gse_project({soft-brightness},
-	    {fifi.org},
-	    {30},
+	    {joelkitching.com},
+	    {31},
 {
 gse_sources	    += files('src/utils.js')
 gse_libs	    += [gse_lib_logger]
