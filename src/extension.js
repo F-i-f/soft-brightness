@@ -547,8 +547,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     // Monitor change handling
     _enableMonitor2ing() {
 	this._logger.log_debug('_enableMonitor2ing()');
-
-	this._monitorManager = Meta.MonitorManager.get();
+	if ('get_monitor_manager' in global.backend) {
+	    // GS 44+
+	    this._monitorManager = global.backend.get_monitor_manager();
+	} else {
+	    // GS 43-
+	    this._monitorManager = Meta.MonitorManager.get();
+	}
 	Utils.newDisplayConfig((function(proxy, error) {
 	    if (error) {
 		this._logger.log("newDisplayConfig() callback: Cannot get Display Config: " + error);
