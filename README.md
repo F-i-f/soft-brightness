@@ -243,6 +243,11 @@ gnome-extensions install soft-brightness@joelkitching.com.v31.shell-extension.zi
 
 ## Changelog
 
+### Version 31
+#### April 6, 2023
+
+- Support Gnome Shell 43 and 44.
+
 ### Version 30
 #### May 20, 2022
 
