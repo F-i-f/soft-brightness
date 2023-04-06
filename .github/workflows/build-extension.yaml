@@ -21,3 +21,9 @@ jobs:
         run: |
           meson build
           ninja -C build extension.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build.zip
+          path: build/
