@@ -243,6 +243,17 @@ gnome-extensions install soft-brightness@joelkitching.com.v31.shell-extension.zi
 
 ## Changelog
 
+### Version 32
+#### April 10, 2023
+
+- Fix a bug in checking for `global.backend` before use.
+- These changes were requested as part of review on
+  extensions.gnome.org:
+  - Drop support for unstable GNOME releases 3.33 and 3.35.
+  - Refactor `ScreenshotClass` creation to include access to
+    `softBrightnessExtension` via closure.
+  - Stop storing reference to extension as a global.
+
 ### Version 31
 #### April 6, 2023
 
