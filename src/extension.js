@@ -549,7 +549,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     // Monitor change handling
     _enableMonitor2ing() {
 	this._logger.log_debug('_enableMonitor2ing()');
-	if ('get_monitor_manager' in global.backend) {
+	if ('backend' in global && 'get_monitor_manager' in global.backend) {
 	    // GS 44+
 	    this._monitorManager = global.backend.get_monitor_manager();
 	} else {
