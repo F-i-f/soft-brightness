@@ -141,7 +141,7 @@ capturing the debug logging.
 Soft Brightness Plus's debug messages can be watched with:
 
 ```
-journalctl -f | grep 'gnome-shell.*Soft-Brightness-Plus'
+journalctl -f | grep 'gnome-shell.*soft-brightness-plus'
 ```
 
 ### Effect on power consumption
@@ -186,7 +186,7 @@ displays:
 #### You have a laptop computer without a back-light
 
 For example an OLED panel or non-functional back-light.  Have
-Soft-Brightness-Plus control the brightness for all your monitors:
+Soft Brightness Plus control the brightness for all your monitors:
 
 - Set _Use backlight control_ to _On_.
 

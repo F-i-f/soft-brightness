@@ -1,4 +1,4 @@
-// Soft-brightness-plus - Control the display's brightness via an alpha channel.
+// soft-brightness-plus - Control the display's brightness via an alpha channel.
 // Copyright (C) 2019-2022 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -149,7 +149,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	if (this._enabled) {
 	    this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
 	} else {
-	    this._logger = new Logger.Logger('Soft-Brightness-Plus');
+	    this._logger = new Logger.Logger('soft-brightness-plus');
 	    this._settings = ExtensionUtils.getSettings();
 	    this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
 	    this._logger.set_debug(this._settings.get_boolean('debug'));
