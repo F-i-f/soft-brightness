@@ -213,12 +213,12 @@ Install directly from the [Gnome Shell Extensions
 site](https://extensions.gnome.org/extension/5880/soft-brightness/).
 
 Or download the [zip
-file](https://github.com/jkitching/soft-brightness/releases/download/v31/soft-brightness@joelkitching.com.v31.shell-extension.zip)
+file](https://github.com/jkitching/soft-brightness/releases/download/v32/soft-brightness@joelkitching.com.v32.shell-extension.zip)
 from the GitHub [releases
 page](https://github.com/jkitching/soft-brightness/releases) and run:
 
 ``` shell
-gnome-extensions install soft-brightness@joelkitching.com.v31.shell-extension.zip
+gnome-extensions install soft-brightness@joelkitching.com.v32.shell-extension.zip
 ```
 
 ## Building from source
