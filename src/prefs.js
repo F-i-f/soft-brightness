@@ -1,4 +1,4 @@
-// Soft-brightness - Control the display's brightness via an alpha channel.
+// Soft-brightness-plus - Control the display's brightness via an alpha channel.
 // Copyright (C) 2019-2022 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -39,7 +39,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	this.orientation = Gtk.Orientation.VERTICAL;
 
 	this._settings = ExtensionUtils.getSettings();
-	this._logger = new Logger.Logger('Soft-Brightness/prefs');
+	this._logger = new Logger.Logger('Soft-Brightness-Plus/prefs');
 	this._logger.set_debug(this._settings.get_boolean('debug'));
 
 	let ypos = 1;
@@ -48,7 +48,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 	this.title_label = new Gtk.Label({
 	    use_markup: true,
 	    label: '<span size="large" weight="heavy">'
-		+_('Soft Brightness')+'</span>',
+		+_('Soft Brightness Plus')+'</span>',
 	    hexpand: true,
 	    halign: Gtk.Align.CENTER
 	});

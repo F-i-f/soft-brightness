@@ -15,7 +15,7 @@ git-submodule).
 
 - [SSH Search Provider Reborn](https://github.com/F-i-f/ssh-search-provider/)
 
-- [Soft Brightness](https://github.com/F-i-f/soft-brightness/)
+- [Soft Brightness Plus](https://github.com/jkitching/soft-brightness-plus/)
 
 - [Tweaks in System Menu](https://github.com/F-i-f/tweaks-system-menu/)
 
