@@ -242,6 +242,14 @@ gnome-extensions install soft-brightness@joelkitching.com.v32.shell-extension.zi
 
 ## Changelog
 
+### Version 33
+#### April 28, 2023
+
+- Fix a bug which broke disabling and enabling the extension,
+  due to `ScreenshotClass` getting registered multiple times.
+- Rename project to "Soft Brightness Plus".  Ensure consistent
+  capitalization and formatting of the name.
+
 ### Version 32
 #### April 10, 2023
 
