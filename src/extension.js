@@ -49,34 +49,34 @@ if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
 	// Wrap around the Shell.Screenshot's C extension in GS 42.
 	class Screenshot extends Shell.Screenshot {
 	    _softBrightnessStartScreenshot(funcname) {
-		softBrightnessExtension._logger.log_debug('ScreenshotClass.'+funcname+'(): start screenshot')
-		softBrightnessExtension._screenshotStart();
+		this.constructor.ext._logger.log_debug('ScreenshotClass.'+funcname+'(): start screenshot')
+		this.constructor.ext._screenshotStart();
 	    }
 
 	    _softBrightnessStopScreenshot(res) {
-		softBrightnessExtension._logger.log_debug('ScreenshotClass: stop screenshot')
-		softBrightnessExtension._on_brightness_change(false);
+		this.constructor.ext._logger.log_debug('ScreenshotClass: stop screenshot')
+		this.constructor.ext._on_brightness_change(false);
 		return res;
 	    }
 
 	    screenshot(...args) {
 		this._softBrightnessStartScreenshot('screenshot');
-		return super.screenshot.apply(this, args).then(this._softBrightnessStopScreenshot);
+		return super.screenshot.apply(this, args).then(this._softBrightnessStopScreenshot.bind(this));
 	    }
 
 	    screenshot_area(...args) {
 		this._softBrightnessStartScreenshot('screenshot_area');
-		return super.screenshot_area.apply(this, args).then(this._softBrightnessStopScreenshot);
+		return super.screenshot_area.apply(this, args).then(this._softBrightnessStopScreenshot.bind(this));
 	    }
 
 	    screenshot_stage_to_content(...args) {
 		this._softBrightnessStartScreenshot('screenshot_stage_to_content');
-		return super.screenshot_stage_to_content.apply(this, args).then(this._softBrightnessStopScreenshot);
+		return super.screenshot_stage_to_content.apply(this, args).then(this._softBrightnessStopScreenshot.bind(this));
 	    }
 
 	    screenshot_window(...args) {
 		this._softBrightnessStartScreenshot('screenshot_window');
-		return super.screenshot_window.apply(this, args).then(this._softBrightnessStopScreenshot);
+		return super.screenshot_window.apply(this, args).then(this._softBrightnessStopScreenshot.bind(this));
 	    }
 	});
 }
@@ -919,6 +919,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    // GS 42+
 	    this._logger.log_debug('_enableScreenshotPatch(): GS 42+ method');
 	    this._screenshotClass = Shell.Screenshot;
+	    ScreenshotClass.ext   = this;
 	    Shell.Screenshot      = ScreenshotClass;
 	} else {
 	    // GS 41-
@@ -939,6 +940,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    // GS 42+
 	    this._logger.log_debug('_disableScreenshotPatch(): GS 42+ method');
 	    Shell.Screenshot      = this._screenshotClass
+	    ScreenshotClass.ext   = null;
 	    this._screenshotClass = null;
 	} else {
 	    // GS 41-
