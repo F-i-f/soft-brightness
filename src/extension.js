@@ -983,6 +983,5 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 };
 
 function init() {
-    softBrightnessExtension = new SoftBrightnessExtension();
-    return softBrightnessExtension;
+    return new SoftBrightnessExtension();
 }
