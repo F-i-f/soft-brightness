@@ -61,22 +61,30 @@ if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
 
 	    screenshot(...args) {
 		this._softBrightnessStartScreenshot('screenshot');
-		return super.screenshot.apply(this, args).then(this._softBrightnessStopScreenshot.bind(this));
+		return super.screenshot
+		    .apply(this, args)
+		    .then(this._softBrightnessStopScreenshot.bind(this));
 	    }
 
 	    screenshot_area(...args) {
 		this._softBrightnessStartScreenshot('screenshot_area');
-		return super.screenshot_area.apply(this, args).then(this._softBrightnessStopScreenshot.bind(this));
+		return super.screenshot_area
+		    .apply(this, args)
+		    .then(this._softBrightnessStopScreenshot.bind(this));
 	    }
 
 	    screenshot_stage_to_content(...args) {
 		this._softBrightnessStartScreenshot('screenshot_stage_to_content');
-		return super.screenshot_stage_to_content.apply(this, args).then(this._softBrightnessStopScreenshot.bind(this));
+		return super.screenshot_stage_to_content
+		    .apply(this, args)
+		    .then(this._softBrightnessStopScreenshot.bind(this));
 	    }
 
 	    screenshot_window(...args) {
 		this._softBrightnessStartScreenshot('screenshot_window');
-		return super.screenshot_window.apply(this, args).then(this._softBrightnessStopScreenshot.bind(this));
+		return super.screenshot_window
+		    .apply(this, args)
+		    .then(this._softBrightnessStopScreenshot.bind(this));
 	    }
 	});
 }
