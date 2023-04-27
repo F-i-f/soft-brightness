@@ -42,45 +42,43 @@ const BrightnessProxy = Gio.DBusProxy.makeProxyWrapper(BrightnessInterface);
 const BUS_NAME = 'org.gnome.SettingsDaemon.Power';
 const OBJECT_PATH = '/org/gnome/SettingsDaemon/Power';
 
-var createScreenshotClass;
+var ScreenshotClass;
 if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
     // GS 42+
-    createScreenshotClass = function(ext) {
-	return GObject.registerClass(
-	    // Wrap around the Shell.Screenshot's C extension in GS 42.
-	    class Screenshot extends Shell.Screenshot {
-		_softBrightnessStartScreenshot(funcname) {
-		    ext._logger.log_debug('ScreenshotClass.'+funcname+'(): start screenshot')
-		    ext._screenshotStart();
-		}
+    ScreenshotClass = GObject.registerClass(
+	// Wrap around the Shell.Screenshot's C extension in GS 42.
+	class Screenshot extends Shell.Screenshot {
+	    _softBrightnessStartScreenshot(funcname) {
+		softBrightnessExtension._logger.log_debug('ScreenshotClass.'+funcname+'(): start screenshot')
+		softBrightnessExtension._screenshotStart();
+	    }
 
-		_softBrightnessStopScreenshot(res) {
-		    ext._logger.log_debug('ScreenshotClass: stop screenshot')
-		    ext._on_brightness_change(false);
-		    return res;
-		}
+	    _softBrightnessStopScreenshot(res) {
+		softBrightnessExtension._logger.log_debug('ScreenshotClass: stop screenshot')
+		softBrightnessExtension._on_brightness_change(false);
+		return res;
+	    }
 
-		screenshot(...args) {
-		    this._softBrightnessStartScreenshot('screenshot');
-		    return super.screenshot.apply(this, args).then(this._softBrightnessStopScreenshot);
-		}
+	    screenshot(...args) {
+		this._softBrightnessStartScreenshot('screenshot');
+		return super.screenshot.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
 
-		screenshot_area(...args) {
-		    this._softBrightnessStartScreenshot('screenshot_area');
-		    return super.screenshot_area.apply(this, args).then(this._softBrightnessStopScreenshot);
-		}
+	    screenshot_area(...args) {
+		this._softBrightnessStartScreenshot('screenshot_area');
+		return super.screenshot_area.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
 
-		screenshot_stage_to_content(...args) {
-		    this._softBrightnessStartScreenshot('screenshot_stage_to_content');
-		    return super.screenshot_stage_to_content.apply(this, args).then(this._softBrightnessStopScreenshot);
-		}
+	    screenshot_stage_to_content(...args) {
+		this._softBrightnessStartScreenshot('screenshot_stage_to_content');
+		return super.screenshot_stage_to_content.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
 
-		screenshot_window(...args) {
-		    this._softBrightnessStartScreenshot('screenshot_window');
-		    return super.screenshot_window.apply(this, args).then(this._softBrightnessStopScreenshot);
-		}
-	    });
-	};
+	    screenshot_window(...args) {
+		this._softBrightnessStartScreenshot('screenshot_window');
+		return super.screenshot_window.apply(this, args).then(this._softBrightnessStopScreenshot);
+	    }
+	});
 }
 
 const SoftBrightnessExtension = class SoftBrightnessExtension {
@@ -921,7 +919,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	    // GS 42+
 	    this._logger.log_debug('_enableScreenshotPatch(): GS 42+ method');
 	    this._screenshotClass = Shell.Screenshot;
-	    Shell.Screenshot      = createScreenshotClass(this);
+	    Shell.Screenshot      = ScreenshotClass;
 	} else {
 	    // GS 41-
 	    this._logger.log_debug('_enableScreenshotPatch(): GS 41- method');
