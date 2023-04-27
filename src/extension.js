@@ -939,7 +939,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 	if (Shell.Screenshot.prototype.screenshot_stage_to_content) {
 	    // GS 42+
 	    this._logger.log_debug('_disableScreenshotPatch(): GS 42+ method');
-	    Shell.Screenshot      = this._screenshotClass
+	    Shell.Screenshot      = this._screenshotClass;
 	    ScreenshotClass.ext   = null;
 	    this._screenshotClass = null;
 	} else {
