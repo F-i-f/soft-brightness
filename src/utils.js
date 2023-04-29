@@ -52,20 +52,20 @@ function newDisplayConfig(callback) {
 function getMonitorConfig(displayConfigProxy, callback) {
     displayConfigProxy.GetResourcesRemote((function(result) {
         if (result.length <= 2) {
-            callback(null, "Cannot get DisplayConfig: No outputs in GetResources()");
+            callback(null, 'Cannot get DisplayConfig: No outputs in GetResources()');
         } else {
             let monitors = [];
             for (let i=0; i < result[2].length; ++i) {
                 let output = result[2][i];
                 if (output.length <= 7) {
-                    callback(null, "Cannot get DisplayConfig: No properties on output #"+i);
+                    callback(null, 'Cannot get DisplayConfig: No properties on output #'+i);
                     return;
                 }
                 let props = output[7];
                 let display_name = props['display-name'].get_string()[0];
                 let connector_name = output[4];
-                if (! display_name || display_name == "") {
-                    let display_name = "Monitor on output "+connector_name;
+                if (! display_name || display_name == '') {
+                    let display_name = 'Monitor on output '+connector_name;
                 }
                 monitors.push([display_name, connector_name]);
             }

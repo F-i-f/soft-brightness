@@ -153,7 +153,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
     enable() {
         if (this._enabled) {
-            this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+", skipping as already enabled");
+            this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+', skipping as already enabled');
         } else {
             this._logger = new Logger.Logger('soft-brightness-plus');
             this._settings = ExtensionUtils.getSettings();
@@ -348,16 +348,16 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
             let enabledMonitors = this._settings.get_string('monitors');
             let monitors;
             this._logger.log_debug('_showOverlays(): enabledMonitors="'+enabledMonitors+'"');
-            if (enabledMonitors == "all") {
+            if (enabledMonitors == 'all') {
                 monitors = Main.layoutManager.monitors;
-            } else if (enabledMonitors == "built-in" || enabledMonitors == "external") {
+            } else if (enabledMonitors == 'built-in' || enabledMonitors == 'external') {
                 if (this._monitorNames == null) {
-                    this._logger.log_debug("_showOverlays(): skipping run as _monitorNames hasn't been set yet.");
+                    this._logger.log_debug('_showOverlays(): skipping run as _monitorNames hasn\'t been set yet.');
                     return;
                 }
                 let builtinMonitorName = this._settings.get_string('builtin-monitor');
                 this._logger.log_debug('_showOverlays(): builtinMonitorName="'+builtinMonitorName+'"');
-                if (builtinMonitorName == "" || builtinMonitorName == null) {
+                if (builtinMonitorName == '' || builtinMonitorName == null) {
                     builtinMonitorName = this._monitorNames[Main.layoutManager.primaryIndex];
                     this._logger.log_debug('_showOverlays(): no builtin monitor, setting to "'+builtinMonitorName+'" and skipping run');
                     this._settings.set_string('builtin-monitor', builtinMonitorName);
@@ -365,13 +365,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
                 }
                 monitors = [];
                 for (let i=0; i < Main.layoutManager.monitors.length; ++i) {
-                    if (    (enabledMonitors == "built-in" && this._monitorNames[i] == builtinMonitorName )
-                         || (enabledMonitors == "external" && this._monitorNames[i] != builtinMonitorName ) ) {
+                    if (    (enabledMonitors == 'built-in' && this._monitorNames[i] == builtinMonitorName )
+                         || (enabledMonitors == 'external' && this._monitorNames[i] != builtinMonitorName ) ) {
                         monitors.push(Main.layoutManager.monitors[i]);
                     }
                 }
             } else {
-                this._logger.log("_showOverlays(): Unhandled \"monitors\" setting = "+enabledMonitors);
+                this._logger.log('_showOverlays(): Unhandled "monitors" setting = '+enabledMonitors);
                 return;
             }
             if (force) {
@@ -379,11 +379,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
             }
             let preventUnredirect = this._settings.get_string('prevent-unredirect');
             switch(preventUnredirect) {
-            case "always":
-            case "when-correcting":
+            case 'always':
+            case 'when-correcting':
                 this._preventUnredirect();
                 break;
-            case "never":
+            case 'never':
                 this._allowUnredirect();
                 break;
             default:
@@ -397,7 +397,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
                 this._logger.log_debug('Create overlay #'+i+': '+monitor.width+'x'+monitor.height+'@'+monitor.x+','+monitor.y);
                 let overlay = new St.Label({
                     style: 'border-radius: 0px; background-color: rgba(0,0,0,1);',
-                    text: "",
+                    text: '',
                 });
                 overlay.set_position(monitor.x, monitor.y);
                 overlay.set_width(monitor.width);
@@ -417,7 +417,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _hideOverlays(forceUnpreventUnredirect) {
         if (this._overlays != null) {
-            this._logger.log_debug("_hideOverlays(): drop overlays, count="+this._overlays.length);
+            this._logger.log_debug('_hideOverlays(): drop overlays, count='+this._overlays.length);
             for (let i=0; i < this._overlays.length; ++i) {
                 this._actorGroup.remove_actor(this._overlays[i]);
             }
@@ -429,11 +429,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
             preventUnredirect = 'never';
         }
         switch(preventUnredirect) {
-        case "always":
+        case 'always':
             this._preventUnredirect();
             break;
-        case "when-correcting":
-        case "never":
+        case 'when-correcting':
+        case 'never':
             this._allowUnredirect();
             break;
         default:
@@ -522,7 +522,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         let curBrightness = this._getBrightnessLevel();
         let minBrightness = this._settings.get_double('min-brightness');
 
-        this._logger.log_debug("_on_brightness_change: current-brightness="+curBrightness+", min-brightness="+minBrightness);
+        this._logger.log_debug('_on_brightness_change: current-brightness='+curBrightness+', min-brightness='+minBrightness);
         if (curBrightness < minBrightness) {
             curBrightness = minBrightness;
             if (! this._settings.get_boolean('use-backlight')) {
@@ -567,7 +567,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         }
         Utils.newDisplayConfig((function(proxy, error) {
             if (error) {
-                this._logger.log("newDisplayConfig() callback: Cannot get Display Config: " + error);
+                this._logger.log('newDisplayConfig() callback: Cannot get Display Config: ' + error);
                 return;
             }
             this._logger.log_debug('newDisplayConfig() callback');
@@ -591,13 +591,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _on_monitors_change() {
         if (this._displayConfigProxy == null) {
-            this._logger.log_debug("_on_monitors_change(): skipping run as the proxy hasn't been set up yet.");
+            this._logger.log_debug('_on_monitors_change(): skipping run as the proxy hasn\'t been set up yet.');
             return;
         }
-        this._logger.log_debug("_on_monitors_change()");
+        this._logger.log_debug('_on_monitors_change()');
         Utils.getMonitorConfig(this._displayConfigProxy, (function(result, error) {
             if (error) {
-                this._logger.log("_on_monitors_change(): cannot get Monitor Config: "+error);
+                this._logger.log('_on_monitors_change(): cannot get Monitor Config: '+error);
                 return;
             }
             let monitorNames = [];
@@ -623,22 +623,22 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _on_clone_mouse_change() {
         if (!this._cloneMouseOverride) {
             // If we can't clone the mouse because of shell incompatibility, nothing changes.
-            this._logger.log_debug("_on_clone_mouse_change(): _cloneMouseOverride is false, no change");
+            this._logger.log_debug('_on_clone_mouse_change(): _cloneMouseOverride is false, no change');
             return;
         }
         let cloneMouse = this._settings.get_boolean('clone-mouse');
         if (cloneMouse == this._cloneMouseSetting) {
-            this._logger.log_debug("_on_clone_mouse_change(): no setting change, no change");
+            this._logger.log_debug('_on_clone_mouse_change(): no setting change, no change');
             return;
         }
         if (cloneMouse) {
             // Starting to clone mouse
-            this._logger.log_debug("_on_clone_mouse_change(): starting mouse cloning");
+            this._logger.log_debug('_on_clone_mouse_change(): starting mouse cloning');
             this._cloneMouseSetting = true;
             this._enableCloningMouse();
             this._on_brightness_change(true);
         } else {
-            this._logger.log_debug("_on_clone_mouse_change(): stopping mouse cloning");
+            this._logger.log_debug('_on_clone_mouse_change(): stopping mouse cloning');
             this._disableCloningMouse();
             this._cloneMouseSetting = false;
         }
@@ -868,7 +868,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         indicator.__orig__sliderChanged = indicator._sliderChanged;
         indicator._sliderChanged = (function() {
             const value = slider.value;
-            ext._logger.log_debug("_sliderChanged(slide, "+value+")");
+            ext._logger.log_debug('_sliderChanged(slide, '+value+')');
             ext._storeBrightnessLevel(value);
         }).bind(indicator);
         slider.disconnect(indicator._sliderChangedId);
@@ -877,14 +877,14 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
         indicator.__orig__sync = indicator._sync;
         indicator._sync = (function() {
-            ext._logger.log_debug("_sync()");
+            ext._logger.log_debug('_sync()');
             ext._on_brightness_change(false);
             this.setSliderValue(ext._getBrightnessLevel());
         }).bind(indicator);
 
         indicator.__orig_setSliderValue = indicator.setSliderValue;
         indicator.setSliderValue = (function(value) {
-            ext._logger.log_debug("setSliderValue("+value+") [GS 3.33.90+]");
+            ext._logger.log_debug('setSliderValue('+value+') [GS 3.33.90+]');
             slider.value = value;
         }).bind(indicator);
 
