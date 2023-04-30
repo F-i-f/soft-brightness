@@ -3,6 +3,7 @@
   "gettext-domain": "@gettext_domain@",
   "name": "Soft Brightness Plus",
   "settings-schema": "org.gnome.shell.extensions.soft-brightness-plus",
+  "session-modes":  [ "user", "unlock-dialog" ],
   "shell-version": [
     "3.34",
     "3.36",
