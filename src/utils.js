@@ -73,3 +73,14 @@ function getMonitorConfig(displayConfigProxy, callback) {
         }
     }).bind(this));
 }
+
+// Patches the given function with a preHook.  Returns a callback that,
+// when run, removes the preHook, and restores original functionality.
+function patchFunction(object, fname, preHook) {
+    const saved = object[fname];
+    object[fname] = function(...args) {
+        preHook(fname);
+        return saved.apply(this, args);
+    };
+    return () => object[fname] = saved;
+}
