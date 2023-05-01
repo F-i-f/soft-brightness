@@ -209,11 +209,10 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 ## Download / Install
 
-<!-- Install directly from the [Gnome Shell Extensions
-site](https://extensions.gnome.org/extension/5880/soft-brightness-plus/). -->
+Install directly from the [Gnome Shell Extensions
+site](https://extensions.gnome.org/extension/5943/soft-brightness-plus/).
 
-<!-- Or -->
-Download the [zip
+Or download the [zip
 file](https://github.com/jkitching/soft-brightness/releases/download/v33/soft-brightness@joelkitching.com.v33.shell-extension.zip)
 from the GitHub [releases
 page](https://github.com/jkitching/soft-brightness-plus/releases) and run:
