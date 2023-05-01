@@ -213,12 +213,12 @@ Install directly from the [Gnome Shell Extensions
 site](https://extensions.gnome.org/extension/5943/soft-brightness-plus/).
 
 Or download the [zip
-file](https://github.com/jkitching/soft-brightness/releases/download/v33/soft-brightness@joelkitching.com.v33.shell-extension.zip)
+file](https://github.com/jkitching/soft-brightness/releases/download/v34/soft-brightness-plus@joelkitching.com.v34.shell-extension.zip)
 from the GitHub [releases
 page](https://github.com/jkitching/soft-brightness-plus/releases) and run:
 
 ``` shell
-gnome-extensions install soft-brightness@joelkitching.com.v33.shell-extension.zip
+gnome-extensions install soft-brightness-plus@joelkitching.com.v34.shell-extension.zip
 ```
 
 ## Building from source
@@ -240,6 +240,13 @@ gnome-extensions install soft-brightness@joelkitching.com.v33.shell-extension.zi
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 34
+#### May 1, 2023
+
+- Rewrite and simplify screenshot functionality.  No longer
+  need to handle cases for different GNOME versions.
+- Code formatting: re-tabbing and other minor changes.
 
 ### Version 33
 #### April 28, 2023
