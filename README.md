@@ -12,7 +12,7 @@ with screen captures (as long as they are initiated by Gnome Shell).
 
 Common uses are:
 
-- Your laptop has no back-light, maybe because it's not supported, or
+- Your laptop has no backlight, maybe because it's not supported, or
   you have an OLED display.
 
 - You want to control the brightness level of external monitor like
@@ -39,14 +39,14 @@ page](https://extensions.gnome.org/local/).
 #### _Use backlight control_
 
 When enabled, Soft Brightness Plus will work together with your computer's
-back-light.  The brightness slider and keyboard brightness hotkeys
-will control both the back-light and the Soft Brightness Plus overlays.
+backlight.  The brightness slider and keyboard brightness hotkeys
+will control both the backlight and the Soft Brightness Plus overlays.
 This is most useful:
 
-- if you have a back-light and  _Monitors_ is set to _External_, or
+- if you have a backlight and  _Monitors_ is set to _External_, or
 
-- if a back-light is detected by Gnome but is not working (like some
-  OLED panel laptops which report having a back-light brightness which
+- if a backlight is detected by Gnome but is not working (like some
+  OLED panel laptops which report having a backlight brightness which
   doesn't exist).  In that latter case _Monitors_ should be set to
   _All_.
 
@@ -108,7 +108,7 @@ Choose one of:
 Sets the minimum allowable brightness for the display where _0_ is
 completely dark and _1_ completely bright. Defaults to _0.1_ (10%).
 
-The minimum brightness will also be enforced for the panel back-light
+The minimum brightness will also be enforced for the panel backlight
 if _Use backlight control_ is on.
 
 When the brightness is set to 0%, the display will go completely dark,
@@ -152,8 +152,8 @@ and track the mouse among other things.  This is true of any Gnome
 Shell extension.
 
 If Soft Brightness Plus controls an LCD panel, changing the brightness will
-not change at all the panel's power consumption.  Use the back-light
-instead:  Changing the back-light brightness will affect power
+not change at all the panel's power consumption.  Use the backlight
+instead:  Changing the backlight brightness will affect power
 consumption, the lower the brightness, the lower the power usage.
 
 If Soft Brightness Plus controls an OLED panel, changing the brightness
@@ -171,9 +171,9 @@ attached monitors:
 
 - Set _Monitor(s)_ to _All_.
 
-#### You have a laptop computer with a back-light
+#### You have a laptop computer with a backlight
 
-You can leave the control of your attached display to the back-light
+You can leave the control of your attached display to the backlight
 and use Soft Brightness Plus to control the brightness of external
 displays:
 
@@ -183,9 +183,9 @@ displays:
 
 - Configure _Built-in monitor_ to your built-in panel's name.
 
-#### You have a laptop computer without a back-light
+#### You have a laptop computer without a backlight
 
-For example an OLED panel or non-functional back-light.  Have
+For example an OLED panel or non-functional backlight.  Have
 Soft Brightness Plus control the brightness for all your monitors:
 
 - Set _Use backlight control_ to _On_.
