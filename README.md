@@ -532,16 +532,3 @@ First public release.
 
 - The [`meson-gse` credits](https://github.com/F-i-f/meson-gse/) are
   included here by reference.
-
-<!--  LocalWords:  OLED VSync extensions' Changelog README md GPLv3 X11
- -->
-<!--  LocalWords:  gse gettext DND js ES6 backlight applications' syslog
- -->
-<!--  LocalWords:  unredirect compositing unredirecting composited eg
- -->
-<!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
- -->
-<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs Vistaus gse's
- -->
-<!--  LocalWords:  getSettings initTranslations ExtensionUtils
- -->
