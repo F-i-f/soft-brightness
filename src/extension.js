@@ -150,21 +150,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
             let patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
             let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
             let onWayland = xdgSessionType == 'wayland';
-            let isPotentiallyBroken = ( major > 3
-                                        || (major == 3 && (   (minor == 33 && patch > 90)
-                                                              || minor > 33 )));
-            let hasSetKeepFocusWhileHidden = Meta.CursorTracker.prototype.set_keep_focus_while_hidden != undefined;
             let hasDefaultSeat = Clutter.get_default_backend != undefined && Clutter.get_default_backend().get_default_seat != undefined;
-            this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', XDG_SESSION_TYPE='+xdgSessionType);
+            this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', system_version='+System.version+', XDG_SESSION_TYPE='+xdgSessionType);
             this._logger.log_debug('_enable(): onWayland='+onWayland
-                                   +', isPotentiallyBroken='+isPotentiallyBroken
-                                   +', hasSetKeepFocusWhileHidden='+hasSetKeepFocusWhileHidden
                                    +', hasDefaultSeat='+hasDefaultSeat);
-            if ( onWayland && isPotentiallyBroken && !hasSetKeepFocusWhileHidden && !hasDefaultSeat) {
-                this._cloneMouseOverride = false;
-                this._logger.log('mouse cloning disabled on broken gnome-shell '+gnomeShellVersion+' running on Wayland');
-            }
 
+            // Should be removed when GS 3.38- support is dropped.
             if ( System.version >= 16500 && System.version < 16601) {
                 this._cloneMouseOverride = false;
                 this._logger.log('mouse cloning disabled on broken gjs '+System.version);
