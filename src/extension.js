@@ -119,6 +119,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     // In order to maintain the same brightness settings when the device
     // is locked and unlocked, the extension will remain active while
     // the lock screen is shown.
+    //   * In GS 42+, this is taken care of by including
+    //     "unlock-dialog" in "session-modes".
+    //   * In GS 41-, disable() will be called when switching to the lock
+    //     screen, and enable() will be called when the screen is unlocked.
+    //     Check for the session mode and skip disabling accordingly.
     disable() {
         if (Main.sessionMode.currentMode == 'unlock-dialog') {
             this._logger.log_debug('disable() skipped as session-mode = unlock-dialog');
