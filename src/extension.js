@@ -125,8 +125,15 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     //     screen, and enable() will be called when the screen is unlocked.
     //     Check for the session mode and skip disabling accordingly.
     disable() {
-        if (Main.sessionMode.currentMode == 'unlock-dialog') {
+        // GS 41- has the allowExtensions property.  Skip disabling the
+        // extension when switching to lock screen.
+        if (Main.sessionMode.hasOwnProperty('allowExtensions') &&
+            Main.sessionMode.currentMode == 'unlock-dialog') {
             this._logger.log_debug('disable() skipped as session-mode = unlock-dialog');
+        // Runs on all versions when disabling the extension.  GS 42+ may
+        // call disable() and enable() when switching to the lock screen in
+        // order to "rebase" extensions, even if "unlock-dialog" is set in
+        // "session-modes".
         } else if (this._enabled) {
             this._logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
             this._settings.disconnect(this._debugSettingChangedConnection);
