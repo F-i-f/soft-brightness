@@ -171,11 +171,11 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
             }
 
             if ( major >= 40 ) {
-                // GS40+
+                // GS 40+
                 this._logger.log('no delays for setting pointer invisible');
                 this._delayedSetPointerInvisibleWithPaintSignal = false;
             } else {
-                // GS3.38-
+                // GS 3.38-
                 this._logger.log('delaying setting pointer invisible');
             }
         }
@@ -757,7 +757,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
                 });
             }
         } else {
-            // GS40: clear the pointer upon entering idle loop
+            // GS 40: clear the pointer upon entering idle loop
             if (this._delayedSetPointerInvisibleIdleSource == null) {
                 this._delayedSetPointerInvisibleIdleSource = MainLoop.idle_add((function() {
                     this._setPointerVisible(false);
@@ -788,8 +788,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         const ext = this;
 
         // In GS 42-, despite swapping out the _sync function, the Brightness proxy
-        // still calls the old function. GS42 and GS43 proxy initialization code is
-        // identical. Perhaps there was a bug in how GS42- SpiderMonkey handles the
+        // still calls the old function. GS 42 and GS 43 proxy initialization code is
+        // identical. Perhaps there was a bug in how GS 42- SpiderMonkey handles the
         // "this" keyword w.r.t. arrow functions? As a workaround, destroy and
         // re-create the proxy. The new proxy will always call the correct _sync
         // function by name, regardless of which is being used. NOTE: We leave this
