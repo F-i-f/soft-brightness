@@ -131,7 +131,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _enable() {
         this._logger.log_debug('_enable()');
 
-        this._cloneMouseOverride       = true;
+        this._cloneMouseOverride = true;
         this._delayedSetPointerInvisibleWithPaintSignal = true;
         let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
         if (gnomeShellVersion != undefined) {
@@ -154,12 +154,12 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
                                    +', hasDefaultSeat='+hasDefaultSeat);
 
             // Should be removed when GS 3.38- support is dropped.
-            if ( System.version >= 16500 && System.version < 16601) {
+            if (System.version >= 16500 && System.version < 16601) {
                 this._cloneMouseOverride = false;
                 this._logger.log('mouse cloning disabled on broken gjs '+System.version);
             }
 
-            if ( major >= 40 ) {
+            if (major >= 40) {
                 // GS 40+
                 this._logger.log('no delays for setting pointer invisible');
                 this._delayedSetPointerInvisibleWithPaintSignal = false;
@@ -292,8 +292,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
                 }
                 monitors = [];
                 for (let i=0; i < Main.layoutManager.monitors.length; ++i) {
-                    if (    (enabledMonitors == 'built-in' && this._monitorNames[i] == builtinMonitorName )
-                         || (enabledMonitors == 'external' && this._monitorNames[i] != builtinMonitorName ) ) {
+                    if ((enabledMonitors == 'built-in' && this._monitorNames[i] == builtinMonitorName) ||
+                        (enabledMonitors == 'external' && this._monitorNames[i] != builtinMonitorName)) {
                         monitors.push(Main.layoutManager.monitors[i]);
                     }
                 }
@@ -637,13 +637,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     _startCloningMouse() {
         if (!this._isMouseClonable()) return;
         this._logger.log_debug('_startCloningMouse()');
-        if (this._cursorWatch == null ) {
+        if (this._cursorWatch == null) {
 
             this._actorGroup.add_actor(this._cursorActor);
             this._cursorChangedConnection = this._cursorTracker.connect('cursor-changed', this._updateMouseSprite.bind(this));
             this._cursorVisibilityChangedConnection = this._cursorTracker.connect('visibility-changed', this._updateMouseSprite.bind(this));
             let frame_rate = 60;
-            if ( Clutter.get_default_frame_rate !== undefined ) {
+            if (Clutter.get_default_frame_rate !== undefined) {
                 // GS 41-
                 frame_rate = Clutter.get_default_frame_rate();
             }
@@ -682,7 +682,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     _stopCloningMouse() {
         if (!this._isMouseClonable()) return;
-        if (this._cursorWatch != null ) {
+        if (this._cursorWatch != null) {
             this._logger.log_debug('_stopCloningMouse()');
 
             this._cursorWatch.remove();
