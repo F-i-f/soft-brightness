@@ -16,14 +16,12 @@
 
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
-const GObject = imports.gi.GObject;
 const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 const MainLoop = imports.mainloop;
 const Magnifier = imports.ui.magnifier;
 const Meta = imports.gi.Meta;
 const PointerWatcher = imports.ui.pointerWatcher;
-const ScreenshotService = imports.ui.screenshot.ScreenshotService;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const StatusArea = imports.ui.main.panel.statusArea;
