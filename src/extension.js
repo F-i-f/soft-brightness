@@ -45,7 +45,6 @@ const OBJECT_PATH = '/org/gnome/SettingsDaemon/Power';
 const SoftBrightnessExtension = class SoftBrightnessExtension {
     constructor() {
         // Set/destroyed by enable/disable
-        this._enabled                                    = false;
         this._logger                                     = null;
         this._settings                                   = null;
         this._debugSettingChangedConnection              = null;
@@ -102,50 +101,27 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
     enable() {
-        if (this._enabled) {
-            this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode+', skipping as already enabled');
-        } else {
-            this._logger = new Logger.Logger('soft-brightness-plus');
-            this._settings = ExtensionUtils.getSettings();
-            this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
-            this._logger.set_debug(this._settings.get_boolean('debug'));
-            this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
-            this._enable();
-            this._enabled = true;
-            this._logger.log_debug('Extension enabled');
-        }
+        this._logger = new Logger.Logger('soft-brightness-plus');
+        this._settings = ExtensionUtils.getSettings();
+        this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
+        this._logger.set_debug(this._settings.get_boolean('debug'));
+        this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
+        this._enable();
+        this._logger.log_debug('Extension enabled');
     }
 
-    // In order to maintain the same brightness settings when the device
-    // is locked and unlocked, the extension will remain active while
-    // the lock screen is shown.
-    //   * In GS 42+, this is taken care of by including
-    //     "unlock-dialog" in "session-modes".
-    //   * In GS 41-, disable() will be called when switching to the lock
-    //     screen, and enable() will be called when the screen is unlocked.
-    //     Check for the session mode and skip disabling accordingly.
+    // In order to maintain the same brightness settings when the device is
+    // locked and unlocked, "session-modes" includes "unlock-dialog" in
+    // metadata.json.  The extension will remain active while the lock screen
+    // is shown (only supported on GS 42+).
     disable() {
-        // GS 41- has the allowExtensions property.  Skip disabling the
-        // extension when switching to lock screen.
-        if (Main.sessionMode.hasOwnProperty('allowExtensions') &&
-            Main.sessionMode.currentMode == 'unlock-dialog') {
-            this._logger.log_debug('disable() skipped as session-mode = unlock-dialog');
-        // Runs on all versions when disabling the extension.  GS 42+ may
-        // call disable() and enable() when switching to the lock screen in
-        // order to "rebase" extensions, even if "unlock-dialog" is set in
-        // "session-modes".
-        } else if (this._enabled) {
-            this._logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
-            this._settings.disconnect(this._debugSettingChangedConnection);
-            this._disable();
-            this._settings.run_dispose();
-            this._settings = null;
-            this._enabled = false;
-            this._logger.log_debug('Extension disabled');
-            this._logger = null;
-        } else {
-            this._logger.log('disabled() called when not enabled');
-        }
+        this._logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
+        this._settings.disconnect(this._debugSettingChangedConnection);
+        this._disable();
+        this._settings.run_dispose();
+        this._settings = null;
+        this._logger.log_debug('Extension disabled');
+        this._logger = null;
     }
 
     _on_debug_change() {
