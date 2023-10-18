@@ -14,27 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const ExtensionUtils = imports.misc.extensionUtils;
 const GLib = imports.gi.GLib;
 
-const Me = ExtensionUtils.getCurrentExtension();
-
-var Logger = class MesonGseLogger {
-    constructor(title) {
-	this._first_log = true;
+export var Logger = class MesonGseLogger {
+    constructor(title, metadata, package_version) {
 	this._title = title;
+	this._metadata = metadata;
+	this._package_version = package_version;
+
+	this._first_log = true;
 	this._debug = false;
     }
 
     get_version() {
-	return Me.metadata['version']+' / git '+Me.metadata['vcs_revision'];
+	return this._metadata['version']+' / git '+this._metadata['vcs_revision'];
     }
 
     log(text) {
 	if (this._first_log) {
 	    this._first_log = false;
 	    let msg = 'version ' + this.get_version();
-	    let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
+	    let gnomeShellVersion = this._package_version;
 	    if (gnomeShellVersion != undefined) {
 		msg += ' on Gnome-Shell ' + gnomeShellVersion;
 	    }
@@ -52,7 +52,7 @@ var Logger = class MesonGseLogger {
 	    if (sessionType != undefined) {
 		msg += ' / ' + sessionType;
 	    }
-	    this.log(msg);
+	  this.log(msg);
 	}
 	log(''+this._title+': '+text);
     }

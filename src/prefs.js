@@ -14,22 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const Gio = imports.gi.Gio;
-const GObject = imports.gi.GObject;
-const Gtk = imports.gi.Gtk;
+import Adw from 'gi://Adw';
+import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk';
+import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Utils = Me.imports.utils;
+import * as Utils from './utils.js';
 
-const Gettext = imports.gettext.domain(Me.metadata['gettext-domain']);
-const _ = Gettext.gettext;
+export default class SoftBrightnessPreferences extends ExtensionPreferences {
+    getPreferencesWidget() {
+        return new PreferencesPage(this.getSettings(), this.metadata);
+    }
+}
 
-const Logger = Me.imports.logger;
+const PreferencesPage = GObject.registerClass(class PreferencesPage extends Gtk.Grid {
 
-const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSettings extends Gtk.Grid {
+    constructor(settings, metadata) {
+        super();
 
-    setup() {
+        this._settings = settings;
+        this._metadata = metadata;
+
         this.margin_top = 12;
         this.margin_bottom = this.margin_top;
         this.margin_start = 48;
@@ -37,10 +43,6 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
         this.row_spacing = 6;
         this.column_spacing = this.row_spacing;
         this.orientation = Gtk.Orientation.VERTICAL;
-
-        this._settings = ExtensionUtils.getSettings();
-        this._logger = new Logger.Logger('soft-brightness-plus/prefs');
-        this._logger.set_debug(this._settings.get_boolean('debug'));
 
         let ypos = 1;
         let descr;
@@ -56,10 +58,11 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 
         ypos += 1;
 
+        const version_string = this._metadata['version'] + ' / git ' + this._metadata['vcs_revision'];
         this.version_label = new Gtk.Label({
             use_markup: true,
             label: '<span size="small">'+_('Version')
-                + ' ' + this._logger.get_version() + '</span>',
+                + ' ' + version_string + '</span>',
             hexpand: true,
             halign: Gtk.Align.CENTER,
         });
@@ -69,8 +72,8 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
 
         this.link_label = new Gtk.Label({
             use_markup: true,
-            label: '<span size="small"><a href="'+Me.metadata.url+'">'
-                + Me.metadata.url + '</a></span>',
+            label: '<span size="small"><a href="'+this._metadata.url+'">'
+                + this._metadata.url + '</a></span>',
             hexpand: true,
             halign: Gtk.Align.CENTER,
             margin_bottom: this.margin_bottom
@@ -113,7 +116,7 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
         if (builtin_monitor_name != '') {
             this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
         }
-        this.displayConfigProxy = Utils.newDisplayConfig((function(proxy, error) {
+        this.displayConfigProxy = Utils.newDisplayConfig(this._metadata['path'], (function(proxy, error) {
             if (error) {
                 log('Cannot get DisplayConfig: '+error);
                 return;
@@ -228,18 +231,3 @@ const SoftBrightnessSettings = GObject.registerClass(class SoftBrightnessSetting
         }).bind(this));
     }
 });
-
-function init() {
-    ExtensionUtils.initTranslations();
-}
-
-function buildPrefsWidget() {
-    let widget = new SoftBrightnessSettings();
-    widget.setup();
-    // show_all() is only available/necessary on GTK < 4.0.
-    if (widget.show_all !== undefined) {
-        widget.show_all();
-    }
-
-    return widget;
-}

@@ -1,3 +1,4 @@
+src/cursor.js
 src/extension.js
 src/prefs.js
 src/utils.js

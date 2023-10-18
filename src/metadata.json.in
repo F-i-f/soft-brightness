@@ -1,18 +1,11 @@
 {
-  "description": "Add or override the brightness slider to change the brightness via an alpha layer (and optionally stop using or cooperate with the exising backlight, if present).\nEither internal, external or all monitors can be dimmed.\nSee the GitHub page for details.\n\nNote that this extension will keep running on the lock screen, as you'd also want the brightness setting to apply to the lock screen as well. Please report on GitHub if this gives you any trouble.\n\nThis extension is a fork of the original 'Soft brightness' extension, and includes support for GNOME 43+.",
+  "description": "Add or override the brightness slider to change the brightness via an alpha layer (and optionally stop using or cooperate with the exising backlight, if present).\nEither internal, external or all monitors can be dimmed.\nSee the GitHub page for details.\n\nNote that this extension will keep running on the lock screen, as you'd also want the brightness setting to apply to the lock screen as well. Please report on GitHub if this gives you any trouble.\n\nThis extension is a fork of the original 'Soft brightness' extension, and maintains support for new GNOME releases.",
   "gettext-domain": "@gettext_domain@",
   "name": "Soft Brightness Plus",
   "settings-schema": "org.gnome.shell.extensions.soft-brightness-plus",
   "session-modes":  [ "user", "unlock-dialog" ],
   "shell-version": [
-    "3.34",
-    "3.36",
-    "3.38",
-    "40",
-    "41",
-    "42",
-    "43",
-    "44"
+    "45"
   ],
   "url": "https://github.com/jkitching/soft-brightness-plus",
   "uuid": "@uuid@",

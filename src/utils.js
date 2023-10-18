@@ -14,22 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const ByteArray = imports.byteArray;
-const Gio = imports.gi.Gio;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import Gio from 'gi://Gio';
 
 let cachedDisplayConfigProxy = null;
 
-function getDisplayConfigProxy() {
+function getDisplayConfigProxy(ext_path) {
     if (cachedDisplayConfigProxy == null) {
         let xml = null;
-        let file = Gio.File.new_for_path(Me.path + '/dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml');
+        let file = Gio.File.new_for_path(ext_path + '/dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml');
         try {
             let [ok, bytes] = file.load_contents(null);
             if (ok) {
-                xml = ByteArray.toString(bytes);
+                xml = new TextDecoder().decode(bytes);
             }
         } catch(e) {
             console.error('failed to load DisplayConfig interface XML');
@@ -41,15 +37,15 @@ function getDisplayConfigProxy() {
     return cachedDisplayConfigProxy;
 }
 
-function newDisplayConfig(callback) {
-    let displayConfigProxy = getDisplayConfigProxy();
+export function newDisplayConfig(ext_path, callback) {
+    let displayConfigProxy = getDisplayConfigProxy(ext_path);
     return new displayConfigProxy(Gio.DBus.session,
                                   'org.gnome.Mutter.DisplayConfig',
                                   '/org/gnome/Mutter/DisplayConfig',
                                   callback);
 }
 
-function getMonitorConfig(displayConfigProxy, callback) {
+export function getMonitorConfig(displayConfigProxy, callback) {
     displayConfigProxy.GetResourcesRemote((function(result) {
         if (result.length <= 2) {
             callback(null, 'Cannot get DisplayConfig: No outputs in GetResources()');
@@ -76,7 +72,7 @@ function getMonitorConfig(displayConfigProxy, callback) {
 
 // Patches the given function with a preHook.  Returns a callback that,
 // when run, removes the preHook, and restores original functionality.
-function patchFunction(object, fname, preHook) {
+export function patchFunction(object, fname, preHook) {
     const saved = object[fname];
     object[fname] = function(...args) {
         preHook(fname);

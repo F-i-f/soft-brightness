@@ -77,7 +77,7 @@ gse_js52 = find_program('js52', required: false)
 
 # Include extension-specific settings
 
-gse_sources	    += files('src/utils.js')
+gse_sources	    += files('src/utils.js', 'src/cursor.js')
 gse_libs	    += [gse_lib_logger]
 gse_data	    += []
 gse_schemas	    += []

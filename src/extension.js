@@ -14,25 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const Clutter = imports.gi.Clutter;
-const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
-const Main = imports.ui.main;
-const MainLoop = imports.mainloop;
-const Magnifier = imports.ui.magnifier;
-const Meta = imports.gi.Meta;
-const PointerWatcher = imports.ui.pointerWatcher;
-const Shell = imports.gi.Shell;
-const St = imports.gi.St;
-const StatusArea = imports.ui.main.panel.statusArea;
-const System = imports.system;
-const { loadInterfaceXML } = imports.misc.fileUtils;
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PointerWatcher from 'resource:///org/gnome/shell/ui/pointerWatcher.js';
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
+import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
+import System from 'system';
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import { loadInterfaceXML } from 'resource:///org/gnome/shell/misc/fileUtils.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const Utils = Me.imports.utils;
-const Logger = Me.imports.logger;
+import * as Logger from './logger.js';
+import * as Utils from './utils.js';
+import { MouseSpriteContent } from './cursor.js';
 
 const BrightnessInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Power.Screen');
 const BrightnessProxy = Gio.DBusProxy.makeProxyWrapper(BrightnessInterface);
@@ -40,8 +37,10 @@ const BrightnessProxy = Gio.DBusProxy.makeProxyWrapper(BrightnessInterface);
 const BUS_NAME = 'org.gnome.SettingsDaemon.Power';
 const OBJECT_PATH = '/org/gnome/SettingsDaemon/Power';
 
-const SoftBrightnessExtension = class SoftBrightnessExtension {
-    constructor() {
+export default class SoftBrightnessExtension extends Extension {
+    constructor(...args) {
+        super(...args);
+
         // Set/destroyed by enable/disable
         this._logger                                     = null;
         this._settings                                   = null;
@@ -99,8 +98,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
     enable() {
-        this._logger = new Logger.Logger('soft-brightness-plus');
-        this._settings = ExtensionUtils.getSettings();
+        this._logger = new Logger.Logger('soft-brightness-plus', this.metadata, Config.PACKAGE_VERSION);
+        this._settings = this.getSettings();
         this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
         this._logger.set_debug(this._settings.get_boolean('debug'));
         this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
@@ -133,7 +132,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
 
         this._cloneMouseOverride = true;
         this._delayedSetPointerInvisibleWithPaintSignal = true;
-        let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
+        let gnomeShellVersion = Config.PACKAGE_VERSION;
         if (gnomeShellVersion != undefined) {
             let splitVersion = gnomeShellVersion.split('.').map((x) => {
                 x = Number(x);
@@ -180,22 +179,25 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         // For some reason, starting the mouse cloning at this stage fails when gnome-shell is restarting on x11 and
         // the mouse listener doesn't receive any events.  Adding a small delay before starting the whole mouse
         // cloning business helps.
-        this._delayedMouseCloning = MainLoop.timeout_add(500, (function() {
-            this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
-            this._enableCloningMouse();
-            this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
-            this._delayedMouseCloning = null;
-            // Start mouse cloning and force recreating overlays.
-            this._on_brightness_change(true);
-        }).bind(this));
+        this._delayedMouseCloning = GLib.timeout_add(
+            GLib.PRIORITY_DEFAULT,
+            500,
+            (function() {
+                this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
+                this._enableCloningMouse();
+                this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
+                this._delayedMouseCloning = null;
+                // Start mouse cloning and force recreating overlays.
+                this._on_brightness_change(true);
+            }).bind(this));
 
-        if (StatusArea.hasOwnProperty('aggregateMenu')) {
+        if (Main.panel.statusArea.hasOwnProperty('aggregateMenu')) {
             // GS 42-
-            this._brightnessIndicator = StatusArea.aggregateMenu._brightness;
+            this._brightnessIndicator = Main.panel.statusArea.aggregateMenu._brightness;
             this._brightnessSlider = this._brightnessIndicator._slider;
         } else {
             // GS 43+
-            this._brightnessIndicator = StatusArea.quickSettings._brightness.quickSettingsItems[0];
+            this._brightnessIndicator = Main.panel.statusArea.quickSettings._brightness.quickSettingsItems[0];
             this._brightnessSlider = this._brightnessIndicator.slider;
         }
         this._enableBrightnessIndicatorPatch();
@@ -215,7 +217,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         this._hideOverlays(true);
 
         if (this._delayedMouseCloning !== null) {
-            MainLoop.source_remove(this._delayedMouseCloning);
+            GLib.source_remove(this._delayedMouseCloning);
             this._delayedMouseCloning = null;
         }
         if (this._cloneMouseSettingChangedConnection !== null) {
@@ -494,7 +496,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
             // GS 43-
             this._monitorManager = Meta.MonitorManager.get();
         }
-        Utils.newDisplayConfig((function(proxy, error) {
+        Utils.newDisplayConfig(this.path, (function(proxy, error) {
             if (error) {
                 this._logger.log('newDisplayConfig() callback: Cannot get Display Config: ' + error);
                 return;
@@ -584,7 +586,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisibleReplacement.bind(this);
 
         this._cursorSprite = new Clutter.Actor({ request_mode: Clutter.RequestMode.CONTENT_SIZE });
-        this._cursorSprite.content = new Magnifier.MouseSpriteContent();
+        this._cursorSprite.content = new MouseSpriteContent();
 
         this._cursorActor = new Clutter.Actor();
         this._cursorActor.add_actor(this._cursorSprite);
@@ -750,11 +752,13 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         } else {
             // GS 40: clear the pointer upon entering idle loop
             if (this._delayedSetPointerInvisibleIdleSource == null) {
-                this._delayedSetPointerInvisibleIdleSource = MainLoop.idle_add((function() {
-                    this._setPointerVisible(false);
-                    this._delayedSetPointerInvisibleIdleSource = null;
-                    return false;
-                }).bind(this));
+                this._delayedSetPointerInvisibleIdleSource = GLib.idle_add(
+                    GLib.PRIORITY_DEFAULT,
+                    (function() {
+                        this._setPointerVisible(false);
+                        this._delayedSetPointerInvisibleIdleSource = null;
+                        return false;
+                    }).bind(this));
             }
         }
     }
@@ -767,7 +771,7 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
         }
 
         if (this._delayedSetPointerInvisibleIdleSource != null) {
-            MainLoop.source_remove(this._delayedSetPointerInvisibleIdleSource);
+            GLib.source_remove(this._delayedSetPointerInvisibleIdleSource);
             this._delayedSetPointerInvisibleIdleSource = null;
         }
     }
@@ -893,7 +897,3 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
     }
 
 };
-
-function init() {
-    return new SoftBrightnessExtension();
-}
