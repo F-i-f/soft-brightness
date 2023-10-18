@@ -185,6 +185,8 @@ const SoftBrightnessExtension = class SoftBrightnessExtension {
             this._enableCloningMouse();
             this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
             this._delayedMouseCloning = null;
+            // Start mouse cloning and force recreating overlays.
+            this._on_brightness_change(true);
         }).bind(this));
 
         if (StatusArea.hasOwnProperty('aggregateMenu')) {
