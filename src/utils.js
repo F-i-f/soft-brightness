@@ -32,8 +32,8 @@ function getDisplayConfigProxy() {
                 xml = ByteArray.toString(bytes);
             }
         } catch(e) {
-            log('failed to load DisplayConfig interface XML');
-            return;
+            console.error('failed to load DisplayConfig interface XML');
+            throw e;
         }
         cachedDisplayConfigProxy = Gio.DBusProxy.makeProxyWrapper(xml);
 
