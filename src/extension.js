@@ -51,11 +51,9 @@ export default class SoftBrightnessExtension extends Extension {
         this._actorAddedConnection                       = null;
         this._actorRemovedConnection                     = null;
         this._delayedMouseCloning                        = null;
-        this._cloneMouseOverride                         = null;
         this._cloneMouseSetting                          = null;
         this._cloneMouseSettingChangedConnection         = null;
         this._brightnessIndicator                        = null;
-        this._delayedSetPointerInvisibleWithPaintSignal  = null; // Used by mouse cloning but set by _enable/_disable.
 
         // Set/destroyed by _showOverlays/_hideOverlays
         this._unredirectPrevented                        = false;
@@ -130,8 +128,6 @@ export default class SoftBrightnessExtension extends Extension {
     _enable() {
         this._logger.log_debug('_enable()');
 
-        this._cloneMouseOverride = true;
-        this._delayedSetPointerInvisibleWithPaintSignal = true;
         let gnomeShellVersion = Config.PACKAGE_VERSION;
         if (gnomeShellVersion != undefined) {
             let splitVersion = gnomeShellVersion.split('.').map((x) => {
@@ -147,25 +143,8 @@ export default class SoftBrightnessExtension extends Extension {
             let patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
             let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
             let onWayland = xdgSessionType == 'wayland';
-            let hasDefaultSeat = Clutter.get_default_backend != undefined && Clutter.get_default_backend().get_default_seat != undefined;
             this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', system_version='+System.version+', XDG_SESSION_TYPE='+xdgSessionType);
-            this._logger.log_debug('_enable(): onWayland='+onWayland
-                                   +', hasDefaultSeat='+hasDefaultSeat);
-
-            // Should be removed when GS 3.38- support is dropped.
-            if (System.version >= 16500 && System.version < 16601) {
-                this._cloneMouseOverride = false;
-                this._logger.log('mouse cloning disabled on broken gjs '+System.version);
-            }
-
-            if (major >= 40) {
-                // GS 40+
-                this._logger.log('no delays for setting pointer invisible');
-                this._delayedSetPointerInvisibleWithPaintSignal = false;
-            } else {
-                // GS 3.38-
-                this._logger.log('delaying setting pointer invisible');
-            }
+            this._logger.log_debug('_enable(): onWayland='+onWayland);
         }
 
         this._actorGroup = new St.Widget({ name: 'soft-brightness-plus-overlays' });
@@ -226,7 +205,6 @@ export default class SoftBrightnessExtension extends Extension {
         }
         this._disableCloningMouse();
         this._cloneMouseSetting = null;
-        this._cloneMouseOverride = null;
 
         this._disableScreenshotPatch();
 
@@ -548,15 +526,10 @@ export default class SoftBrightnessExtension extends Extension {
 
     // Cursor handling
     _isMouseClonable() {
-        return this._cloneMouseOverride && this._cloneMouseSetting;
+        return this._cloneMouseSetting;
     }
 
     _on_clone_mouse_change() {
-        if (!this._cloneMouseOverride) {
-            // If we can't clone the mouse because of shell incompatibility, nothing changes.
-            this._logger.log_debug('_on_clone_mouse_change(): _cloneMouseOverride is false, no change');
-            return;
-        }
         let cloneMouse = this._settings.get_boolean('clone-mouse');
         if (cloneMouse == this._cloneMouseSetting) {
             this._logger.log_debug('_on_clone_mouse_change(): no setting change, no change');
@@ -591,11 +564,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._cursorActor = new Clutter.Actor();
         this._cursorActor.add_actor(this._cursorSprite);
         this._cursorWatcher = PointerWatcher.getPointerWatcher();
-
-        if (Clutter.get_default_backend && Clutter.get_default_backend().get_default_seat) {
-            this._logger.log_debug('_enableCloningMouse(): using GS 3.35.92+ seat control');
-            this._cursorSeat = Clutter.get_default_backend().get_default_seat();
-        }
+        this._cursorSeat = Clutter.get_default_backend().get_default_seat();
     }
 
     _disableCloningMouse() {
@@ -646,12 +615,7 @@ export default class SoftBrightnessExtension extends Extension {
             this._actorGroup.add_actor(this._cursorActor);
             this._cursorChangedConnection = this._cursorTracker.connect('cursor-changed', this._updateMouseSprite.bind(this));
             this._cursorVisibilityChangedConnection = this._cursorTracker.connect('visibility-changed', this._updateMouseSprite.bind(this));
-            let frame_rate = 60;
-            if (Clutter.get_default_frame_rate !== undefined) {
-                // GS 41-
-                frame_rate = Clutter.get_default_frame_rate();
-            }
-            let interval = 1000 / frame_rate;
+            let interval = 1000 / 60;
             this._logger.log_debug('_startCloningMouse(): watch interval = '+interval+' ms');
             this._cursorWatch = this._cursorWatcher.addWatch(interval, this._updateMousePosition.bind(this));
 
@@ -664,7 +628,7 @@ export default class SoftBrightnessExtension extends Extension {
             this._cursorTracker.set_keep_focus_while_hidden(true);
         }
 
-        if (this._cursorSeat != null && ! this._cursorSeat.is_unfocus_inhibited()) {
+        if (!this._cursorSeat.is_unfocus_inhibited()) {
             this._cursorSeat.inhibit_unfocus();
         }
     }
@@ -679,7 +643,7 @@ export default class SoftBrightnessExtension extends Extension {
             this._cursorTracker.set_keep_focus_while_hidden(false);
         }
 
-        if (this._cursorSeat != null && this._cursorSeat.is_unfocus_inhibited()) {
+        if (this._cursorSeat.is_unfocus_inhibited()) {
             this._cursorSeat.uninhibit_unfocus();
         }
     }
@@ -722,17 +686,10 @@ export default class SoftBrightnessExtension extends Extension {
         }
 
         let [xHot, yHot] = this._cursorTracker.get_hot();
-        if (this._cursorSprite.set_anchor_point !== undefined) {
-            // GS 3.36-
-            this._cursorSprite.set_anchor_point(xHot, yHot);
-        } else {
-            // GS 3.38+: set_anchor_point has disappeared in GS 3.38.
-            // Apply transform directly
-            this._cursorSprite.set({
-                translation_x: -xHot,
-                translation_y: -yHot,
-            });
-        }
+        this._cursorSprite.set({
+            translation_x: -xHot,
+            translation_y: -yHot,
+        });
         this._delayedSetPointerInvisible();
     }
 
@@ -740,26 +697,15 @@ export default class SoftBrightnessExtension extends Extension {
         // this._logger.log('_delayedSetPointerInvisible()');
         this._setPointerVisible(false);
 
-        if (this._delayedSetPointerInvisibleWithPaintSignal) {
-            // GS 3.38-: make the pointer invisible after every paint event.
-            if (this._delayedSetPointerInvisibleRedrawConnection == null) {
-                this._delayedSetPointerInvisibleRedrawConnection = this._actorGroup.connect('paint', () => {
-                    // this._logger.log('_delayedSetPointerInvisible::paint()');
-                    this._clearDelayedSetPointerInvibleCallbacks();
+        // Clear the pointer upon entering idle loop
+        if (this._delayedSetPointerInvisibleIdleSource == null) {
+            this._delayedSetPointerInvisibleIdleSource = GLib.idle_add(
+                GLib.PRIORITY_DEFAULT,
+                (function() {
                     this._setPointerVisible(false);
-                });
-            }
-        } else {
-            // GS 40: clear the pointer upon entering idle loop
-            if (this._delayedSetPointerInvisibleIdleSource == null) {
-                this._delayedSetPointerInvisibleIdleSource = GLib.idle_add(
-                    GLib.PRIORITY_DEFAULT,
-                    (function() {
-                        this._setPointerVisible(false);
-                        this._delayedSetPointerInvisibleIdleSource = null;
-                        return false;
-                    }).bind(this));
-            }
+                    this._delayedSetPointerInvisibleIdleSource = null;
+                    return false;
+                }).bind(this));
         }
     }
 
