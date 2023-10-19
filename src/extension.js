@@ -170,15 +170,8 @@ export default class SoftBrightnessExtension extends Extension {
                 this._on_brightness_change(true);
             }).bind(this));
 
-        if (Main.panel.statusArea.hasOwnProperty('aggregateMenu')) {
-            // GS 42-
-            this._brightnessIndicator = Main.panel.statusArea.aggregateMenu._brightness;
-            this._brightnessSlider = this._brightnessIndicator._slider;
-        } else {
-            // GS 43+
-            this._brightnessIndicator = Main.panel.statusArea.quickSettings._brightness.quickSettingsItems[0];
-            this._brightnessSlider = this._brightnessIndicator.slider;
-        }
+        this._brightnessIndicator = Main.panel.statusArea.quickSettings._brightness.quickSettingsItems[0];
+        this._brightnessSlider = this._brightnessIndicator.slider;
         this._enableBrightnessIndicatorPatch();
         this._enableMonitor2ing();
         this._enableSettingsMonitoring();
@@ -704,22 +697,6 @@ export default class SoftBrightnessExtension extends Extension {
         const slider = this._brightnessSlider;
         const ext = this;
 
-        // In GS 42-, despite swapping out the _sync function, the Brightness proxy
-        // still calls the old function. GS 42 and GS 43 proxy initialization code is
-        // identical. Perhaps there was a bug in how GS 42- SpiderMonkey handles the
-        // "this" keyword w.r.t. arrow functions? As a workaround, destroy and
-        // re-create the proxy. The new proxy will always call the correct _sync
-        // function by name, regardless of which is being used. NOTE: We leave this
-        // new Brightness proxy as-is when disabling the extension.
-        indicator._proxy.run_dispose();
-        indicator._proxy = new BrightnessProxy(
-            Gio.DBus.session, BUS_NAME, OBJECT_PATH, (function (proxy, error) {
-                if (error)
-                    console.error(error.message);
-                else
-                    this._proxy.connect('g-properties-changed', () => this._sync());
-            }).bind(indicator));
-
         indicator.__orig__sliderChanged = indicator._sliderChanged;
         indicator._sliderChanged = (function() {
             const value = slider.value;
@@ -739,7 +716,7 @@ export default class SoftBrightnessExtension extends Extension {
 
         indicator.__orig_setSliderValue = indicator.setSliderValue;
         indicator.setSliderValue = (function(value) {
-            ext._logger.log_debug('setSliderValue('+value+') [GS 3.33.90+]');
+            ext._logger.log_debug('setSliderValue('+value+')');
             slider.value = value;
         }).bind(indicator);
 
