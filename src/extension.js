@@ -108,7 +108,7 @@ export default class SoftBrightnessExtension extends Extension {
     // In order to maintain the same brightness settings when the device is
     // locked and unlocked, "session-modes" includes "unlock-dialog" in
     // metadata.json.  The extension will remain active while the lock screen
-    // is shown (only supported on GS 42+).
+    // is shown.
     disable() {
         this._logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
         this._settings.disconnect(this._debugSettingChangedConnection);
