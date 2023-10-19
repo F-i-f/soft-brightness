@@ -449,13 +449,7 @@ export default class SoftBrightnessExtension extends Extension {
     // Monitor change handling
     _enableMonitor2ing() {
         this._logger.log_debug('_enableMonitor2ing()');
-        if ('backend' in global && 'get_monitor_manager' in global.backend) {
-            // GS 44+
-            this._monitorManager = global.backend.get_monitor_manager();
-        } else {
-            // GS 43-
-            this._monitorManager = Meta.MonitorManager.get();
-        }
+        this._monitorManager = global.backend.get_monitor_manager();
         Utils.newDisplayConfig(this.path, (function(proxy, error) {
             if (error) {
                 this._logger.log('newDisplayConfig() callback: Cannot get Display Config: ' + error);
