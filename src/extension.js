@@ -220,29 +220,11 @@ export default class SoftBrightnessExtension extends Extension {
     }
 
     _restackOverlays() {
-        if (this._actorGroup.raise_top !== undefined) {
-            this._logger.log_debug('_restackOverlays() (GS 3.34- method)');
-            this._actorGroup.raise_top();
-            if (this._overlays != null) {
-                for (let i=0; i < this._overlays.length; ++i) {
-                    this._overlays[i].raise_top();
-                }
-            }
-        } else if (this._actorGroup.raise_child !== undefined) {
-            this._logger.log_debug('_restackOverlays() (GS 3.35-41 method)');
-            this._actorGroup.get_parent().raise_child(this._actorGroup, null);
-            if (this._overlays != null) {
-                for (let i=0; i < this._overlays.length; ++i) {
-                    this._actorGroup.raise_child(this._overlays[i], null);
-                }
-            }
-        } else {
-            this._logger.log_debug('_restackOverlays() (GS 42+ method)');
-            this._actorGroup.get_parent().set_child_above_sibling(this._actorGroup, null);
-            if (this._overlays != null) {
-                for (let i=0; i < this._overlays.length; ++i) {
-                    this._actorGroup.set_child_above_sibling(this._overlays[i], null);
-                }
+        this._logger.log_debug('_restackOverlays()');
+        this._actorGroup.get_parent().set_child_above_sibling(this._actorGroup, null);
+        if (this._overlays != null) {
+            for (let i=0; i < this._overlays.length; ++i) {
+                this._actorGroup.set_child_above_sibling(this._overlays[i], null);
             }
         }
         if (this._overlays != null) {
