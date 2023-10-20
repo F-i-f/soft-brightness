@@ -23,6 +23,25 @@ import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/
 import * as Utils from './utils.js';
 
 export default class SoftBrightnessPreferences extends ExtensionPreferences {
+    fillPreferencesWindow(window) {
+        // Aside from rewriting the preferences page as Adw, I am unable to
+        // come up with a good solution for ensuring the preferences window has
+        // a sane default width.  Hard-coding the size here is a hacky
+        // workaround, but does not take into account text size scaling.  Width
+        // and height of widgets do not actually scale according to the text
+        // scaling factor (width increases more than height in our case), but
+        // as an approximate band-aid for an already-broken solution, it should
+        // work well enough.
+        const text_scaling_factor = Gio.Settings
+            .new('org.gnome.desktop.interface')
+            .get_double('text-scaling-factor');
+        window.set_size_request(
+            730 * text_scaling_factor,
+            510 * text_scaling_factor,
+        );
+        super.fillPreferencesWindow(window);
+    }
+
     getPreferencesWidget() {
         return new PreferencesPage(this.getSettings(), this.metadata);
     }
