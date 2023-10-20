@@ -213,12 +213,12 @@ Install directly from the [Gnome Shell Extensions
 site](https://extensions.gnome.org/extension/5943/soft-brightness-plus/).
 
 Or download the [zip
-file](https://github.com/jkitching/soft-brightness/releases/download/v34/soft-brightness-plus@joelkitching.com.v34.shell-extension.zip)
+file](https://github.com/jkitching/soft-brightness/releases/download/v35/soft-brightness-plus@joelkitching.com.v35.shell-extension.zip)
 from the GitHub [releases
 page](https://github.com/jkitching/soft-brightness-plus/releases) and run:
 
 ``` shell
-gnome-extensions install soft-brightness-plus@joelkitching.com.v34.shell-extension.zip
+gnome-extensions install soft-brightness-plus@joelkitching.com.v35.shell-extension.zip
 ```
 
 ## Building from source
@@ -240,6 +240,24 @@ gnome-extensions install soft-brightness-plus@joelkitching.com.v34.shell-extensi
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 35
+#### October 20, 2023
+
+- Rewrite to support GNOME 45.  Since it is now required to
+  use ECMAScript modules, and since the `import` and `export`
+  mechanisms are not compatible with previous GNOME versions,
+  declare compatibility bankruptcy, and drop all support for
+  previous GNOME versions.
+- Code is vastly simplified by removing all of the workarounds
+  to support multiple versions of GNOME with the same file.
+- Since the GNOME extensions website supports hosting multiple
+  builds for different GNOME versions, simply leave all GNOME
+  versions prior to 45 using Soft Brightness Plus v34.
+- If bugfixes need to be made to version 34, a branch can be
+  cut, and fixes can be applied there.
+- Rewrite `enable()` function as async in order to wait for the
+  existence of `quickSettings._brightness`.
 
 ### Version 34
 #### May 1, 2023
