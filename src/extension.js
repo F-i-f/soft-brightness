@@ -54,6 +54,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._cloneMouseSetting                          = null;
         this._cloneMouseSettingChangedConnection         = null;
         this._brightnessIndicator                        = null;
+        this._brightnessSlider                           = null;
 
         // Set/destroyed by _showOverlays/_hideOverlays
         this._unredirectPrevented                        = false;
@@ -746,6 +747,9 @@ export default class SoftBrightnessExtension extends Extension {
 
         indicator.setSliderValue = indicator.__orig_setSliderValue;
         delete indicator.__orig_setSliderValue;
+
+        this._brightnessIndicator = null;
+        this._brightnessSlider = null;
 
         // If "use-backlight" is false and slider was being used for adjusting gamma,
         // slider will now revert to its previous use of backlight adjustment. Run
