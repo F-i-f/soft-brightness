@@ -50,7 +50,6 @@ export default class SoftBrightnessExtension extends Extension {
         this._actorGroup                                 = null;
         this._actorAddedConnection                       = null;
         this._actorRemovedConnection                     = null;
-        this._delayedMouseCloning                        = null;
         this._cloneMouseSetting                          = null;
         this._cloneMouseSettingChangedConnection         = null;
         this._brightnessIndicator                        = null;
@@ -96,13 +95,13 @@ export default class SoftBrightnessExtension extends Extension {
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
-    enable() {
+    async enable() {
         this._logger = new Logger.Logger('soft-brightness-plus', this.metadata, Config.PACKAGE_VERSION);
         this._settings = this.getSettings();
         this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
         this._logger.set_debug(this._settings.get_boolean('debug'));
         this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
-        this._enable();
+        await this._enable();
         this._logger.log_debug('Extension enabled');
     }
 
@@ -126,7 +125,7 @@ export default class SoftBrightnessExtension extends Extension {
     }
 
     // Main enable / disable switch
-    _enable() {
+    async _enable() {
         this._logger.log_debug('_enable()');
 
         let gnomeShellVersion = Config.PACKAGE_VERSION;
@@ -148,6 +147,30 @@ export default class SoftBrightnessExtension extends Extension {
             this._logger.log_debug('_enable(): onWayland='+onWayland);
         }
 
+        // For some reason, starting the mouse cloning at this stage fails when
+        // gnome-shell is restarting on x11 and the mouse listener doesn't
+        // receive any events.  Adding a small delay before starting the whole
+        // mouse cloning business helps.
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Now wait until the _brightness object has been set on quickSettings.
+        const quickSettings = Main.panel.statusArea.quickSettings;
+        for (let tries = 1; tries <= 10; tries++) {
+            if (quickSettings._brightness !== null)
+                break;
+
+            if (tries === 10) {
+                this._logger.log_debug('Giving up on brightness slider');
+                // Access something within the _brightness object to force an exception.
+                quickSettings._brightness.quickSettingsItems[0];
+                break;
+            }
+
+            this._logger.log_debug('Brightness slider not ready, wait (attempt ' + tries + ')');
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        this._logger.log_debug('Brightness slider ready, continue enable procedure');
+
         this._actorGroup = new St.Widget({ name: 'soft-brightness-plus-overlays' });
         this._actorGroup.set_size(global.screen_width, global.screen_height);
         Shell.util_set_hidden_from_pick(this._actorGroup, true);
@@ -156,27 +179,15 @@ export default class SoftBrightnessExtension extends Extension {
         this._actorAddedConnection   = global.stage.connect('actor-added',   this._restackOverlays.bind(this));
         this._actorRemovedConnection = global.stage.connect('actor-removed', this._restackOverlays.bind(this));
 
-        // For some reason, starting the mouse cloning at this stage fails when gnome-shell is restarting on x11 and
-        // the mouse listener doesn't receive any events.  Adding a small delay before starting the whole mouse
-        // cloning business helps.
-        this._delayedMouseCloning = GLib.timeout_add(
-            GLib.PRIORITY_DEFAULT,
-            500,
-            (function() {
-                this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
-                this._enableCloningMouse();
-                this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
-                this._delayedMouseCloning = null;
-                // Start mouse cloning and force recreating overlays.
-                this._on_brightness_change(true);
-            }).bind(this));
+        this._cloneMouseSetting = this._settings.get_boolean('clone-mouse');
+        this._enableCloningMouse();
+        this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
 
-        this._brightnessIndicator = Main.panel.statusArea.quickSettings._brightness.quickSettingsItems[0];
+        this._brightnessIndicator = quickSettings._brightness.quickSettingsItems[0];
         this._brightnessSlider = this._brightnessIndicator.slider;
         this._enableBrightnessIndicatorPatch();
         this._enableMonitor2ing();
         this._enableSettingsMonitoring();
-
         this._enableScreenshotPatch();
     }
 
@@ -189,14 +200,8 @@ export default class SoftBrightnessExtension extends Extension {
 
         this._hideOverlays(true);
 
-        if (this._delayedMouseCloning !== null) {
-            GLib.source_remove(this._delayedMouseCloning);
-            this._delayedMouseCloning = null;
-        }
-        if (this._cloneMouseSettingChangedConnection !== null) {
-            this._settings.disconnect(this._cloneMouseSettingChangedConnection);
-            this._cloneMouseSettingChangedConnection = null;
-        }
+        this._settings.disconnect(this._cloneMouseSettingChangedConnection);
+        this._cloneMouseSettingChangedConnection = null;
         this._disableCloningMouse();
         this._cloneMouseSetting = null;
 
@@ -733,6 +738,8 @@ export default class SoftBrightnessExtension extends Extension {
     }
 
     _disableBrightnessIndicatorPatch() {
+        if (this._brightnessIndicator === null) return;
+
         const indicator = this._brightnessIndicator;
         const slider = this._brightnessSlider;
 
