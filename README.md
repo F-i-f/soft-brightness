@@ -258,6 +258,9 @@ gnome-extensions install soft-brightness-plus@joelkitching.com.v35.shell-extensi
   cut, and fixes can be applied there.
 - Rewrite `enable()` function as async in order to wait for the
   existence of `quickSettings._brightness`.
+- Hard-code width and height of the preferences window, since
+  after converting it to use Adw, the default width is not
+  large enough to contain all widgets.
 
 ### Version 34
 #### May 1, 2023
