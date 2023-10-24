@@ -24,210 +24,224 @@ import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/
 import * as Utils from './utils.js';
 
 export default class SoftBrightnessPreferences extends ExtensionPreferences {
-    fillPreferencesWindow(window) {
-        // Aside from rewriting the preferences page as Adw, I am unable to
-        // come up with a good solution for ensuring the preferences window has
-        // a sane default width.  Hard-coding the size here is a hacky
-        // workaround, but does not take into account text size scaling.  Width
-        // and height of widgets do not actually scale according to the text
-        // scaling factor (width increases more than height in our case), but
-        // as an approximate band-aid for an already-broken solution, it should
-        // work well enough.
-        const text_scaling_factor = Gio.Settings
-            .new('org.gnome.desktop.interface')
-            .get_double('text-scaling-factor');
-        window.set_size_request(
-            730 * text_scaling_factor,
-            510 * text_scaling_factor,
-        );
-
-        const page = new Adw.PreferencesPage();
-        const group = new Adw.PreferencesGroup();
-        const widget = new PreferencesPage(this.getSettings(), this.metadata);
-
-        group.add(widget);
-        page.add(group);
-        window.add(page);
+    getPreferencesWidget() {
+        return new PreferencesPage(this.getSettings(), this.metadata);
     }
 }
 
-const PreferencesPage = GObject.registerClass(class PreferencesPage extends Gtk.Grid {
-
+const PreferencesPage = GObject.registerClass(class PreferencesPage extends Adw.PreferencesPage {
     constructor(settings, metadata) {
         super();
 
         this._settings = settings;
         this._metadata = metadata;
 
-        this.margin_top = 12;
-        this.margin_bottom = this.margin_top;
-        this.margin_start = 48;
-        this.margin_end = this.margin_start;
-        this.row_spacing = 6;
-        this.column_spacing = this.row_spacing;
-        this.orientation = Gtk.Orientation.VERTICAL;
+        {
+            const group = new Adw.PreferencesGroup();
 
-        let ypos = 1;
-        let descr;
+            this.title_label = new Gtk.Label({
+                use_markup: true,
+                label: '<span size="large" weight="heavy">'
+                    +_('Soft Brightness Plus')+'</span>',
+                hexpand: true,
+                halign: Gtk.Align.CENTER,
+            });
+            group.add(this.title_label);
 
-        this.title_label = new Gtk.Label({
-            use_markup: true,
-            label: '<span size="large" weight="heavy">'
-                +_('Soft Brightness Plus')+'</span>',
-            hexpand: true,
-            halign: Gtk.Align.CENTER
-        });
-        this.attach(this.title_label, 1, ypos, 2, 1);
+            const version_string = this._metadata['version'] + ' / git ' + this._metadata['vcs_revision'];
+            this.version_label = new Gtk.Label({
+                use_markup: true,
+                label: '<span size="small">'+_('Version')
+                    + ' ' + version_string + '</span>',
+                hexpand: true,
+                halign: Gtk.Align.CENTER,
+            });
+            group.add(this.version_label);
 
-        ypos += 1;
+            this.link_label = new Gtk.Label({
+                use_markup: true,
+                label: '<span size="small"><a href="'+this._metadata.url+'">'
+                    + this._metadata.url + '</a></span>',
+                hexpand: true,
+                halign: Gtk.Align.CENTER,
+                margin_bottom: this.margin_bottom,
+            });
+            group.add(this.link_label);
 
-        const version_string = this._metadata['version'] + ' / git ' + this._metadata['vcs_revision'];
-        this.version_label = new Gtk.Label({
-            use_markup: true,
-            label: '<span size="small">'+_('Version')
-                + ' ' + version_string + '</span>',
-            hexpand: true,
-            halign: Gtk.Align.CENTER,
-        });
-        this.attach(this.version_label, 1, ypos, 2, 1);
-
-        ypos += 1;
-
-        this.link_label = new Gtk.Label({
-            use_markup: true,
-            label: '<span size="small"><a href="'+this._metadata.url+'">'
-                + this._metadata.url + '</a></span>',
-            hexpand: true,
-            halign: Gtk.Align.CENTER,
-            margin_bottom: this.margin_bottom
-        });
-        this.attach(this.link_label, 1, ypos, 2, 1);
-
-        ypos += 1;
-
-        descr = _(this._settings.settings_schema.get_key('use-backlight').get_description());
-        this.enabled_label = new Gtk.Label({label: _('Use backlight control:'), halign: Gtk.Align.START});
-        this.enabled_label.set_tooltip_text(descr);
-        this.enabled_control = new Gtk.Switch({halign: Gtk.Align.END});
-        this.enabled_control.set_tooltip_text(descr);
-        this.attach(this.enabled_label,   1, ypos, 1, 1);
-        this.attach(this.enabled_control, 2, ypos, 1, 1);
-        this._settings.bind('use-backlight', this.enabled_control, 'active', Gio.SettingsBindFlags.DEFAULT);
-
-        ypos += 1;
-
-        descr = _(this._settings.settings_schema.get_key('monitors').get_description());
-        this.monitors_label = new Gtk.Label({label: _('Monitor(s):'), halign: Gtk.Align.START});
-        this.monitors_label.set_tooltip_text(descr);
-        this.monitors_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
-        this.monitors_control.set_tooltip_text(descr);
-        this.monitors_control.append('all', _('All'));
-        this.monitors_control.append('built-in', _('Built-in'));
-        this.monitors_control.append('external', _('External'));
-        this._settings.bind('monitors', this.monitors_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
-        this.attach(this.monitors_label,   1, ypos, 1, 1);
-        this.attach(this.monitors_control, 2, ypos, 1, 1);
-
-        ypos += 1;
-
-        descr = _(this._settings.settings_schema.get_key('builtin-monitor').get_description());
-        this.builtin_monitor_label = new Gtk.Label({label: _('Built-in monitor:'), halign: Gtk.Align.START});
-        this.builtin_monitor_label.set_tooltip_text(descr);
-        this.builtin_monitor_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
-        this.builtin_monitor_control.set_tooltip_text(descr);
-        let builtin_monitor_name = this._settings.get_string('builtin-monitor');
-        if (builtin_monitor_name != '') {
-            this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
+            this.add(group);
         }
-        this.displayConfigProxy = Utils.newDisplayConfig(this._metadata['path'], (function(proxy, error) {
-            if (error) {
-                console.log('Cannot get DisplayConfig: '+error);
-                return;
-            }
-            this.displayConfigProxy.connectSignal('MonitorsChanged', this._refreshMonitors.bind(this));
-            this._refreshMonitors();
-        }).bind(this));
-        this._bindBuiltinMonitorControl();
-        this.attach(this.builtin_monitor_label,   1, ypos, 1, 1);
-        this.attach(this.builtin_monitor_control, 2, ypos, 1, 1);
 
-        ypos += 1;
+        {
+            const group = new Adw.PreferencesGroup();
 
-        descr = _(this._settings.settings_schema.get_key('prevent-unredirect').get_description());
-        this.prevent_unredirect_label = new Gtk.Label({label: _('Full-screen behavior:'), halign: Gtk.Align.START});
-        this.prevent_unredirect_label.set_tooltip_text(descr);
-        this.prevent_unredirect_control = new Gtk.ComboBoxText({halign: Gtk.Align.END});
-        this.prevent_unredirect_control.set_tooltip_text(descr);
-        this.prevent_unredirect_control.append('never',           _('Do not enforce brightness in full-screen'));
-        this.prevent_unredirect_control.append('when-correcting', _('Brightness enforced in full-screen'));
-        this.prevent_unredirect_control.append('always',          _('Brightness enforced in full-screen, always tear-free'));
-        this._settings.bind('prevent-unredirect', this.prevent_unredirect_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
-        this.attach(this.prevent_unredirect_label,   1, ypos, 1, 1);
-        this.attach(this.prevent_unredirect_control, 2, ypos, 1, 1);
+            this.enabled_control = new Adw.SwitchRow({
+                title: _('Use backlight control:'),
+                subtitle: this._getDescription('use-backlight'),
+            });
+            this._settings.bind('use-backlight', this.enabled_control, 'active', Gio.SettingsBindFlags.DEFAULT);
+            group.add(this.enabled_control);
 
-        ypos += 1;
+            const monitors_model = new Gtk.StringList();
+            monitors_model.append(_('All'));
+            monitors_model.append(_('Built-in'));
+            monitors_model.append(_('External'));
+            this.monitors_control = new Adw.ComboRow({
+                title: _('Monitor(s):'),
+                subtitle: this._getDescription('monitors'),
+                model: monitors_model,
+            });
+            this.monitors_control.connect('notify::selected', () => {
+                this._settings.set_enum('monitors', this.monitors_control.selected);
+            });
+            this._settings.connect('changed::monitors', () => {
+                this.monitors_control.set_selected(this._settings.get_enum('monitors'));
+            });
+            group.add(this.monitors_control);
 
-        descr = _(this._settings.settings_schema.get_key('min-brightness').get_description());
-        this.min_brightness_label = new Gtk.Label({label: _('Minimum brightness (0..1):'), halign: Gtk.Align.START});
-        this.min_brightness_label.set_tooltip_text(descr);
-        this.min_brightness_control = new Gtk.SpinButton({
-            halign: Gtk.Align.END,
-            digits: 2,
-            adjustment: new Gtk.Adjustment({
-                lower: 0.0,
-                upper: 1.0,
-                step_increment: 0.01
-            })
-        });
-        this.min_brightness_control.set_tooltip_text(descr);
-        this.attach(this.min_brightness_label,   1, ypos, 1, 1);
-        this.attach(this.min_brightness_control, 2, ypos, 1, 1);
-        this._settings.bind('min-brightness', this.min_brightness_control, 'value', Gio.SettingsBindFlags.DEFAULT);
+            this.builtin_monitor_control = new Adw.ComboRow({
+                title: _('Built-in monitor:'),
+                subtitle: this._getDescription('builtin-monitor'),
+            });
+            this._bindBuiltinMonitorControl();
+            this.displayConfigProxy = Utils.newDisplayConfig(this._metadata['path'], (function(proxy, error) {
+                if (error) {
+                    console.log('Cannot get DisplayConfig: '+error);
+                    return;
+                }
+                this.displayConfigProxy.connectSignal('MonitorsChanged', this._refreshMonitors.bind(this));
+                this._refreshMonitors();
+            }).bind(this));
+            group.add(this.builtin_monitor_control);
 
-        ypos += 1;
+            this.add(group);
+        }
 
-        descr = _(this._settings.settings_schema.get_key('clone-mouse').get_description());
-        this.debug_label = new Gtk.Label({label: _('Mouse cursor brightness control:'), halign: Gtk.Align.START});
-        this.debug_label.set_tooltip_text(descr);
-        this.debug_control = new Gtk.Switch({halign: Gtk.Align.END});
-        this.debug_control.set_tooltip_text(descr);
-        this.attach(this.debug_label,   1, ypos, 1, 1);
-        this.attach(this.debug_control, 2, ypos, 1, 1);
-        this._settings.bind('clone-mouse', this.debug_control, 'active', Gio.SettingsBindFlags.DEFAULT);
+        {
+            const group = new Adw.PreferencesGroup({
+                title: _('Full-screen behavior:'),
+                description: this._getDescription('prevent-unredirect'),
+            });
+            const selected = this._settings.get_enum('prevent-unredirect')
 
-        ypos += 1;
+            let row;
 
-        descr = _(this._settings.settings_schema.get_key('debug').get_description());
-        this.debug_label = new Gtk.Label({label: _('Debug:'), halign: Gtk.Align.START});
-        this.debug_label.set_tooltip_text(descr);
-        this.debug_control = new Gtk.Switch({halign: Gtk.Align.END});
-        this.debug_control.set_tooltip_text(descr);
-        this.attach(this.debug_label,   1, ypos, 1, 1);
-        this.attach(this.debug_control, 2, ypos, 1, 1);
-        this._settings.bind('debug', this.debug_control, 'active', Gio.SettingsBindFlags.DEFAULT);
+            row = new Adw.ActionRow({
+                title: _('Do not enforce brightness in full-screen'),
+            });
+            const option0 = new Gtk.CheckButton();
+            if (selected == 0)
+                option0.set_active(true);
+            row.add_prefix(option0);
+            row.set_activatable_widget(option0);
+            group.add(row);
 
-        ypos += 1;
+            row = new Adw.ActionRow({
+                title: _('Brightness enforced in full-screen'),
+            });
+            const option1 = new Gtk.CheckButton();
+            if (selected == 1)
+                option1.set_active(true);
+            option1.set_group(option0);
+            row.add_prefix(option1);
+            row.set_activatable_widget(option1);
+            group.add(row);
 
-        this.copyright_label = new Gtk.Label({
-            use_markup: true,
-            label: '<span size="small">'
-                + _('Copyright © 2019-2022 Philippe Troin (<a href="https://github.com/F-i-f">F-i-f</a> on GitHub)')
-                + '</span>',
-            hexpand: true,
-            halign: Gtk.Align.CENTER,
-            margin_top: this.margin_bottom
-        });
-        this.attach(this.copyright_label, 1, ypos, 2, 1);
+            row = new Adw.ActionRow({
+                title: _('Brightness enforced in full-screen, always tear-free'),
+            });
+            const option2 = new Gtk.CheckButton();
+            if (selected == 2)
+                option2.set_active(true);
+            option2.set_group(option0);
+            row.add_prefix(option2);
+            row.set_activatable_widget(option2);
+            group.add(row);
 
-        ypos += 1;
+            option0.connect('toggled', () => this._settings.set_enum('prevent-unredirect', 0));
+            option1.connect('toggled', () => this._settings.set_enum('prevent-unredirect', 1));
+            option2.connect('toggled', () => this._settings.set_enum('prevent-unredirect', 2));
+            this._settings.connect('changed::prevent-unredirect', () => {
+                if (this.processing_prevent_unredirect)
+                    return;
+                this.processing_prevent_unredirect = true;
+                const selected = this._settings.get_enum('prevent-unredirect');
+                const options = [option0, option1, option2];
+                const cur = options.splice(selected, 1)[0];
+                cur.set_active(true);
+                options.forEach(option => option.set_active(false));
+                this.processing_prevent_unredirect = false;
+            });
+
+            this.add(group);
+        }
+
+        {
+            const group = new Adw.PreferencesGroup();
+
+            this.min_brightness_control = new Adw.SpinRow({
+                title: _('Minimum brightness (0..1):'),
+                subtitle: this._getDescription('min-brightness'),
+                digits: 2,
+                adjustment: new Gtk.Adjustment({
+                    lower: 0.0,
+                    upper: 1.0,
+                    step_increment: 0.01,
+                }),
+            });
+            this._settings.bind('min-brightness', this.min_brightness_control, 'value', Gio.SettingsBindFlags.DEFAULT);
+            group.add(this.min_brightness_control);
+
+            this.clone_mouse_control = new Adw.SwitchRow({
+                title: _('Mouse cursor brightness control:'), 
+                subtitle: this._getDescription('clone-mouse'),
+            });
+            this._settings.bind('clone-mouse', this.clone_mouse_control, 'active', Gio.SettingsBindFlags.DEFAULT);
+            group.add(this.clone_mouse_control);
+
+            this.debug_control = new Adw.SwitchRow({
+                title: _('Debug:'),
+                subtitle: this._getDescription('debug'),
+            });
+            this._settings.bind('debug', this.debug_control, 'active', Gio.SettingsBindFlags.DEFAULT); 
+            group.add(this.debug_control);
+
+            this.add(group);
+        }
+
+        {
+            const group = new Adw.PreferencesGroup();
+
+            this.copyright_label = new Gtk.Label({
+                use_markup: true,
+                label: '<span size="small">'
+                    + _('Copyright © 2019-2022 Philippe Troin (<a href="https://github.com/F-i-f">F-i-f</a> on GitHub)')
+                    + '</span>',
+                hexpand: true,
+                halign: Gtk.Align.CENTER,
+                margin_top: this.margin_bottom,
+            });
+            group.add(this.copyright_label);
+
+            this.add(group);
+        }
+    }
+
+    _getDescription(name) {
+        return _(this._settings.settings_schema.get_key(name).get_description());
     }
 
     _bindBuiltinMonitorControl() {
-        this._settings.bind('builtin-monitor', this.builtin_monitor_control, 'active-id', Gio.SettingsBindFlags.DEFAULT);
+        this.builtin_monitor_control_signal = this.builtin_monitor_control.connect('notify::selected', () => {
+            this._settings.set_string('builtin-monitor', this.builtin_monitor_control.selected_item.string);
+        });
+        this.builtin_monitor_settings_signal = this._settings.connect('changed::builtin-monitor', () => {
+            this._refreshMonitors();
+        });
     }
 
     _unbindBuiltinMonitorControl() {
-        Gio.Settings.unbind(this.builtin_monitor_control, 'active-id');
+        this.builtin_monitor_control.disconnect(this.builtin_monitor_control_signal);
+        this._settings.disconnect(this.builtin_monitor_settings_signal);
     }
 
     _refreshMonitors() {
@@ -236,20 +250,25 @@ const PreferencesPage = GObject.registerClass(class PreferencesPage extends Gtk.
                 console.log('Cannot get DisplayConfig: '+error);
                 return;
             }
-            let builtin_monitor_name = this._settings.get_string('builtin-monitor');
+            const builtin_monitor_name = this._settings.get_string('builtin-monitor');
+            const builtin_monitor_model = new Gtk.StringList();
             this._unbindBuiltinMonitorControl();
-            this.builtin_monitor_control.remove_all();
             let builtin_found = false;
+            let builtin_idx = 0;
             for (let i=0; i < result.length; ++i) {
                 let display_name = result[i][0];
                 if (display_name == builtin_monitor_name) {
                     builtin_found = true;
+                    builtin_idx = i;
                 }
-                this.builtin_monitor_control.append(display_name, display_name);
+                builtin_monitor_model.append(display_name);
             }
             if (! builtin_found && builtin_monitor_name != '') {
-                this.builtin_monitor_control.append(builtin_monitor_name, builtin_monitor_name);
+                builtin_monitor_model.append(builtin_monitor_name);
+                builtin_idx = result.length;
             }
+            this.builtin_monitor_control.set_model(builtin_monitor_model);
+            this.builtin_monitor_control.set_selected(builtin_idx);
             this._bindBuiltinMonitorControl();
         }).bind(this));
     }
