@@ -1,7 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Dutch translations for soft-brightness-plus package.
+# Copyright (C) 2019, 2020 THE soft-brightness-plus'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the soft-brightness-plus package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Heimen Stoffels <vistausss@fastmail.com>, 2021.
 #
 msgid ""
 msgstr ""
