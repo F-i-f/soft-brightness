@@ -21,18 +21,17 @@ let cachedDisplayConfigProxy = null;
 function getDisplayConfigProxy(ext_path) {
     if (cachedDisplayConfigProxy == null) {
         let xml = null;
-        let file = Gio.File.new_for_path(ext_path + '/dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml');
+        const file = Gio.File.new_for_path(ext_path + '/dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml');
         try {
             let [ok, bytes] = file.load_contents(null);
             if (ok) {
                 xml = new TextDecoder().decode(bytes);
             }
-        } catch(e) {
+        } catch (e) {
             console.error('failed to load DisplayConfig interface XML');
             throw e;
         }
         cachedDisplayConfigProxy = Gio.DBusProxy.makeProxyWrapper(xml);
-
     }
     return cachedDisplayConfigProxy;
 }
@@ -51,10 +50,10 @@ export function getMonitorConfig(displayConfigProxy, callback) {
             callback(null, 'Cannot get DisplayConfig: No outputs in GetResources()');
         } else {
             let monitors = [];
-            for (let i=0; i < result[2].length; ++i) {
+            for (let i = 0; i < result[2].length; ++i) {
                 let output = result[2][i];
                 if (output.length <= 7) {
-                    callback(null, 'Cannot get DisplayConfig: No properties on output #'+i);
+                    callback(null, 'Cannot get DisplayConfig: No properties on output #' + i);
                     return;
                 }
                 let props = output[7];
