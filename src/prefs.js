@@ -102,12 +102,13 @@ const PreferencesPage = GObject.registerClass(class PreferencesPage extends Adw.
                 title: _('Built-in monitor:'),
                 subtitle: this._getDescription('builtin-monitor'),
             });
-            this._bindBuiltinMonitorControl();
-            this.displayConfigProxy = Utils.newDisplayConfig(this._metadata['path'], (function(proxy, error) {
+            Utils.newDisplayConfig(this._metadata['path'], (function(proxy, error) {
                 if (error) {
                     console.log('Cannot get DisplayConfig: '+error);
                     return;
                 }
+                this.displayConfigProxy = proxy;
+                this._bindBuiltinMonitorControl();
                 this.displayConfigProxy.connectSignal('MonitorsChanged', this._refreshMonitors.bind(this));
                 this._refreshMonitors();
             }).bind(this));

@@ -38,11 +38,11 @@ function getDisplayConfigProxy(ext_path) {
 }
 
 export function newDisplayConfig(ext_path, callback) {
-    let displayConfigProxy = getDisplayConfigProxy(ext_path);
-    return new displayConfigProxy(Gio.DBus.session,
-                                  'org.gnome.Mutter.DisplayConfig',
-                                  '/org/gnome/Mutter/DisplayConfig',
-                                  callback);
+    const DisplayConfigProxy = getDisplayConfigProxy(ext_path);
+    new DisplayConfigProxy(Gio.DBus.session,
+                           'org.gnome.Mutter.DisplayConfig',
+                           '/org/gnome/Mutter/DisplayConfig',
+                           callback);
 }
 
 export function getMonitorConfig(displayConfigProxy, callback) {
