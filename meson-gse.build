@@ -17,7 +17,7 @@
 
 gse_project({soft-brightness-plus},
 	    {joelkitching.com},
-	    {35},
+	    {36},
 {
 gse_sources	    += files('src/utils.js', 'src/cursor.js')
 gse_libs	    += [gse_lib_logger]
