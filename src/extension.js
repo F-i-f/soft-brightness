@@ -113,7 +113,6 @@ export default class SoftBrightnessExtension extends Extension {
         this._logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
         this._settings.disconnect(this._debugSettingChangedConnection);
         this._disable();
-        this._settings.run_dispose();
         this._settings = null;
         this._logger.log_debug('Extension disabled');
         this._logger = null;
