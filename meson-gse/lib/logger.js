@@ -55,7 +55,7 @@ export class Logger {
 	    }
 	  this.log(msg);
 	}
-	log(''+this._title+': '+text);
+	console.log(''+this._title+': '+text);
     }
 
     log_debug(text) {

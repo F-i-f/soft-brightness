@@ -137,7 +137,7 @@ const PreferencesPage = GObject.registerClass(class PreferencesPage extends Gtk.
         }
         this.displayConfigProxy = Utils.newDisplayConfig(this._metadata['path'], (function(proxy, error) {
             if (error) {
-                log('Cannot get DisplayConfig: '+error);
+                console.log('Cannot get DisplayConfig: '+error);
                 return;
             }
             this.displayConfigProxy.connectSignal('MonitorsChanged', this._refreshMonitors.bind(this));
@@ -229,7 +229,7 @@ const PreferencesPage = GObject.registerClass(class PreferencesPage extends Gtk.
     _refreshMonitors() {
         Utils.getMonitorConfig(this.displayConfigProxy, (function(result, error) {
             if (error) {
-                log('Cannot get DisplayConfig: '+error);
+                console.log('Cannot get DisplayConfig: '+error);
                 return;
             }
             let builtin_monitor_name = this._settings.get_string('builtin-monitor');
