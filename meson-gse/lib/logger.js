@@ -17,7 +17,7 @@
 import GLib from 'gi://GLib';
 import System from 'system';
 
-export var Logger = class MesonGseLogger {
+export class Logger {
     constructor(title, metadata, package_version) {
 	this._title = title;
 	this._metadata = metadata;
