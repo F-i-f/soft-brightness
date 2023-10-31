@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const GLib = imports.gi.GLib;
+import GLib from 'gi://GLib';
+import System from 'system';
 
 export var Logger = class MesonGseLogger {
     constructor(title, metadata, package_version) {
@@ -38,7 +39,7 @@ export var Logger = class MesonGseLogger {
 	    if (gnomeShellVersion != undefined) {
 		msg += ' on Gnome-Shell ' + gnomeShellVersion;
 	    }
-	    let gjsVersion = imports.system.version;
+	    let gjsVersion = System.version;
 	    if (gjsVersion != undefined) {
 		let gjsVersionMajor = Math.floor(gjsVersion / 10000);
 		let gjsVersionMinor = Math.floor((gjsVersion % 10000) / 100);
