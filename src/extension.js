@@ -31,9 +31,6 @@ import * as Logger from './logger.js';
 import * as Utils from './utils.js';
 import { MouseSpriteContent } from './cursor.js';
 
-const BrightnessInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Power.Screen');
-const BrightnessProxy = Gio.DBusProxy.makeProxyWrapper(BrightnessInterface);
-
 const BUS_NAME = 'org.gnome.SettingsDaemon.Power';
 const OBJECT_PATH = '/org/gnome/SettingsDaemon/Power';
 
