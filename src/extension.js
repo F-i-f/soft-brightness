@@ -20,20 +20,15 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PointerWatcher from 'resource:///org/gnome/shell/ui/pointerWatcher.js';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
-import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import System from 'system';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { loadInterfaceXML } from 'resource:///org/gnome/shell/misc/fileUtils.js';
 
 import * as Logger from './logger.js';
 import * as Utils from './utils.js';
 import { MouseSpriteContent } from './cursor.js';
-
-const BUS_NAME = 'org.gnome.SettingsDaemon.Power';
-const OBJECT_PATH = '/org/gnome/SettingsDaemon/Power';
 
 export default class SoftBrightnessExtension extends Extension {
     constructor(...args) {
