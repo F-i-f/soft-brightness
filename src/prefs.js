@@ -40,11 +40,14 @@ export default class SoftBrightnessPreferences extends ExtensionPreferences {
             730 * text_scaling_factor,
             510 * text_scaling_factor,
         );
-        super.fillPreferencesWindow(window);
-    }
 
-    getPreferencesWidget() {
-        return new PreferencesPage(this.getSettings(), this.metadata);
+        const page = new Adw.PreferencesPage();
+        const group = new Adw.PreferencesGroup();
+        const widget = new PreferencesPage(this.getSettings(), this.metadata);
+
+        group.add(widget);
+        page.add(group);
+        window.add(page);
     }
 }
 
