@@ -708,7 +708,7 @@ export default class SoftBrightnessExtension extends Extension {
         }).bind(indicator);
         slider.disconnect(indicator._sliderChangedId);
         indicator._sliderChangedId = slider.connect(
-          'notify::value', indicator._sliderChanged.bind(indicator));
+            'notify::value', indicator._sliderChanged.bind(indicator));
 
         indicator.__orig__sync = indicator._sync;
         indicator._sync = (function() {
@@ -743,7 +743,7 @@ export default class SoftBrightnessExtension extends Extension {
         indicator._sliderChanged = indicator.__orig__sliderChanged;
         slider.disconnect(indicator._sliderChangedId);
         indicator._sliderChangedId = slider.connect(
-          'notify::value', indicator._sliderChanged.bind(indicator));
+            'notify::value', indicator._sliderChanged.bind(indicator));
         delete indicator.__orig__sliderChanged;
 
         indicator._sync = indicator.__orig__sync;
@@ -765,15 +765,15 @@ export default class SoftBrightnessExtension extends Extension {
     // Monkey-patched screenshot methods
     _enableScreenshotPatch() {
         const preHook = fname => {
-            this._logger.log_debug('Screenshot ' + fname + '(): pre-capture')
+            this._logger.log_debug('Screenshot ' + fname + '(): pre-capture');
             this._hideOverlays(false);
             this._stopCloningMouse();
             this._setPointerVisible(false);
-        }
+        };
         const postHook = fname => {
-            this._logger.log_debug('Screenshot ' + fname + '(): post-capture')
+            this._logger.log_debug('Screenshot ' + fname + '(): post-capture');
             this._on_brightness_change(false);
-        }
+        };
         // Monkey-patch screenshot capture functions to remove the overlay during
         // area, desktop, and interactive screenshots.  This is unnecessary for
         // window screenshots, so skip the `screenshot_window` function.
@@ -802,5 +802,4 @@ export default class SoftBrightnessExtension extends Extension {
         this._screenshotRevertFns.map(fn => fn());
         this._screenshotRevertFns = [];
     }
-
-};
+}
