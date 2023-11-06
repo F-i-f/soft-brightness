@@ -126,9 +126,9 @@ export default class SoftBrightnessExtension extends Extension {
     }
 
     _logVersion() {
-        let gnomeShellVersion = Config.PACKAGE_VERSION;
+        const gnomeShellVersion = Config.PACKAGE_VERSION;
         if (gnomeShellVersion != undefined) {
-            let splitVersion = gnomeShellVersion.split('.').map((x) => {
+            const splitVersion = gnomeShellVersion.split('.').map((x) => {
                 x = Number(x);
                 if (Number.isNaN(x)) {
                     return 0;
@@ -136,11 +136,11 @@ export default class SoftBrightnessExtension extends Extension {
                     return x;
                 }
             });
-            let major = splitVersion[0];
-            let minor = splitVersion.length >= 2 ? splitVersion[1] : 0;
-            let patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
-            let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
-            let onWayland = xdgSessionType == 'wayland';
+            const major = splitVersion[0];
+            const minor = splitVersion.length >= 2 ? splitVersion[1] : 0;
+            const patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
+            const xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
+            const onWayland = xdgSessionType == 'wayland';
             this._logger.log_debug('_logVersion(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', system_version='+System.version+', XDG_SESSION_TYPE='+xdgSessionType);
             this._logger.log_debug('_logVersion(): onWayland='+onWayland);
         }
