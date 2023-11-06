@@ -38,6 +38,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._logger                                     = null;
         this._settings                                   = null;
         this._debugSettingChangedConnection              = null;
+        this._enableTimeoutId                            = null;
 
         // Set/destroyed by _enable/_disable
         this._actorGroup                                 = null;
@@ -88,13 +89,14 @@ export default class SoftBrightnessExtension extends Extension {
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
-    async enable() {
+    enable() {
         this._logger = new Logger.Logger('soft-brightness-plus', this.metadata, Config.PACKAGE_VERSION);
         this._settings = this.getSettings();
         this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
         this._logger.set_debug(this._settings.get_boolean('debug'));
         this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
-        await this._enable();
+        this._logVersion();
+        this._tryEnable();
         this._logger.log_debug('Extension enabled');
     }
 
@@ -105,7 +107,14 @@ export default class SoftBrightnessExtension extends Extension {
     disable() {
         this._logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
         this._settings.disconnect(this._debugSettingChangedConnection);
-        this._disable();
+
+        // If _enableTimeoutId is non-null, _enable() has not run yet, and will
+        // not run.  Do not run _disable() in this case.
+        GLib.source_remove(this._enableTimeoutId);
+        if (this._enableTimeoutId === null)
+            this._disable();
+        this._enableTimeoutId = null;
+
         this._settings = null;
         this._logger.log_debug('Extension disabled');
         this._logger = null;
@@ -116,10 +125,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._logger.log('debug = '+this._logger.get_debug());
     }
 
-    // Main enable / disable switch
-    async _enable() {
-        this._logger.log_debug('_enable()');
-
+    _logVersion() {
         let gnomeShellVersion = Config.PACKAGE_VERSION;
         if (gnomeShellVersion != undefined) {
             let splitVersion = gnomeShellVersion.split('.').map((x) => {
@@ -135,33 +141,47 @@ export default class SoftBrightnessExtension extends Extension {
             let patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
             let xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
             let onWayland = xdgSessionType == 'wayland';
-            this._logger.log_debug('_enable(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', system_version='+System.version+', XDG_SESSION_TYPE='+xdgSessionType);
-            this._logger.log_debug('_enable(): onWayland='+onWayland);
+            this._logger.log_debug('_logVersion(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', system_version='+System.version+', XDG_SESSION_TYPE='+xdgSessionType);
+            this._logger.log_debug('_logVersion(): onWayland='+onWayland);
         }
+    }
 
-        // For some reason, starting the mouse cloning at this stage fails when
-        // gnome-shell is restarting on x11 and the mouse listener doesn't
-        // receive any events.  Adding a small delay before starting the whole
-        // mouse cloning business helps.
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Now wait until the _brightness object has been set on quickSettings.
+    _tryEnable() {
+        // First 500ms: For some reason, starting the mouse cloning at this
+        // stage fails when gnome-shell is restarting on x11 and the mouse
+        // listener doesn't receive any events.  Adding a small delay before
+        // starting the whole mouse cloning business helps.
+        // Subsequent 100ms checks: Wait until the _brightness object has been
+        // set on quickSettings.
         const quickSettings = Main.panel.statusArea.quickSettings;
-        for (let tries = 1; tries <= 10; tries++) {
-            if (quickSettings._brightness !== null)
-                break;
-
-            if (tries === 10) {
-                this._logger.log_debug('Giving up on brightness slider');
-                // Access something within the _brightness object to force an exception.
-                quickSettings._brightness.quickSettingsItems[0];
-                break;
+        let tries = -5;
+        this._enableTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+            // Wait 500ms before starting to check for the _brightness object.
+            if (tries >= 0 && quickSettings._brightness !== null) {
+                this._logger.log_debug('Brightness slider ready, continue enable procedure');
+                this._enableTimeoutId = null;
+                this._enable();
+                return GLib.SOURCE_REMOVE;
             }
 
-            this._logger.log_debug('Brightness slider not ready, wait (attempt ' + tries + ')');
-            await new Promise(resolve => setTimeout(resolve, 200));
-        }
-        this._logger.log_debug('Brightness slider ready, continue enable procedure');
+            if (tries >= 5) {
+                this._logger.log_debug('Giving up on brightness slider');
+                this._enableTimeoutId = null;
+                // Access something within the _brightness object to force an exception.
+                quickSettings._brightness.quickSettingsItems[0];
+                return GLib.SOURCE_REMOVE;
+            }
+
+            tries += 1;
+            if (tries >= 1)
+                this._logger.log_debug('Brightness slider not ready, wait (attempt ' + tries + ')');
+            return GLib.SOURCE_CONTINUE;
+        });
+    }
+
+    // Main enable / disable switch
+    _enable() {
+        this._logger.log_debug('_enable()');
 
         this._actorGroup = new St.Widget({ name: 'soft-brightness-plus-overlays' });
         this._actorGroup.set_size(global.screen_width, global.screen_height);
@@ -175,7 +195,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._enableCloningMouse();
         this._cloneMouseSettingChangedConnection = this._settings.connect('changed::clone-mouse', this._on_clone_mouse_change.bind(this));
 
-        this._brightnessIndicator = quickSettings._brightness.quickSettingsItems[0];
+        this._brightnessIndicator = Main.panel.statusArea.quickSettings._brightness.quickSettingsItems[0];
         this._brightnessSlider = this._brightnessIndicator.slider;
         this._enableBrightnessIndicatorPatch();
         this._enableMonitor2ing();
