@@ -42,15 +42,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._cursorManager                              = null;
         this._indicatorManager                           = null;
         this._screenshotManager                          = null;
-
-        // Set/destroyed by _enableSettingsMonitoring/_disableSettingsMonitoring
-        this._minBrightnessSettingChangedConnection      = null;
-        this._currentBrightnessSettingChangedConnection  = null;
-        this._monitorsSettingChangedConnection           = null;
-        this._builtinMonitorSettingChangedConnection     = null;
-        this._useBacklightSettingChangedConnection       = null;
-        this._preventUnredirectChangedConnection         = null;
-        this._debugSettingChangedConnection              = null;
+        this._removeSettingsCallbacks                    = [];
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
@@ -163,36 +155,27 @@ export default class SoftBrightnessExtension extends Extension {
     _enableSettingsMonitoring() {
         this._logger.log_debug('_enableSettingsMonitoring()');
 
-        let brightnessChange       = (function() { this._on_brightness_change(false); }).bind(this);
-        let forcedBrightnessChange = (function() { this._on_brightness_change(true); }).bind(this);
-
-        this._minBrightnessSettingChangedConnection     = this._settings.connect('changed::min-brightness',     brightnessChange);
-        this._currentBrightnessSettingChangedConnection = this._settings.connect('changed::current-brightness', brightnessChange);
-        this._monitorsSettingChangedConnection          = this._settings.connect('changed::monitors',           forcedBrightnessChange);
-        this._builtinMonitorSettingChangedConnection    = this._settings.connect('changed::builtin-monitor',    forcedBrightnessChange);
-        this._useBacklightSettingChangedConnection      = this._settings.connect('changed::use-backlight',      this._on_use_backlight_change.bind(this));
-        this._preventUnredirectChangedConnection        = this._settings.connect('changed::prevent-unredirect', forcedBrightnessChange);
-        this._debugSettingChangedConnection = this._settings.connect('changed::debug', this._on_debug_change.bind(this));
+        const callbacks = {
+            'changed::min-brightness': () => this._on_brightness_change(false),
+            'changed::current-brightness': () => this._on_brightness_change(false),
+            'changed::monitors': () => this._on_brightness_change(true),
+            'changed::builtin-monitor': () => this._on_brightness_change(true),
+            'changed::use-backlight': () => this._on_use_backlight_change(),
+            'changed::prevent-unredirect': () => this._on_brightness_change(true),
+            'changed::debug': () => this._on_debug_change(),
+        }
+        this._removeSettingsCallbacks = Object.entries(callbacks).map(
+            ([name, fn]) => {
+                const conn = this._settings.connect(name, fn);
+                return () => this._settings.disconnect(conn);
+            }
+        );
     }
 
     _disableSettingsMonitoring() {
         this._logger.log_debug('_disableSettingsMonitoring()');
-
-        this._settings.disconnect(this._minBrightnessSettingChangedConnection);
-        this._settings.disconnect(this._currentBrightnessSettingChangedConnection);
-        this._settings.disconnect(this._monitorsSettingChangedConnection);
-        this._settings.disconnect(this._builtinMonitorSettingChangedConnection);
-        this._settings.disconnect(this._useBacklightSettingChangedConnection);
-        this._settings.disconnect(this._preventUnredirectChangedConnection);
-        this._settings.disconnect(this._debugSettingChangedConnection);
-
-        this._minBrightnessSettingChangedConnection     = null;
-        this._currentBrightnessSettingChangedConnection = null;
-        this._monitorsSettingChangedConnection          = null;
-        this._builtinMonitorSettingChangedConnection    = null;
-        this._useBacklightSettingChangedConnection      = null;
-        this._preventUnredirectChangedConnection        = null;
-        this._debugSettingChangedConnection             = null;
+        this._removeSettingsCallbacks.forEach((fn) => fn());
+        this._removeSettingsCallbacks = [];
     }
 
     _on_brightness_change(force) {
