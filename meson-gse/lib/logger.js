@@ -1,6 +1,5 @@
 // meson-gse - Library for gnome-shell extensions
-// Copyright (C) 2019-2021 Philippe Troin (F-i-f on Github)
-// Copyright (C) 2023 Joel Kitching (jkitching on Github)
+// Copyright (C) 2019, 2020 Philippe Troin (F-i-f on Github)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,32 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import GLib from 'gi://GLib';
-import System from 'system';
+const ExtensionUtils = imports.misc.extensionUtils;
+const GLib = imports.gi.GLib;
 
-export class Logger {
-    constructor(title, metadata, package_version) {
-	this._title = title;
-	this._metadata = metadata;
-	this._package_version = package_version;
+const Me = ExtensionUtils.getCurrentExtension();
 
+var Logger = class MesonGseLogger {
+    constructor(title) {
 	this._first_log = true;
+	this._title = title;
 	this._debug = false;
     }
 
     get_version() {
-	return this._metadata['version']+' / git '+this._metadata['vcs_revision'];
+	return Me.metadata['version']+' / git '+Me.metadata['vcs_revision'];
     }
 
     log(text) {
 	if (this._first_log) {
 	    this._first_log = false;
 	    let msg = 'version ' + this.get_version();
-	    let gnomeShellVersion = this._package_version;
+	    let gnomeShellVersion = imports.misc.config.PACKAGE_VERSION;
 	    if (gnomeShellVersion != undefined) {
 		msg += ' on Gnome-Shell ' + gnomeShellVersion;
 	    }
-	    let gjsVersion = System.version;
+	    let gjsVersion = imports.system.version;
 	    if (gjsVersion != undefined) {
 		let gjsVersionMajor = Math.floor(gjsVersion / 10000);
 		let gjsVersionMinor = Math.floor((gjsVersion % 10000) / 100);
@@ -54,9 +52,9 @@ export class Logger {
 	    if (sessionType != undefined) {
 		msg += ' / ' + sessionType;
 	    }
-	  this.log(msg);
+	    this.log(msg);
 	}
-	console.log(''+this._title+': '+text);
+	global.log(''+this._title+': '+text);
     }
 
     log_debug(text) {
