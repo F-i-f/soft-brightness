@@ -51,7 +51,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._logger = new Logger.Logger('soft-brightness-plus', this.metadata, Config.PACKAGE_VERSION);
         this._logger.set_debug(this._settings.get_boolean('debug'));
         this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
-        this._logVersion();
+        this._logger.logVersion();
 
         this._monitorManager = new MonitorManager(this._logger, this._settings, this.path);
         this._overlayManager = new OverlayManager(this._logger, this._settings, this._monitorManager);
@@ -123,27 +123,6 @@ export default class SoftBrightnessExtension extends Extension {
         this._cursorManager                              = null;
         this._indicatorManager                           = null;
         this._screenshotManager                          = null;
-    }
-
-    _logVersion() {
-        const gnomeShellVersion = Config.PACKAGE_VERSION;
-        if (gnomeShellVersion != undefined) {
-            const splitVersion = gnomeShellVersion.split('.').map((x) => {
-                x = Number(x);
-                if (Number.isNaN(x)) {
-                    return 0;
-                } else {
-                    return x;
-                }
-            });
-            const major = splitVersion[0];
-            const minor = splitVersion.length >= 2 ? splitVersion[1] : 0;
-            const patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
-            const xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
-            const onWayland = xdgSessionType == 'wayland';
-            this._logger.log_debug('_logVersion(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', system_version='+System.version+', XDG_SESSION_TYPE='+xdgSessionType);
-            this._logger.log_debug('_logVersion(): onWayland='+onWayland);
-        }
     }
 
     _on_debug_change() {

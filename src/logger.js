@@ -32,6 +32,27 @@ export class Logger {
         return this._metadata['version']+' / git '+this._metadata['vcs_revision'];
     }
 
+    logVersion() {
+        const gnomeShellVersion = Config.PACKAGE_VERSION;
+        if (gnomeShellVersion != undefined) {
+            const splitVersion = gnomeShellVersion.split('.').map((x) => {
+                x = Number(x);
+                if (Number.isNaN(x)) {
+                    return 0;
+                } else {
+                    return x;
+                }
+            });
+            const major = splitVersion[0];
+            const minor = splitVersion.length >= 2 ? splitVersion[1] : 0;
+            const patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
+            const xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
+            const onWayland = xdgSessionType == 'wayland';
+            this.log_debug('_logVersion(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', system_version='+System.version+', XDG_SESSION_TYPE='+xdgSessionType);
+            this.log_debug('_logVersion(): onWayland='+onWayland);
+        }
+    }
+
     log(text) {
         if (this._first_log) {
             this._first_log = false;
