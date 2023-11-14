@@ -77,8 +77,8 @@ gse_js52 = find_program('js52', required: false)
 
 # Include extension-specific settings
 
-gse_sources	    += files('src/utils.js', 'src/cursor.js')
-gse_libs	    += [gse_lib_logger]
+gse_sources	    += files('src/utils.js', 'src/cursor.js', 'src/logger.js')
+gse_libs	    += []
 gse_data	    += []
 gse_schemas	    += []
 gse_dbus_interfaces += [files('dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml')]
