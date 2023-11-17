@@ -219,7 +219,7 @@ const PreferencesPage = GObject.registerClass(class PreferencesPage extends Adw.
         {
             const group = new Adw.PreferencesGroup();
 
-            this.copyright_label = new Gtk.Label({
+            const copyright1 = new Gtk.Label({
                 use_markup: true,
                 label: '<span size="small">' +
                     _('Copyright © 2019-2022 Philippe Troin (<a href="https://github.com/F-i-f">F-i-f</a> on GitHub)') +
@@ -228,7 +228,18 @@ const PreferencesPage = GObject.registerClass(class PreferencesPage extends Adw.
                 halign: Gtk.Align.CENTER,
                 margin_top: this.margin_bottom,
             });
-            group.add(this.copyright_label);
+            const copyright2 = new Gtk.Label({
+                use_markup: true,
+                label: '<span size="small">' +
+                    _('Copyright © 2022-2023 Joel Kitching (<a href="https://github.com/jkitching">jkitching</a> on GitHub)') +
+                    '</span>',
+                hexpand: true,
+                halign: Gtk.Align.CENTER,
+                margin_top: this.margin_bottom,
+            });
+
+            group.add(copyright1);
+            group.add(copyright2);
 
             this.add(group);
         }
