@@ -19,17 +19,17 @@ import GLib from 'gi://GLib';
 import System from 'system';
 
 export class Logger {
-    constructor(title, metadata, package_version) {
+    constructor(title, metadata, packageVersion) {
         this._title = title;
         this._metadata = metadata;
-        this._package_version = package_version;
+        this._packageVersion = packageVersion;
 
         this._first_log = true;
         this._debug = false;
     }
 
     get_version() {
-        return this._metadata['version']+' / git '+this._metadata['vcs_revision'];
+        return this._metadata['version'] + ' / git ' + this._metadata['vcs_revision'];
     }
 
     logVersion() {
@@ -48,8 +48,8 @@ export class Logger {
             const patch = splitVersion.length >= 3 ? splitVersion[2] : 0;
             const xdgSessionType = GLib.getenv('XDG_SESSION_TYPE');
             const onWayland = xdgSessionType == 'wayland';
-            this.log_debug('_logVersion(): gnome-shell version major='+major+', minor='+minor+', patch='+patch+', system_version='+System.version+', XDG_SESSION_TYPE='+xdgSessionType);
-            this.log_debug('_logVersion(): onWayland='+onWayland);
+            this.log_debug('_logVersion(): gnome-shell version major=' + major + ', minor=' + minor + ', patch=' + patch + ', system_version=' + System.version + ', XDG_SESSION_TYPE=' + xdgSessionType);
+            this.log_debug('_logVersion(): onWayland=' + onWayland);
         }
     }
 
@@ -57,27 +57,28 @@ export class Logger {
         if (this._first_log) {
             this._first_log = false;
             let msg = 'version ' + this.get_version();
-            let gnomeShellVersion = this._package_version;
+            const gnomeShellVersion = this._packageVersion;
             if (gnomeShellVersion != undefined) {
-            msg += ' on Gnome-Shell ' + gnomeShellVersion;
+                msg += ' on Gnome-Shell ' + gnomeShellVersion;
             }
-            let gjsVersion = System.version;
+            const gjsVersion = System.version;
             if (gjsVersion != undefined) {
-            let gjsVersionMajor = Math.floor(gjsVersion / 10000);
-            let gjsVersionMinor = Math.floor((gjsVersion % 10000) / 100);
-            let gjsVersionPatch = gjsVersion % 100;
-            msg +=( ' / gjs ' + gjsVersionMajor
-                + '.' +gjsVersionMinor
-                + '.' +gjsVersionPatch
-                + ' ('+gjsVersion+')');
+                const gjsVersionMajor = Math.floor(gjsVersion / 10000);
+                const gjsVersionMinor = Math.floor((gjsVersion % 10000) / 100);
+                const gjsVersionPatch = gjsVersion % 100;
+                msg += (' / gjs ' + gjsVersionMajor +
+                    '.' + gjsVersionMinor +
+                    '.' + gjsVersionPatch +
+                    ' (' + gjsVersion + ')'
+                );
             }
-            let sessionType = GLib.getenv('XDG_SESSION_TYPE');
+            const sessionType = GLib.getenv('XDG_SESSION_TYPE');
             if (sessionType != undefined) {
-            msg += ' / ' + sessionType;
+                msg += ' / ' + sessionType;
             }
-          this.log(msg);
+            this.log(msg);
         }
-        console.log(''+this._title+': '+text);
+        console.log('' + this._title + ': ' + text);
     }
 
     log_debug(text) {

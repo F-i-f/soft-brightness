@@ -35,14 +35,14 @@ export default class SoftBrightnessExtension extends Extension {
         super(...args);
 
         // Set/destroyed by enable/disable
-        this._settings                                   = null;
-        this._logger                                     = null;
-        this._monitorManager                             = null;
-        this._overlayManager                             = null;
-        this._cursorManager                              = null;
-        this._indicatorManager                           = null;
-        this._screenshotManager                          = null;
-        this._removeSettingsCallbacks                    = [];
+        this._settings = null;
+        this._logger = null;
+        this._monitorManager = null;
+        this._overlayManager = null;
+        this._cursorManager = null;
+        this._indicatorManager = null;
+        this._screenshotManager = null;
+        this._removeSettingsCallbacks = [];
     }
 
     // Base functionality: set-up and tear down logger, settings and debug setting monitoring
@@ -50,7 +50,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._settings = this.getSettings();
         this._logger = new Logger.Logger('soft-brightness-plus', this.metadata, Config.PACKAGE_VERSION);
         this._logger.set_debug(this._settings.get_boolean('debug'));
-        this._logger.log_debug('enable(), session mode = '+Main.sessionMode.currentMode);
+        this._logger.log_debug('enable(), session mode = ' + Main.sessionMode.currentMode);
         this._logger.logVersion();
 
         this._monitorManager = new MonitorManager(this._logger, this._settings, this.path);
@@ -104,7 +104,7 @@ export default class SoftBrightnessExtension extends Extension {
     // metadata.json.  The extension will remain active while the lock screen
     // is shown.
     disable() {
-        this._logger.log_debug('disable(), session mode = '+Main.sessionMode.currentMode);
+        this._logger.log_debug('disable(), session mode = ' + Main.sessionMode.currentMode);
 
         this._monitorManager.disable();
         this._overlayManager.disable();
@@ -116,18 +116,18 @@ export default class SoftBrightnessExtension extends Extension {
 
         this._logger.log_debug('Extension disabled');
 
-        this._settings                                   = null;
-        this._logger                                     = null;
-        this._monitorManager                             = null;
-        this._overlayManager                             = null;
-        this._cursorManager                              = null;
-        this._indicatorManager                           = null;
-        this._screenshotManager                          = null;
+        this._settings = null;
+        this._logger = null;
+        this._monitorManager = null;
+        this._overlayManager = null;
+        this._cursorManager = null;
+        this._indicatorManager = null;
+        this._screenshotManager = null;
     }
 
     _on_debug_change() {
         this._logger.set_debug(this._settings.get_boolean('debug'));
-        this._logger.log('debug = '+this._logger.get_debug());
+        this._logger.log('debug = ' + this._logger.get_debug());
     }
 
     // Settings monitoring
@@ -159,12 +159,12 @@ export default class SoftBrightnessExtension extends Extension {
 
     _on_brightness_change(force) {
         let curBrightness = this._getBrightnessLevel();
-        let minBrightness = this._settings.get_double('min-brightness');
+        const minBrightness = this._settings.get_double('min-brightness');
 
-        this._logger.log_debug('_on_brightness_change: current-brightness='+curBrightness+', min-brightness='+minBrightness);
+        this._logger.log_debug('_on_brightness_change: current-brightness=' + curBrightness + ', min-brightness=' + minBrightness);
         if (curBrightness < minBrightness) {
             curBrightness = minBrightness;
-            if (! this._settings.get_boolean('use-backlight')) {
+            if (!this._settings.get_boolean('use-backlight')) {
                 this._indicatorManager.setSliderValue(curBrightness);
             }
             this._storeBrightnessLevel(minBrightness);
@@ -204,11 +204,11 @@ export default class SoftBrightnessExtension extends Extension {
         }
 
         if (this._settings.get_boolean('use-backlight') && proxy.Brightness >= 0) {
-            let convertedBrightness = Math.min(100, Math.round(value * 100.0));
-            this._logger.log_debug('_storeBrightnessLevel('+value+') by proxy -> '+convertedBrightness);
+            const convertedBrightness = Math.min(100, Math.round(value * 100.0));
+            this._logger.log_debug('_storeBrightnessLevel(' + value + ') by proxy -> ' + convertedBrightness);
             proxy.Brightness = convertedBrightness;
         } else {
-            this._logger.log_debug('_storeBrightnessLevel('+value+') by setting');
+            this._logger.log_debug('_storeBrightnessLevel(' + value + ') by setting');
             this._settings.set_double('current-brightness', value);
         }
     }
@@ -223,11 +223,11 @@ export default class SoftBrightnessExtension extends Extension {
         const proxyBrightness = proxy.Brightness;
         if (this._settings.get_boolean('use-backlight') && proxyBrightness >= 0) {
             const convertedBrightness = proxyBrightness / 100.0;
-            this._logger.log_debug('_getBrightnessLevel() by proxy = '+convertedBrightness+' <- '+proxyBrightness);
+            this._logger.log_debug('_getBrightnessLevel() by proxy = ' + convertedBrightness + ' <- ' + proxyBrightness);
             return convertedBrightness;
         } else {
             const brightness = this._settings.get_double('current-brightness');
-            this._logger.log_debug('_getBrightnessLevel() by setting = '+brightness);
+            this._logger.log_debug('_getBrightnessLevel() by setting = ' + brightness);
             return brightness;
         }
     }
@@ -239,7 +239,7 @@ class ScreenshotManager {
         this._logger = logger;
 
         // Set/destroyed by _enableScreenshotPatch/_disableScreenshotPatch
-        this._screenshotRevertFns                        = [];
+        this._screenshotRevertFns = [];
     }
 
     setPreCaptureHook(fn) {
@@ -288,7 +288,7 @@ class ScreenshotManager {
     disable() {
         // Undo monkey-patching of screenshot functions
         this._logger.log_debug('_disableScreenshotPatch()');
-        this._screenshotRevertFns.map(fn => fn());
+        this._screenshotRevertFns.forEach(fn => fn());
         this._screenshotRevertFns = [];
     }
 }
@@ -299,11 +299,11 @@ class IndicatorManager {
         this._logger = logger;
         this._settings = settings;
 
-        this._enableTimeoutId                            = null;
+        this._enableTimeoutId = null;
 
         // Set/destroyed by _enable/_disable
-        this._indicator                                  = null;
-        this._slider                                     = null;
+        this._indicator = null;
+        this._slider = null;
     }
 
     getProxy() {
@@ -337,8 +337,9 @@ class IndicatorManager {
             }
 
             tries += 1;
-            if (tries >= 1)
+            if (tries >= 1) {
                 this._logger.log_debug('Brightness slider not ready, wait (attempt ' + tries + ')');
+            }
             return GLib.SOURCE_CONTINUE;
         });
     }
@@ -361,7 +362,7 @@ class IndicatorManager {
         indicator.__orig__sliderChanged = indicator._sliderChanged;
         indicator._sliderChanged = () => {
             const value = slider.value;
-            this._logger.log_debug('_sliderChanged(slide, '+value+')');
+            this._logger.log_debug('_sliderChanged(slide, ' + value + ')');
             if (this._setBrightnessFn !== null) {
                 this._setBrightnessFn(value);
             }
@@ -393,11 +394,14 @@ class IndicatorManager {
         // If _enableTimeoutId is non-null, _enable() has not run yet, and will
         // not run.  Do not run _disable() in this case.
         GLib.source_remove(this._enableTimeoutId);
-        if (this._enableTimeoutId !== null)
+        if (this._enableTimeoutId !== null) {
             return;
+        }
         this._enableTimeoutId = null;
 
-        if (this._indicator === null) return;
+        if (this._indicator === null) {
+            return;
+        }
 
         const indicator = this._indicator;
         const slider = this._slider;
@@ -429,27 +433,27 @@ class CursorManager {
         this._settings = settings;
         this._overlayManager = overlayManager;
 
-        this._enableTimeoutId                            = null;
-        this._changeHookFn                               = null;
+        this._enableTimeoutId = null;
+        this._changeHookFn = null;
 
-        this._cloneMouseSetting                          = null;
-        this._cloneMouseSettingChangedConnection         = null;
+        this._cloneMouseSetting = null;
+        this._cloneMouseSettingChangedConnection = null;
 
         // Set/destroyed by _enableCloningMouse/_disableCloningMouse
-        this._cursorWantedVisible                        = null;
-        this._cursorTracker                              = null;
-        this._cursorTrackerSetPointerVisible             = null;
-        this._cursorTrackerSetPointerVisibleBound        = null;
-        this._cursorSprite                               = null;
-        this._cursorActor                                = null;
-        this._cursorWatcher                              = null;
-        this._cursorSeat                                 = null;
+        this._cursorWantedVisible = null;
+        this._cursorTracker = null;
+        this._cursorTrackerSetPointerVisible = null;
+        this._cursorTrackerSetPointerVisibleBound = null;
+        this._cursorSprite = null;
+        this._cursorActor = null;
+        this._cursorWatcher = null;
+        this._cursorSeat = null;
         // Set/destroyed by _startCloningMouse / _stopCloningMouse
-        this._cursorWatch                                = null;
-        this._cursorChangedConnection                    = null;
-        this._cursorVisibilityChangedConnection          = null;
+        this._cursorWatch = null;
+        this._cursorChangedConnection = null;
+        this._cursorVisibilityChangedConnection = null;
         // Set/destroyed by _delayedSetPointerInvisible/_clearDelayedSetPointerInvibleCallbacks
-        this._delayedSetPointerInvisibleIdleSource       = null;
+        this._delayedSetPointerInvisibleIdleSource = null;
     }
 
     setChangeHook(fn) {
@@ -483,8 +487,9 @@ class CursorManager {
         // If _enableTimeoutId is non-null, _enable() has not run yet, and will
         // not run.  Do not run _disable() in this case.
         GLib.source_remove(this._enableTimeoutId);
-        if (this._enableTimeoutId !== null)
+        if (this._enableTimeoutId !== null) {
             return;
+        }
         this._enableTimeoutId = null;
         this._changeHookFn = null;
 
@@ -494,20 +499,20 @@ class CursorManager {
         this._cloneMouseSetting = null;
 
         // Set/destroyed by _enableCloningMouse/_disableCloningMouse
-        this._cursorWantedVisible                        = null;
-        this._cursorTracker                              = null;
-        this._cursorTrackerSetPointerVisible             = null;
-        this._cursorTrackerSetPointerVisibleBound        = null;
-        this._cursorSprite                               = null;
-        this._cursorActor                                = null;
-        this._cursorWatcher                              = null;
-        this._cursorSeat                                 = null;
+        this._cursorWantedVisible = null;
+        this._cursorTracker = null;
+        this._cursorTrackerSetPointerVisible = null;
+        this._cursorTrackerSetPointerVisibleBound = null;
+        this._cursorSprite = null;
+        this._cursorActor = null;
+        this._cursorWatcher = null;
+        this._cursorSeat = null;
         // Set/destroyed by _startCloningMouse / _stopCloningMouse
-        this._cursorWatch                                = null;
-        this._cursorChangedConnection                    = null;
-        this._cursorVisibilityChangedConnection          = null;
+        this._cursorWatch = null;
+        this._cursorChangedConnection = null;
+        this._cursorVisibilityChangedConnection = null;
         // Set/destroyed by _delayedSetPointerInvisible/_clearDelayedSetPointerInvibleCallbacks
-        this._delayedSetPointerInvisibleIdleSource       = null;
+        this._delayedSetPointerInvisibleIdleSource = null;
     }
 
     startCloning() {
@@ -525,7 +530,7 @@ class CursorManager {
     }
 
     _on_clone_mouse_change() {
-        let cloneMouse = this._settings.get_boolean('clone-mouse');
+        const cloneMouse = this._settings.get_boolean('clone-mouse');
         if (cloneMouse == this._cloneMouseSetting) {
             this._logger.log_debug('_on_clone_mouse_change(): no setting change, no change');
             return;
@@ -546,7 +551,9 @@ class CursorManager {
     }
 
     _enableCloningMouse() {
-        if (!this._isMouseClonable()) return;
+        if (!this._isMouseClonable()) {
+            return;
+        }
         this._logger.log_debug('_enableCloningMouse()');
 
         this._cursorWantedVisible = true;
@@ -565,36 +572,37 @@ class CursorManager {
     }
 
     _disableCloningMouse() {
-        if (!this._isMouseClonable()) return;
+        if (!this._isMouseClonable()) {
+            return;
+        }
         this._stopCloningShowMouse();
         this._logger.log_debug('_disableCloningMouse()');
 
         Meta.CursorTracker.prototype.set_pointer_visible = this._cursorTrackerSetPointerVisible;
 
-        this._cursorWantedVisible                 = null;
-        this._cursorTracker                       = null;
-        this._cursorTrackerSetPointerVisible      = null;
+        this._cursorWantedVisible = null;
+        this._cursorTracker = null;
+        this._cursorTrackerSetPointerVisible = null;
         this._cursorTrackerSetPointerVisibleBound = null;
-        this._cursorSprite                        = null;
-        this._cursorActor                         = null;
-        this._cursorWatcher                       = null;
-        this._cursorSeat                          = null;
+        this._cursorSprite = null;
+        this._cursorActor = null;
+        this._cursorWatcher = null;
+        this._cursorSeat = null;
     }
 
     _setPointerVisible(visible) {
-        if (!this._isMouseClonable()) return;
-        // this._logger.log_debug('_setPointerVisible('+visible+')');
-        let boundFunc = this._cursorTrackerSetPointerVisibleBound;
-        boundFunc(visible);
+        if (!this._isMouseClonable()) {
+            return;
+        }
+        this._cursorTrackerSetPointerVisibleBound(visible);
     }
 
     _cursorTrackerSetPointerVisibleReplacement(visible) {
-        // this._logger.log_debug('_cursorTrackerSetPointerVisibleReplacement('+visible+')');
         if (visible) {
             this._startCloningMouse();
-            // For some reson, exiting the magnifier causes the
+            // For some reason, exiting the magnifier causes the
             // stacking order for the cursor and overlay actors to be
-            // swapped around.  Reassert stacking over whenever the
+            // swapped around.  Reassert stacking order whenever the
             // pointer should become visible again.
             if (this._changeHookFn !== null) {
                 this._changeHookFn();
@@ -607,15 +615,16 @@ class CursorManager {
     }
 
     _startCloningMouse() {
-        if (!this._isMouseClonable()) return;
+        if (!this._isMouseClonable()) {
+            return;
+        }
         this._logger.log_debug('_startCloningMouse()');
         if (this._cursorWatch == null) {
-
             this._overlayManager.addActor(this._cursorActor);
             this._cursorChangedConnection = this._cursorTracker.connect('cursor-changed', this._updateMouseSprite.bind(this));
             this._cursorVisibilityChangedConnection = this._cursorTracker.connect('visibility-changed', this._updateMouseSprite.bind(this));
-            let interval = 1000 / 60;
-            this._logger.log_debug('_startCloningMouse(): watch interval = '+interval+' ms');
+            const interval = 1000 / 60;
+            this._logger.log_debug('_startCloningMouse(): watch interval = ' + interval + ' ms');
             this._cursorWatch = this._cursorWatcher.addWatch(interval, this._updateMousePosition.bind(this));
 
             this._updateMouseSprite();
@@ -633,8 +642,10 @@ class CursorManager {
     }
 
     _stopCloningShowMouse() {
-        if (!this._isMouseClonable()) return;
-        this._logger.log_debug('_stopCloningShowMouse(), restoring cursor visibility to '+this._cursorWantedVisible);
+        if (!this._isMouseClonable()) {
+            return;
+        }
+        this._logger.log_debug('_stopCloningShowMouse(), restoring cursor visibility to ' + this._cursorWantedVisible);
         this._stopCloningMouse();
         this._setPointerVisible(this._cursorWantedVisible);
 
@@ -648,7 +659,9 @@ class CursorManager {
     }
 
     _stopCloningMouse() {
-        if (!this._isMouseClonable()) return;
+        if (!this._isMouseClonable()) {
+            return;
+        }
         if (this._cursorWatch != null) {
             this._logger.log_debug('_stopCloningMouse()');
 
@@ -668,15 +681,13 @@ class CursorManager {
     }
 
     _updateMousePosition(actor, event) {
-        // this._logger.log_debug('_updateMousePosition()');
-        let [x, y, mask] = global.get_pointer();
+        const [x, y, mask] = global.get_pointer();
         this._cursorActor.set_position(x, y);
         this._delayedSetPointerInvisible();
     }
 
     _updateMouseSprite() {
-        // this._logger.log_debug('_updateMouseSprite()');
-        let sprite = this._cursorTracker.get_sprite();
+        const sprite = this._cursorTracker.get_sprite();
         if (sprite) {
             this._cursorSprite.content.texture = sprite;
             this._cursorSprite.show();
@@ -684,7 +695,7 @@ class CursorManager {
             this._cursorSprite.hide();
         }
 
-        let [xHot, yHot] = this._cursorTracker.get_hot();
+        const [xHot, yHot] = this._cursorTracker.get_hot();
         this._cursorSprite.set({
             translation_x: -xHot,
             translation_y: -yHot,
@@ -693,18 +704,18 @@ class CursorManager {
     }
 
     _delayedSetPointerInvisible() {
-        // this._logger.log('_delayedSetPointerInvisible()');
         this._setPointerVisible(false);
 
         // Clear the pointer upon entering idle loop
         if (this._delayedSetPointerInvisibleIdleSource == null) {
             this._delayedSetPointerInvisibleIdleSource = GLib.idle_add(
                 GLib.PRIORITY_DEFAULT,
-                (function() {
+                () => {
                     this._setPointerVisible(false);
                     this._delayedSetPointerInvisibleIdleSource = null;
                     return false;
-                }).bind(this));
+                }
+            );
         }
     }
 
@@ -723,10 +734,10 @@ class OverlayManager {
         this._settings = settings;
         this._monitorManager = monitorManager;
 
-        this._overlays                                   = null;
-        this._actorGroup                                 = null;
-        this._actorAddedConnection                       = null;
-        this._actorRemovedConnection                     = null;
+        this._overlays = null;
+        this._actorGroup = null;
+        this._actorAddedConnection = null;
+        this._actorRemovedConnection = null;
     }
 
     enable() {
@@ -735,7 +746,7 @@ class OverlayManager {
         Shell.util_set_hidden_from_pick(this._actorGroup, true);
         global.stage.add_actor(this._actorGroup);
 
-        this._actorAddedConnection   = global.stage.connect('actor-added',   this._restackOverlays.bind(this));
+        this._actorAddedConnection = global.stage.connect('actor-added',   this._restackOverlays.bind(this));
         this._actorRemovedConnection = global.stage.connect('actor-removed', this._restackOverlays.bind(this));
     }
 
@@ -743,7 +754,7 @@ class OverlayManager {
         global.stage.disconnect(this._actorAddedConnection);
         global.stage.disconnect(this._actorRemovedConnection);
 
-        this._actorAddedConnection   = null;
+        this._actorAddedConnection = null;
         this._actorRemovedConnection = null;
 
         this.hideOverlays(true);
@@ -778,7 +789,7 @@ class OverlayManager {
         this._logger.log_debug('_restackOverlays()');
         this._actorGroup.get_parent().set_child_above_sibling(this._actorGroup, null);
         if (this._overlays != null) {
-            for (let i=0; i < this._overlays.length; ++i) {
+            for (let i = 0; i < this._overlays.length; i++) {
                 this._actorGroup.set_child_above_sibling(this._overlays[i], null);
             }
         }
@@ -788,31 +799,31 @@ class OverlayManager {
     }
 
     showOverlays(brightness, force) {
-        this._logger.log_debug('_showOverlays('+brightness+', '+force+')');
+        this._logger.log_debug('_showOverlays(' + brightness + ', ' + force + ')');
         if (this._overlays == null || force) {
-            let monitors = this._monitorManager.getMonitors();
+            const monitors = this._monitorManager.getMonitors();
             if (force) {
                 this.hideOverlays(false);
             }
-            let preventUnredirect = this._settings.get_string('prevent-unredirect');
-            switch(preventUnredirect) {
-            case 'always':
-            case 'when-correcting':
-                this._preventUnredirect();
-                break;
-            case 'never':
-                this._allowUnredirect();
-                break;
-            default:
-                this._logger.log('_showOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
-                break;
+            const preventUnredirect = this._settings.get_string('prevent-unredirect');
+            switch (preventUnredirect) {
+                case 'always':
+                case 'when-correcting':
+                    this._preventUnredirect();
+                    break;
+                case 'never':
+                    this._allowUnredirect();
+                    break;
+                default:
+                    this._logger.log('_showOverlays(): Unexpected prevent-unredirect="' + preventUnredirect + '"');
+                    break;
             }
 
             this._overlays = [];
-            for (let i=0; i < monitors.length; ++i) {
-                let monitor = monitors[i];
-                this._logger.log_debug('Create overlay #'+i+': '+monitor.width+'x'+monitor.height+'@'+monitor.x+','+monitor.y);
-                let overlay = new St.Label({
+            for (let i = 0; i < monitors.length; i++) {
+                const monitor = monitors[i];
+                this._logger.log_debug('Create overlay #' + i + ': ' + monitor.width + 'x' + monitor.height + '@' + monitor.x + ',' + monitor.y);
+                const overlay = new St.Label({
                     style: 'border-radius: 0px; background-color: rgba(0,0,0,1);',
                     text: '',
                 });
@@ -825,17 +836,17 @@ class OverlayManager {
             }
         }
 
-        let opacity = (1.0-brightness)*255;
-        for (let i=0; i < this._overlays.length; ++i) {
-            this._logger.log_debug('_showOverlay(): set opacity '+opacity+' on overlay #'+i);
+        const opacity = (1.0 - brightness) * 255;
+        for (let i = 0; i < this._overlays.length; i++) {
+            this._logger.log_debug('_showOverlay(): set opacity ' + opacity + ' on overlay #' + i);
             this._overlays[i].opacity = opacity;
         }
     }
 
     hideOverlays(forceUnpreventUnredirect) {
         if (this._overlays != null) {
-            this._logger.log_debug('_hideOverlays(): drop overlays, count='+this._overlays.length);
-            for (let i=0; i < this._overlays.length; ++i) {
+            this._logger.log_debug('_hideOverlays(): drop overlays, count=' + this._overlays.length);
+            for (let i = 0; i < this._overlays.length; i++) {
                 this._actorGroup.remove_actor(this._overlays[i]);
             }
             this._overlays = null;
@@ -845,23 +856,23 @@ class OverlayManager {
         if (forceUnpreventUnredirect) {
             preventUnredirect = 'never';
         }
-        switch(preventUnredirect) {
-        case 'always':
-            this._preventUnredirect();
-            break;
-        case 'when-correcting':
-        case 'never':
-            this._allowUnredirect();
-            break;
-        default:
-            this._logger.log('_hideOverlays(): Unexpected prevent-unredirect="'+preventUnredirect+'"');
-            break;
+        switch (preventUnredirect) {
+            case 'always':
+                this._preventUnredirect();
+                break;
+            case 'when-correcting':
+            case 'never':
+                this._allowUnredirect();
+                break;
+            default:
+                this._logger.log('_hideOverlays(): Unexpected prevent-unredirect="' + preventUnredirect + '"');
+                break;
         }
     }
 
     _preventUnredirect() {
-        if (! this._unredirectPrevented) {
-            this._logger.log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
+        if (!this._unredirectPrevented) {
+            this._logger.log_debug('_preventUnredirect(): disabling unredirects, prevent-unredirect=' + this._settings.get_string('prevent-unredirect'));
             Meta.disable_unredirect_for_display(global.display);
             this._unredirectPrevented = true;
         }
@@ -869,7 +880,7 @@ class OverlayManager {
 
     _allowUnredirect() {
         if (this._unredirectPrevented) {
-            this._logger.log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect='+this._settings.get_string('prevent-unredirect'));
+            this._logger.log_debug('_allowUnredirect(): enabling unredirects, prevent-unredirect=' + this._settings.get_string('prevent-unredirect'));
             Meta.enable_unredirect_for_display(global.display);
             this._unredirectPrevented = false;
         }
@@ -884,16 +895,16 @@ class MonitorManager {
         this._extPath = extPath;
 
         this._monitorsChangedConnection = null;
-        this._displayConfigProxy        = null;
-        this._backendManager            = null;
-        this._monitorNames              = null;
-        this._changeHookFn              = null;
+        this._displayConfigProxy = null;
+        this._backendManager = null;
+        this._monitorNames = null;
+        this._changeHookFn = null;
     }
 
     enable() {
         this._logger.log_debug('_enableMonitor2ing()');
         this._backendManager = global.backend.get_monitor_manager();
-        Utils.newDisplayConfig(this._extPath, (function(proxy, error) {
+        Utils.newDisplayConfig(this._extPath, (proxy, error) => {
             if (error) {
                 this._logger.log('newDisplayConfig() callback: Cannot get Display Config: ' + error);
                 return;
@@ -901,7 +912,7 @@ class MonitorManager {
             this._logger.log_debug('newDisplayConfig() callback');
             this._displayConfigProxy = proxy;
             this._on_monitors_change();
-        }).bind(this));
+        });
 
         this._monitorsChangedConnection = Main.layoutManager.connect('monitors-changed', this._on_monitors_change.bind(this));
     }
@@ -915,10 +926,10 @@ class MonitorManager {
         this._settings = null;
 
         this._monitorsChangedConnection = null;
-        this._displayConfigProxy        = null;
-        this._backendManager            = null;
-        this._monitorNames              = null;
-        this._changeHookFn              = null;
+        this._displayConfigProxy = null;
+        this._backendManager = null;
+        this._monitorNames = null;
+        this._changeHookFn = null;
     }
 
     setChangeHook(fn) {
@@ -930,9 +941,9 @@ class MonitorManager {
     }
 
     getMonitors() {
-        let enabledMonitors = this._settings.get_string('monitors');
+        const enabledMonitors = this._settings.get_string('monitors');
         let monitors;
-        this._logger.log_debug('_showOverlays(): enabledMonitors="'+enabledMonitors+'"');
+        this._logger.log_debug('_showOverlays(): enabledMonitors="' + enabledMonitors + '"');
         if (enabledMonitors == 'all') {
             monitors = Main.layoutManager.monitors;
         } else if (enabledMonitors == 'built-in' || enabledMonitors == 'external') {
@@ -941,22 +952,22 @@ class MonitorManager {
                 return null;
             }
             let builtinMonitorName = this._settings.get_string('builtin-monitor');
-            this._logger.log_debug('_showOverlays(): builtinMonitorName="'+builtinMonitorName+'"');
+            this._logger.log_debug('_showOverlays(): builtinMonitorName="' + builtinMonitorName + '"');
             if (builtinMonitorName == '' || builtinMonitorName == null) {
                 builtinMonitorName = this._monitorNames[Main.layoutManager.primaryIndex];
-                this._logger.log_debug('_showOverlays(): no builtin monitor, setting to "'+builtinMonitorName+'" and skipping run');
+                this._logger.log_debug('_showOverlays(): no builtin monitor, setting to "' + builtinMonitorName + '" and skipping run');
                 this._settings.set_string('builtin-monitor', builtinMonitorName);
                 return null;
             }
             monitors = [];
-            for (let i=0; i < Main.layoutManager.monitors.length; ++i) {
+            for (let i = 0; i < Main.layoutManager.monitors.length; i++) {
                 if ((enabledMonitors == 'built-in' && this._monitorNames[i] == builtinMonitorName) ||
                     (enabledMonitors == 'external' && this._monitorNames[i] != builtinMonitorName)) {
                     monitors.push(Main.layoutManager.monitors[i]);
                 }
             }
         } else {
-            this._logger.log('_showOverlays(): Unhandled "monitors" setting = '+enabledMonitors);
+            this._logger.log('_showOverlays(): Unhandled "monitors" setting = ' + enabledMonitors);
             return null;
         }
         return monitors;
@@ -968,16 +979,16 @@ class MonitorManager {
             return;
         }
         this._logger.log_debug('_on_monitors_change()');
-        Utils.getMonitorConfig(this._displayConfigProxy, (function(result, error) {
+        Utils.getMonitorConfig(this._displayConfigProxy, (result, error) => {
             if (error) {
-                this._logger.log('_on_monitors_change(): cannot get Monitor Config: '+error);
+                this._logger.log('_on_monitors_change(): cannot get Monitor Config: ' + error);
                 return;
             }
-            let monitorNames = [];
-            for (let i=0; i < result.length; ++i) {
-                let [monitorName, connectorName] = result[i];
-                let monitorIndex = this._backendManager.get_monitor_for_connector(connectorName);
-                this._logger.log_debug('_on_monitors_change(): monitor="'+monitorName+'", connector="'+connectorName+'", index='+monitorIndex);
+            const monitorNames = [];
+            for (let i = 0; i < result.length; i++) {
+                const [monitorName, connectorName] = result[i];
+                const monitorIndex = this._backendManager.get_monitor_for_connector(connectorName);
+                this._logger.log_debug('_on_monitors_change(): monitor="' + monitorName + '", connector="' + connectorName + '", index=' + monitorIndex);
                 if (monitorIndex >= 0) {
                     monitorNames[monitorIndex] = monitorName;
                 }
@@ -986,6 +997,6 @@ class MonitorManager {
             if (this._changeHookFn !== null) {
                 this._changeHookFn();
             }
-        }).bind(this));
+        });
     }
 }

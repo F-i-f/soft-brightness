@@ -19,12 +19,12 @@ import Gio from 'gi://Gio';
 
 let cachedDisplayConfigProxy = null;
 
-function getDisplayConfigProxy(ext_path) {
+function getDisplayConfigProxy(extPath) {
     if (cachedDisplayConfigProxy == null) {
         let xml = null;
-        const file = Gio.File.new_for_path(ext_path + '/dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml');
+        const file = Gio.File.new_for_path(extPath + '/dbus-interfaces/org.gnome.Mutter.DisplayConfig.xml');
         try {
-            let [ok, bytes] = file.load_contents(null);
+            const [ok, bytes] = file.load_contents(null);
             if (ok) {
                 xml = new TextDecoder().decode(bytes);
             }
@@ -37,37 +37,39 @@ function getDisplayConfigProxy(ext_path) {
     return cachedDisplayConfigProxy;
 }
 
-export function newDisplayConfig(ext_path, callback) {
-    const DisplayConfigProxy = getDisplayConfigProxy(ext_path);
-    new DisplayConfigProxy(Gio.DBus.session,
-                           'org.gnome.Mutter.DisplayConfig',
-                           '/org/gnome/Mutter/DisplayConfig',
-                           callback);
+export function newDisplayConfig(extPath, callback) {
+    const DisplayConfigProxy = getDisplayConfigProxy(extPath);
+    new DisplayConfigProxy(
+        Gio.DBus.session,
+        'org.gnome.Mutter.DisplayConfig',
+        '/org/gnome/Mutter/DisplayConfig',
+        callback
+    );
 }
 
 export function getMonitorConfig(displayConfigProxy, callback) {
-    displayConfigProxy.GetResourcesRemote((function(result) {
+    displayConfigProxy.GetResourcesRemote((result) => {
         if (result.length <= 2) {
             callback(null, 'Cannot get DisplayConfig: No outputs in GetResources()');
         } else {
-            let monitors = [];
-            for (let i = 0; i < result[2].length; ++i) {
-                let output = result[2][i];
+            const monitors = [];
+            for (let i = 0; i < result[2].length; i++) {
+                const output = result[2][i];
                 if (output.length <= 7) {
                     callback(null, 'Cannot get DisplayConfig: No properties on output #' + i);
                     return;
                 }
-                let props = output[7];
-                let display_name = props['display-name'].get_string()[0];
-                let connector_name = output[4];
-                if (! display_name || display_name == '') {
-                    let display_name = 'Monitor on output '+connector_name;
+                const props = output[7];
+                const displayName = props['display-name'].get_string()[0];
+                const connectorName = output[4];
+                if (!displayName || displayName == '') {
+                    const displayName = 'Monitor on output ' + connectorName;
                 }
-                monitors.push([display_name, connector_name]);
+                monitors.push([displayName, connectorName]);
             }
             callback(monitors, null);
         }
-    }).bind(this));
+    });
 }
 
 // Patches the given function with a preHook.  Returns a callback that,
