@@ -64,6 +64,10 @@ export default class SoftBrightnessExtension extends Extension {
             this._on_brightness_change(true);
         });
 
+        this._overlayManager.setRestackHook(() => {
+            this._cursorManager.hidePointer();
+        });
+
         this._cursorManager.setChangeHook(() => {
             this._on_brightness_change(true);
         });
@@ -80,8 +84,7 @@ export default class SoftBrightnessExtension extends Extension {
         this._screenshotManager.setPreCaptureHook(() => {
             this._overlayManager.hideOverlays(false);
             this._cursorManager.stopCloning();
-            // TODO: Double-check that this call is not needed.
-            //this._cursorManager._setPointerVisible(false);
+            this._cursorManager.hidePointer();
         });
 
         this._screenshotManager.setPostCaptureHook(() => {
@@ -525,6 +528,10 @@ class CursorManager {
         this._stopCloningShowMouse();
     }
 
+    hidePointer() {
+        this._setPointerVisible(false);
+    }
+
     _isMouseClonable() {
         return this._cloneMouseSetting;
     }
@@ -738,6 +745,11 @@ class OverlayManager {
         this._actorGroup = null;
         this._actorAddedConnection = null;
         this._actorRemovedConnection = null;
+        this._restackHookFn = null;
+    }
+
+    setRestackHook(fn) {
+        this._restackHookFn = fn;
     }
 
     enable() {
@@ -763,6 +775,8 @@ class OverlayManager {
         global.stage.remove_actor(this._actorGroup);
         this._actorGroup.destroy();
         this._actorGroup = null;
+
+        this._restackHookFn = null;
     }
 
     resetSize() {
@@ -788,13 +802,13 @@ class OverlayManager {
     _restackOverlays() {
         this._logger.log_debug('_restackOverlays()');
         this._actorGroup.get_parent().set_child_above_sibling(this._actorGroup, null);
-        if (this._overlays != null) {
+        if (this._overlays !== null) {
             for (let i = 0; i < this._overlays.length; i++) {
                 this._actorGroup.set_child_above_sibling(this._overlays[i], null);
             }
         }
-        if (this._overlays != null) {
-            this._setPointerVisible(false);
+        if (this._overlays !== null && this._restackHookFn !== null) {
+            this._restackHookFn();
         }
     }
 
