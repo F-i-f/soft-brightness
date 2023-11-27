@@ -241,6 +241,16 @@ gnome-extensions install soft-brightness-plus@joelkitching.com.v36.shell-extensi
 
 ## Changelog
 
+### Version 37
+#### November 17, 2023
+
+- Re-implement preferences window using Adw.ActionRow.
+  This conveniently sidesteps the "window too small" issue.
+- Split main class into multiple compartmentalized classes.
+- Add my name to copyright message in preferences window.
+- Fix up code for style and consistency.
+- Re-implement logger.js instead of using meson-gse.
+
 ### Version 36
 #### October 31, 2023
 
