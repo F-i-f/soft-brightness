@@ -1,21 +1,21 @@
-<schemalist gettext-domain="soft-brightness">
-  <enum id="org.gnome.shell.extensions.soft-brightness.monitors">
+<schemalist gettext-domain="soft-brightness-plus">
+  <enum id="org.gnome.shell.extensions.soft-brightness-plus.monitors">
     <value value="0" nick="all"/>
     <value value="1" nick="built-in"/>
     <value value="2" nick="external"/>
   </enum>
-  <enum id="org.gnome.shell.extensions.soft-brightness.prevent-unredirect">
+  <enum id="org.gnome.shell.extensions.soft-brightness-plus.prevent-unredirect">
     <value value="0" nick="never"/>
     <value value="1" nick="when-correcting"/>
     <value value="2" nick="always"/>
   </enum>
-  <schema id="org.gnome.shell.extensions.soft-brightness" path="/org/gnome/shell/extensions/soft-brightness/">
+  <schema id="org.gnome.shell.extensions.soft-brightness-plus" path="/org/gnome/shell/extensions/soft-brightness-plus/">
     <key name="use-backlight" type="b">
       <default>false</default>
       <summary>Use backlight control.</summary>
       <description>Use the regular backlight control.</description>
     </key>
-    <key name="monitors" enum="org.gnome.shell.extensions.soft-brightness.monitors">
+    <key name="monitors" enum="org.gnome.shell.extensions.soft-brightness-plus.monitors">
       <default>"all"</default>
       <summary>Monitors.</summary>
       <description>The monitors whose brightness should be adjusted.</description>
@@ -25,7 +25,7 @@
       <summary>Builtin monitor.</summary>
       <description>The name of the built-in monitor.</description>
     </key>
-    <key name="prevent-unredirect" enum="org.gnome.shell.extensions.soft-brightness.prevent-unredirect">
+    <key name="prevent-unredirect" enum="org.gnome.shell.extensions.soft-brightness-plus.prevent-unredirect">
       <default>"when-correcting"</default>
       <summary>Prevent window unredirecting behavior.</summary>
       <description>If set to never, unredirection is never

@@ -1,11 +1,11 @@
-# Czech translations for soft-brightness package.
-# Copyright (C) 2019, 2020 THE soft-brightness'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the soft-brightness package.
+# Czech translations for soft-brightness-plus package.
+# Copyright (C) 2019, 2020 THE soft-brightness-plus'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the soft-brightness-plus package.
 # Philippe Troin, 2019, 2020.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: soft-brightness\n"
+"Project-Id-Version: soft-brightness-plus\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 08:06-0800\n"
 "PO-Revision-Date: 2022-03-02 08:08-0800\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: src/prefs.js:51
-msgid "Soft Brightness"
+msgid "Soft Brightness Plus"
 msgstr "Softwarová regulace jasu"
 
 #: src/prefs.js:61
@@ -83,35 +83,35 @@ msgid ""
 "i-f</a> on GitHub)"
 msgstr "Autorská práva © 2019-2022 Philippe Troin (<a href=\"https://github.com/F-i-f\">F-i-f</a> na portálu GitHub)"
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:15
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:15
 msgid "Use backlight control."
 msgstr "Použít ovládání podsvícení."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:16
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:16
 msgid "Use the regular backlight control."
 msgstr "Použít ovládání jasu v hardware."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:20
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:20
 msgid "Monitors."
 msgstr "Monitory."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:21
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:21
 msgid "The monitors whose brightness should be adjusted."
 msgstr "Monitory, kterých jas upravit."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:25
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:25
 msgid "Builtin monitor."
 msgstr "Vestavěný displej."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:26
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:26
 msgid "The name of the built-in monitor."
 msgstr "Název pro vestavěný displej."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:30
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:30
 msgid "Prevent window unredirecting behavior."
 msgstr "Prevence nepřesměrovávání oken."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:31
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:31
 msgid ""
 "If set to never, unredirection is never prevented. If set to when-"
 "correcting, unredirection will be prevented when the brightness is not at "
@@ -124,27 +124,27 @@ msgstr ""
 "nepřesměrovávání oken bude bráněno vždy, když je toto rozšíření aktivní, "
 "čímž se zabrání záškubům při zobrazování (vertikální synchronizace)."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:41
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:41
 msgid "Minimum brightness."
 msgstr "Minimální jas."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:42
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:42
 msgid "Minimum brightness level."
 msgstr "Minimální úroveň jasu."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:47
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:47
 msgid "Current brightness level."
 msgstr "Stávající úroveň jasu."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:48
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:48
 msgid "The current brightness level."
 msgstr "Stávající úroveň jasu."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:52
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:52
 msgid "Mouse cursor brightness control."
 msgstr ""
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:53
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:53
 msgid ""
 "When enabled, the mouse cursor follows the brightness setting. When "
 "disabled, the mouse cursor always remains at full brightness. Controlling "
@@ -154,10 +154,10 @@ msgid ""
 "accessibility feature), the cursor will follow the screen brightness."
 msgstr ""
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:65
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:65
 msgid "Debugging."
 msgstr "Ladění."
 
-#: schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml:66
+#: schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml:66
 msgid "Enable debugging for the extension."
 msgstr "Zapnout ladící režim rozšíření."

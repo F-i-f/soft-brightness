@@ -1,4 +1,5 @@
+src/cursor.js
 src/extension.js
 src/prefs.js
 src/utils.js
-schemas/org.gnome.shell.extensions.soft-brightness.gschema.xml
+schemas/org.gnome.shell.extensions.soft-brightness-plus.gschema.xml

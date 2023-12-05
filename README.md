@@ -1,12 +1,10 @@
-# Soft Brightness Gnome Shell Extension
+# Soft Brightness Plus Gnome Shell Extension
 
-[![Build Status](https://travis-ci.org/F-i-f/soft-brightness.svg?branch=master)](https://travis-ci.org/F-i-f/soft-brightness)
-
-![Brightness slider in Gnome Shell's system menu](docs/soft-brightness.png)
+![Brightness slider in Gnome Shell's system menu](docs/soft-brightness-plus.png)
 
 ## Overview
 
-Soft Brightness uses an alpha overlay to control the brightness on all
+Soft Brightness Plus uses an alpha overlay to control the brightness on all
 or some of your monitors.  It integrates smoothly and does not
 interfere with other Gnome Shell features.  It works flawlessly with
 the _Night Light_, the _Magnifier_ from the Accessibility Services, or
@@ -14,7 +12,7 @@ with screen captures (as long as they are initiated by Gnome Shell).
 
 Common uses are:
 
-- Your laptop has no back-light, maybe because it's not supported, or
+- Your laptop has no backlight, maybe because it's not supported, or
   you have an OLED display.
 
 - You want to control the brightness level of external monitor like
@@ -30,30 +28,30 @@ Bonus features:
 
 ## Configuration
 
-Soft Brightness comes with a configuration panel, which can be
+Soft Brightness Plus comes with a configuration panel, which can be
 accessed from the "Tweaks" application or the [Gnome Shell Extensions
 page](https://extensions.gnome.org/local/).
 
-![Soft Brightness preference panel](docs/preferences.png)
+![Soft Brightness Plus preference panel](docs/preferences.png)
 
 ### Configuration Settings
 
 #### _Use backlight control_
 
-When enabled, Soft Brightness will work together with your computer's
-back-light.  The brightness slider and keyboard brightness hotkeys
-will control both the back-light and the Soft Brightness overlays.
+When enabled, Soft Brightness Plus will work together with your computer's
+backlight.  The brightness slider and keyboard brightness hotkeys
+will control both the backlight and the Soft Brightness Plus overlays.
 This is most useful:
 
-- if you have a back-light and  _Monitors_ is set to _External_, or
+- if you have a backlight and  _Monitors_ is set to _External_, or
 
-- if a back-light is detected by Gnome but is not working (like some
-  OLED panel laptops which report having a back-light brightness which
+- if a backlight is detected by Gnome but is not working (like some
+  OLED panel laptops which report having a backlight brightness which
   doesn't exist).  In that latter case _Monitors_ should be set to
   _All_.
 
 If _Use backlight control_ is disabled, the Brightness slider will
-only control the Soft Brightness overlays.  The keyboard brightness
+only control the Soft Brightness Plus overlays.  The keyboard brightness
 hotkeys will keep their default bindings.
 
 #### _Monitor(s)_
@@ -102,7 +100,7 @@ Choose one of:
   brightness overlay is active (brightness is 100%).  Applications
   will then always be rendered
   [tear-free](https://en.wikipedia.org/wiki/Screen_tearing), whatever
-  the brightness may be. In this mode, Soft Brightness can be used as
+  the brightness may be. In this mode, Soft Brightness Plus can be used as
   a replacement for extensions like _Fix Fullscreen Tearing_.
 
 #### _Minimum brightness_
@@ -110,7 +108,7 @@ Choose one of:
 Sets the minimum allowable brightness for the display where _0_ is
 completely dark and _1_ completely bright. Defaults to _0.1_ (10%).
 
-The minimum brightness will also be enforced for the panel back-light
+The minimum brightness will also be enforced for the panel backlight
 if _Use backlight control_ is on.
 
 When the brightness is set to 0%, the display will go completely dark,
@@ -133,32 +131,32 @@ brightness will always follow the screen's.
 
 #### _Debug_
 
-When toggled on, Soft Brightness will log extra debugging information
+When toggled on, Soft Brightness Plus will log extra debugging information
 to the system journal (or syslog).
 
 This will be useful if you encounter a bug:  In that case, please turn
 _Debug_ on, and try to reproduce the issue with that setting before
 capturing the debug logging.
 
-Soft Brightness's debug messages can be watched with:
+Soft Brightness Plus's debug messages can be watched with:
 
 ```
-journalctl -f | grep 'gnome-shell.*Soft-Brightness'
+journalctl -f | grep 'gnome-shell.*soft-brightness-plus'
 ```
 
 ### Effect on power consumption
 
-Soft Brightness will cause extra load on the hardware and therefore
+Soft Brightness Plus will cause extra load on the hardware and therefore
 slightly increase power usage, as it needs to add extra alpha layers
 and track the mouse among other things.  This is true of any Gnome
 Shell extension.
 
-If Soft Brightness controls an LCD panel, changing the brightness will
-not change at all the panel's power consumption.  Use the back-light
-instead:  Changing the back-light brightness will affect power
+If Soft Brightness Plus controls an LCD panel, changing the brightness will
+not change at all the panel's power consumption.  Use the backlight
+instead:  Changing the backlight brightness will affect power
 consumption, the lower the brightness, the lower the power usage.
 
-If Soft Brightness controls an OLED panel, changing the brightness
+If Soft Brightness Plus controls an OLED panel, changing the brightness
 will affect power consumption, the lower the brightness, the lower the
 power usage.
 
@@ -166,17 +164,17 @@ power usage.
 
 #### You have a desktop computer
 
-Soft Brightness can be used to control the brightness of all your
+Soft Brightness Plus can be used to control the brightness of all your
 attached monitors:
 
 - Set _Use backlight control_ to _Off_.
 
 - Set _Monitor(s)_ to _All_.
 
-#### You have a laptop computer with a back-light
+#### You have a laptop computer with a backlight
 
-You can leave the control of your attached display to the back-light
-and use Soft Brightness to control the brightness of external
+You can leave the control of your attached display to the backlight
+and use Soft Brightness Plus to control the brightness of external
 displays:
 
 - Set _Use backlight control_ to _On_.
@@ -185,10 +183,10 @@ displays:
 
 - Configure _Built-in monitor_ to your built-in panel's name.
 
-#### You have a laptop computer without a back-light
+#### You have a laptop computer without a backlight
 
-For example an OLED panel or non-functional back-light.  Have
-Soft-Brightness control the brightness for all your monitors:
+For example an OLED panel or non-functional backlight.  Have
+Soft Brightness Plus control the brightness for all your monitors:
 
 - Set _Use backlight control_ to _On_.
 
@@ -196,7 +194,7 @@ Soft-Brightness control the brightness for all your monitors:
 
 ## License
 
-Soft Brightness is free software: you can redistribute it and/or
+Soft Brightness Plus is free software: you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
@@ -212,15 +210,15 @@ along with this program.  If not, see [http://www.gnu.org/licenses/].
 ## Download / Install
 
 Install directly from the [Gnome Shell Extensions
-site](https://extensions.gnome.org/extension/1625/soft-brightness/).
+site](https://extensions.gnome.org/extension/5943/soft-brightness-plus/).
 
 Or download the [zip
-file](https://github.com/F-i-f/soft-brightness/releases/download/v30/soft-brightness@fifi.org.v30.shell-extension.zip)
+file](https://github.com/jkitching/soft-brightness/releases/download/v36/soft-brightness-plus@joelkitching.com.v36.shell-extension.zip)
 from the GitHub [releases
-page](https://github.com/F-i-f/soft-brightness/releases) and run:
+page](https://github.com/jkitching/soft-brightness-plus/releases) and run:
 
 ``` shell
-gnome-extensions install soft-brightness@fifi.org.v30.shell-extension.zip
+gnome-extensions install soft-brightness-plus@joelkitching.com.v36.shell-extension.zip
 ```
 
 ## Building from source
@@ -231,9 +229,9 @@ gnome-extensions install soft-brightness@fifi.org.v30.shell-extension.zip
 
 ### Running the build
 
-- Check out: `git clone https://github.com/F-i-f/soft-brightness`
+- Check out: `git clone https://github.com/jkitching/soft-brightness-plus`
 
-- `cd soft-brightness`
+- `cd soft-brightness-plus`
 
 - Run meson: `meson build`
 
@@ -242,6 +240,74 @@ gnome-extensions install soft-brightness@fifi.org.v30.shell-extension.zip
 - To build the extension zip files, run: `ninja -C build extension.zip`, the extension will be found under `build/extension.zip`.
 
 ## Changelog
+
+### Version 37
+#### November 17, 2023
+
+- Re-implement preferences window using Adw.ActionRow.
+  This conveniently sidesteps the "window too small" issue.
+- Split main class into multiple compartmentalized classes.
+- Add my name to copyright message in preferences window.
+- Fix up code for style and consistency.
+- Re-implement logger.js instead of using meson-gse.
+
+### Version 36
+#### October 31, 2023
+
+- Changes requested by extensions.gnome.org code review of v35.
+- Update copyright notices at top of files to include my name.
+
+### Version 35
+#### October 20, 2023
+
+- Rewrite to support GNOME 45.  Since it is now required to
+  use ECMAScript modules, and since the `import` and `export`
+  mechanisms are not compatible with previous GNOME versions,
+  declare compatibility bankruptcy, and drop all support for
+  previous GNOME versions.
+- Code is vastly simplified by removing all of the workarounds
+  to support multiple versions of GNOME with the same file.
+- Since the GNOME extensions website supports hosting multiple
+  builds for different GNOME versions, simply leave all GNOME
+  versions prior to 45 using Soft Brightness Plus v34.
+- If bugfixes need to be made to version 34, a branch can be
+  cut, and fixes can be applied there.
+- Rewrite `enable()` function as async in order to wait for the
+  existence of `quickSettings._brightness`.
+- Hard-code width and height of the preferences window, since
+  after converting it to use Adw, the default width is not
+  large enough to contain all widgets.
+
+### Version 34
+#### May 1, 2023
+
+- Rewrite and simplify screenshot functionality.  No longer
+  need to handle cases for different GNOME versions.
+- Code formatting: re-tabbing and other minor changes.
+
+### Version 33
+#### April 28, 2023
+
+- Fix a bug which broke disabling and enabling the extension,
+  due to `ScreenshotClass` getting registered multiple times.
+- Rename project to "Soft Brightness Plus".  Ensure consistent
+  capitalization and formatting of the name.
+
+### Version 32
+#### April 10, 2023
+
+- Fix a bug in checking for `global.backend` before use.
+- These changes were requested as part of review on
+  extensions.gnome.org:
+  - Drop support for unstable GNOME releases 3.33 and 3.35.
+  - Refactor `ScreenshotClass` creation to include access to
+    `softBrightnessExtension` via closure.
+  - Stop storing reference to extension as a global.
+
+### Version 31
+#### April 6, 2023
+
+- Support Gnome Shell 43 and 44.
 
 ### Version 30
 #### May 20, 2022
@@ -503,16 +569,3 @@ First public release.
 
 - The [`meson-gse` credits](https://github.com/F-i-f/meson-gse/) are
   included here by reference.
-
-<!--  LocalWords:  OLED VSync extensions' Changelog README md GPLv3 X11
- -->
-<!--  LocalWords:  gse gettext DND js ES6 backlight applications' syslog
- -->
-<!--  LocalWords:  unredirect compositing unredirecting composited eg
- -->
-<!--  LocalWords:  fullscreen merchantability Wayland Xorg gdm Gitlab
- -->
-<!--  LocalWords:  bo kludgy gjs CursorSprite mozjs Vistaus gse's
- -->
-<!--  LocalWords:  getSettings initTranslations ExtensionUtils
- -->
